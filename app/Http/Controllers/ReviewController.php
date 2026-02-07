@@ -63,4 +63,76 @@ class ReviewController extends Controller
         $review->delete();
         return back()->with('success', 'Ulasan berhasil dihapus');
     }
+
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Build query based on user role
+        $query = Review::with(['book', 'user']);
+        
+        // User can only see their own reviews
+        if ($user->isUser()) {
+            $query->where('user_id', $user->id);
+        }
+        // Admin and Petugas can see all reviews
+        
+        // Filter by rating
+        if ($request->filled('rating')) {
+            $query->where('rating', $request->rating);
+        }
+        
+        // Filter by book
+        if ($request->filled('book_id')) {
+            $query->where('book_id', $request->book_id);
+        }
+        
+        // Search by review content or user name
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('review', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('book', function($q) use ($search) {
+                      $q->where('title', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        $reviews = $query->orderBy('created_at', 'desc')->paginate(15);
+        
+        // Statistics for Admin/Petugas
+        $stats = null;
+        if ($user->isAdmin() || $user->isPetugas()) {
+            $stats = [
+                'total_reviews' => Review::count(),
+                'average_rating' => round(Review::avg('rating'), 1),
+                'five_star' => Review::where('rating', 5)->count(),
+                'four_star' => Review::where('rating', 4)->count(),
+                'three_star' => Review::where('rating', 3)->count(),
+                'two_star' => Review::where('rating', 2)->count(),
+                'one_star' => Review::where('rating', 1)->count(),
+            ];
+        }
+        
+        // Get books for filter dropdown
+        $books = Book::orderBy('title')->get();
+        
+        return view('reviews.index', compact('reviews', 'stats', 'books'));
+    }
+
+    public function adminDestroy(Review $review)
+    {
+        $user = Auth::user();
+        
+        // Only admin and petugas can delete any review
+        if (!$user->isAdmin() && !$user->isPetugas()) {
+            abort(403);
+        }
+        
+        $review->delete();
+        return back()->with('success', 'Ulasan berhasil dihapus');
+    }
 }

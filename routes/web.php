@@ -40,6 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Borrowing routes
     Route::get('/borrowings', [App\Http\Controllers\BorrowingController::class, 'index'])->name('borrowings.index');
     Route::post('/borrowings', [App\Http\Controllers\BorrowingController::class, 'store'])->name('borrowings.store');
+    Route::get('/borrowings/return', [App\Http\Controllers\BorrowingController::class, 'returnPage'])->name('borrowings.return.page');
     Route::patch('/borrowings/{borrowing}/return', [App\Http\Controllers\BorrowingController::class, 'return'])->name('borrowings.return');
     Route::get('/borrowings/{borrowing}', [App\Http\Controllers\BorrowingController::class, 'show'])->name('borrowings.show');
     
@@ -49,6 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/collections/{collection}', [App\Http\Controllers\CollectionController::class, 'destroy'])->name('collections.destroy');
     
     // Review routes
+    Route::get('/reviews', [App\Http\Controllers\ReviewController::class, 'index'])->name('reviews.index');
     Route::post('/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
     Route::patch('/reviews/{review}', [App\Http\Controllers\ReviewController::class, 'update'])->name('reviews.update');
     Route::delete('/reviews/{review}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
@@ -59,11 +61,22 @@ Route::middleware(['auth', 'verified', 'role:admin,petugas'])->group(function ()
     Route::post('/books', [App\Http\Controllers\BookController::class, 'store'])->name('books.store');
     Route::patch('/books/{book}', [App\Http\Controllers\BookController::class, 'update'])->name('books.update');
     Route::delete('/books/{book}', [App\Http\Controllers\BookController::class, 'destroy'])->name('books.destroy');
+    
+    // Admin delete review
+    Route::delete('/reviews/{review}/admin', [App\Http\Controllers\ReviewController::class, 'adminDestroy'])->name('reviews.admin.destroy');
 });
 
 // Petugas Dashboard Routes
 Route::middleware(['auth', 'verified', 'role:petugas'])->prefix('petugas')->name('petugas.')->group(function () {
     Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('dashboard');
+});
+
+// Reports Routes (Petugas and Admin only)
+Route::middleware(['auth', 'verified', 'role:petugas,admin'])->prefix('reports')->name('reports.')->group(function () {
+    Route::get('/', [App\Http\Controllers\ReportController::class, 'index'])->name('index');
+    Route::post('/borrowing', [App\Http\Controllers\ReportController::class, 'borrowingReport'])->name('borrowing');
+    Route::post('/book', [App\Http\Controllers\ReportController::class, 'bookReport'])->name('book');
+    Route::post('/statistics', [App\Http\Controllers\ReportController::class, 'statisticsReport'])->name('statistics');
 });
 
 // Admin Dashboard Routes

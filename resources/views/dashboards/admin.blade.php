@@ -92,6 +92,28 @@
                     </div>
                 </div>
 
+                <!-- CTA Pengembalian Buku -->
+                @if($myActiveBorrowings > 0)
+                    <div class="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-2xl p-6 mb-8">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center shrink-0">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-800 mb-1">Anda Memiliki Buku yang Dipinjam</h3>
+                                    <p class="text-sm text-slate-600">Anda memiliki <span class="font-semibold text-red-700">{{ $myActiveBorrowings }} buku</span> yang sedang dipinjam. Jangan lupa untuk mengembalikannya tepat waktu!</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('borrowings.return.page') }}" class="bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 shrink-0">
+                                Kembalikan Buku
+                            </a>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Staff Statistics -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div class="bg-white rounded-2xl shadow-sm p-6">

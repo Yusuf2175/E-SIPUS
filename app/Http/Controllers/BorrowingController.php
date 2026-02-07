@@ -99,27 +99,86 @@ class BorrowingController extends Controller
         return redirect()->back()->with('success', 'Buku berhasil dipinjam! Harap kembalikan sebelum tanggal ' . $borrowing->due_date->format('d/m/Y'));
     }
 
-    public function return(Borrowing $borrowing)
+    public function return(Request $request, Borrowing $borrowing)
     {
-        // Check if user is authorized to return this book
-        if (!Auth::user()->isAdmin() && !Auth::user()->isPetugas() && $borrowing->user_id !== Auth::id()) {
-            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk mengembalikan buku ini!');
-        }
-
+        $currentUser = Auth::user();
+        $borrower = $borrowing->user;
+        
+        // Check if book is already returned
         if ($borrowing->status !== 'borrowed') {
             return redirect()->back()->with('error', 'Buku sudah dikembalikan!');
         }
+        
+        // Authorization logic based on borrower's role
+        if ($borrower->isAdmin()) {
+            // If admin borrowed the book, only admin can return it
+            if (!$currentUser->isAdmin()) {
+                return redirect()->back()->with('error', 'Hanya Admin yang dapat mengembalikan buku yang dipinjam oleh Admin!');
+            }
+        } elseif ($borrower->isPetugas()) {
+            // If petugas borrowed the book, only petugas can return it
+            if (!$currentUser->isPetugas()) {
+                return redirect()->back()->with('error', 'Hanya Petugas yang dapat mengembalikan buku yang dipinjam oleh Petugas!');
+            }
+        } else {
+            // Regular user - the user themselves, admin, or petugas can return it
+            if ($borrowing->user_id !== $currentUser->id && !$currentUser->isAdmin() && !$currentUser->isPetugas()) {
+                return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk mengembalikan buku ini!');
+            }
+        }
+
+        // Validate return reason if returned by admin/petugas for user's book
+        if (($currentUser->isAdmin() || $currentUser->isPetugas()) && $borrower->isUser()) {
+            $request->validate([
+                'return_reason' => 'required|in:normal,user_missing,book_damaged,book_lost',
+                'return_notes' => 'nullable|string|max:500'
+            ], [
+                'return_reason.required' => 'Alasan pengembalian harus dipilih',
+                'return_reason.in' => 'Alasan pengembalian tidak valid'
+            ]);
+        }
 
         // Update borrowing status
-        $borrowing->update([
+        $updateData = [
             'status' => 'returned',
-            'returned_date' => Carbon::now()->toDateString()
-        ]);
+            'returned_date' => Carbon::now()->toDateString(),
+            'returned_by' => $currentUser->id
+        ];
 
-        // Increase available copies
-        $borrowing->book->increment('available_copies');
+        // Add return reason if provided
+        if ($request->filled('return_reason')) {
+            $updateData['return_reason'] = $request->return_reason;
+            $updateData['return_notes'] = $request->return_notes;
+        }
+
+        $borrowing->update($updateData);
+
+        // Increase available copies (except if book is lost)
+        if ($request->return_reason !== 'book_lost') {
+            $borrowing->book->increment('available_copies');
+        }
 
         return redirect()->back()->with('success', 'Buku berhasil dikembalikan!');
+    }
+
+    public function returnPage()
+    {
+        $user = Auth::user();
+        
+        // Get active borrowings for the user
+        $activeBorrowings = Borrowing::with(['book'])
+            ->where('user_id', $user->id)
+            ->where('status', 'borrowed')
+            ->orderBy('due_date', 'asc')
+            ->get();
+        
+        // Calculate overdue status for each borrowing
+        $activeBorrowings->each(function ($borrowing) {
+            $borrowing->is_overdue = Carbon::parse($borrowing->due_date)->isPast();
+            $borrowing->days_remaining = Carbon::now()->diffInDays(Carbon::parse($borrowing->due_date), false);
+        });
+        
+        return view('borrowings.return', compact('activeBorrowings'));
     }
 
     public function show(Borrowing $borrowing)

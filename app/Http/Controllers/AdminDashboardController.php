@@ -43,12 +43,18 @@ class AdminDashboardController extends Controller
             ->take(5)
             ->get();
         
+        // My active borrowings (for CTA)
+        $myActiveBorrowings = \App\Models\Borrowing::where('user_id', $user->id)
+            ->where('status', 'borrowed')
+            ->count();
+        
         return view('dashboards.admin', compact(
             'user', 
             'stats',
             'recentUsers',
             'pendingRoleRequests',
-            'recentBorrowings'
+            'recentBorrowings',
+            'myActiveBorrowings'
         ));
     }
 

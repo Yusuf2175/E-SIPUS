@@ -75,10 +75,32 @@
                             </div>
                         </div>
                         <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['total_users'] }}</p>
-                        <p class="text-sm text-slate-600">Total Anggota</p>
+                        <p class="text-sm text-slate-600">Total Siswa & Siswi</p>
                         <p class="text-xs text-blue-600 mt-2">{{ $stats['books_added_by_me'] }} buku ditambahkan</p>
                     </div>
                 </div>
+
+                <!-- CTA Pengembalian Buku -->
+                @if($myActiveBorrowings > 0)
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6 mb-8">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center shrink-0">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-800 mb-1">Anda Memiliki Buku yang Dipinjam</h3>
+                                    <p class="text-sm text-slate-600">Anda memiliki <span class="font-semibold text-green-700">{{ $myActiveBorrowings }} buku</span> yang sedang dipinjam. Jangan lupa untuk mengembalikannya tepat waktu!</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('borrowings.return.page') }}" class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 shrink-0">
+                                Kembalikan Buku
+                            </a>
+                        </div>
+                    </div>
+                @endif
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <!-- Recent Borrowings -->
@@ -122,15 +144,6 @@
                                                     <span class="text-xs text-slate-500">{{ $borrowing->borrowed_date->format('d M Y') }}</span>
                                                 </div>
                                             </div>
-                                            @if($borrowing->status === 'borrowed')
-                                                <form action="{{ route('borrowings.return', $borrowing) }}" method="POST">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <button type="submit" class="px-3 py-1 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-700 transition">
-                                                        Kembalikan
-                                                    </button>
-                                                </form>
-                                            @endif
                                         </div>
                                     @endforeach
                                 </div>

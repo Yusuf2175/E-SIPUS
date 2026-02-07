@@ -16,7 +16,10 @@ class Borrowing extends Model
         'returned_date',
         'status',
         'notes',
-        'approved_by'
+        'approved_by',
+        'return_reason',
+        'return_notes',
+        'returned_by'
     ];
 
     protected $casts = [
@@ -38,6 +41,11 @@ class Borrowing extends Model
     public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function returnedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'returned_by');
     }
 
     public function isOverdue(): bool

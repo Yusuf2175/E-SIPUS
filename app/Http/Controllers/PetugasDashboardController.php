@@ -47,6 +47,11 @@ class PetugasDashboardController extends Controller
             ->take(5)
             ->get();
         
-        return view('dashboards.petugas', compact('user', 'stats', 'recentBorrowings', 'overdueBorrowings', 'lowStockBooks'));
+        // My active borrowings (for CTA)
+        $myActiveBorrowings = Borrowing::where('user_id', $user->id)
+            ->where('status', 'borrowed')
+            ->count();
+        
+        return view('dashboards.petugas', compact('user', 'stats', 'recentBorrowings', 'overdueBorrowings', 'lowStockBooks', 'myActiveBorrowings'));
     }
 }
