@@ -190,26 +190,6 @@
                                 </a>
                             </div>
                         </div>
-
-                        @if($roleRequests->where('status', 'pending')->isEmpty())
-                            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
-                                <h3 class="text-lg font-bold mb-2">Ingin Jadi Petugas?</h3>
-                                <p class="text-sm text-purple-100 mb-4">Ajukan permintaan untuk menjadi petugas perpustakaan</p>
-                                <button onclick="document.getElementById('roleRequestModal').classList.remove('hidden')" class="w-full px-4 py-2 bg-white text-purple-600 font-semibold rounded-lg hover:bg-purple-50 transition">
-                                    Ajukan Sekarang
-                                </button>
-                            </div>
-                        @else
-                            <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    <h3 class="font-bold text-yellow-800">Permintaan Pending</h3>
-                                </div>
-                                <p class="text-sm text-yellow-700">Permintaan role Anda sedang diproses oleh admin</p>
-                            </div>
-                        @endif
                     </div>
                 </div>
 

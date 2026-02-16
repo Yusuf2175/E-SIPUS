@@ -13,9 +13,7 @@ class UserDashboardController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
-        $roleRequests = $user->roleRequests()->latest()->get();
-        
+        $user = auth()->user();        
         // Statistics
         $stats = [
             'active_borrowings' => $user->borrowings()->where('status', 'borrowed')->count(),
@@ -37,34 +35,6 @@ class UserDashboardController extends Controller
             ->take(6)
             ->get();
         
-        return view('dashboards.user', compact('user', 'roleRequests', 'stats', 'recentBorrowings', 'recommendedBooks'));
-    }
-
-    public function requestRole(Request $request)
-    {
-        $request->validate([
-            'requested_role' => 'required|in:petugas',
-            'reason' => 'required|string|max:500',
-        ]);
-
-        $user = auth()->user();
-
-        // Cek apakah sudah ada request pending
-        $existingRequest = $user->roleRequests()
-            ->where('status', 'pending')
-            ->where('requested_role', $request->requested_role)
-            ->first();
-
-        if ($existingRequest) {
-            return back()->with('error', 'Anda sudah memiliki permintaan role yang sedang diproses.');
-        }
-
-        RoleRequest::create([
-            'user_id' => $user->id,
-            'requested_role' => $request->requested_role,
-            'reason' => $request->reason,
-        ]);
-
-        return back()->with('success', 'Permintaan role berhasil dikirim dan menunggu persetujuan admin.');
+        return view('dashboards.user', compact('user','stats', 'recentBorrowings', 'recommendedBooks'));
     }
 }

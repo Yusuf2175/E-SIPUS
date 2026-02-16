@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'index'])->name('landingPage');  
 
-// Redirect dashboard lama ke role-based dashboard
+// Redirect to role-based dashboard
 Route::get('/dashboard', function () {
     $user = auth()->user();
     if (!$user) {
