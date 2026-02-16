@@ -175,7 +175,7 @@ class BorrowingController extends Controller
         // Calculate overdue status for each borrowing
         $activeBorrowings->each(function ($borrowing) {
             $borrowing->is_overdue = Carbon::parse($borrowing->due_date)->isPast();
-            $borrowing->days_remaining = Carbon::now()->diffInDays(Carbon::parse($borrowing->due_date), false);
+            $borrowing->days_remaining = (int) Carbon::now()->diffInDays(Carbon::parse($borrowing->due_date), false);
         });
         
         return view('borrowings.return', compact('activeBorrowings'));

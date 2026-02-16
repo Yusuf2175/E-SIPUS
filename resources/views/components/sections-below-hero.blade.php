@@ -9,7 +9,7 @@
                     <div class="relative ml-6 md:ml-10 z-10">
                         <h2 class="text-3xl md:text-4xl font-extrabold tracking-wide mb-6 uppercase">About Me</h2>
                         <p class="text-sm md:text-base leading-relaxed text-purple-50 max-w-2xl">
-                            e-SIPUS adalah sistem informasi perpustakaan berbasis web yang berfungsi untuk mengelola data buku, anggota, serta proses peminjaman dan pengembalian secara digital. Sistem ini dirancang untuk mempermudah pengelolaan perpustakaan dengan tampilan modern dan mudah digunakan.
+                            e-SIPUS is a web-based library information system that manages book data, membership data, and the borrowing and return process digitally. Designed to simplify library management, the system offers a modern, user-friendly interface.
                         </p>
                     </div>
                 </div>

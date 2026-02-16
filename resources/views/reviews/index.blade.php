@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ulasan & Rating Buku - E-SIPUS</title>
+    <title>Book Reviews & Ratings - E-SIPUS</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-slate-50">
@@ -21,7 +21,7 @@
             <!-- Top Bar -->
             <div class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
                 <div>
-                    <h2 class="text-lg font-semibold text-slate-800">Ulasan & Rating Buku</h2>
+                    <h2 class="text-lg font-semibold text-slate-800">Book Reviews & Ratings</h2>
                 </div>
                 <div class="flex items-center gap-4">
                     <span class="text-sm text-slate-600">{{ auth()->user()->name }}</span>
@@ -58,7 +58,7 @@
                                 </div>
                             </div>
                             <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['total_reviews'] }}</p>
-                            <p class="text-sm text-slate-600">Total Ulasan</p>
+                            <p class="text-sm text-slate-600">Total Reviews</p>
                         </div>
 
                         <!-- Average Rating -->
@@ -71,7 +71,7 @@
                                 </div>
                             </div>
                             <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['average_rating'] }}</p>
-                            <p class="text-sm text-slate-600">Rating Rata-rata</p>
+                            <p class="text-sm text-slate-600">Average Rating</p>
                         </div>
 
                         <!-- 5 Star Reviews -->
@@ -82,7 +82,7 @@
                                 </div>
                             </div>
                             <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['five_star'] }}</p>
-                            <p class="text-sm text-slate-600">Ulasan Bintang 5</p>
+                            <p class="text-sm text-slate-600">5-Star Reviews</p>
                         </div>
 
                         <!-- Low Rating Reviews -->
@@ -93,13 +93,13 @@
                                 </div>
                             </div>
                             <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['one_star'] + $stats['two_star'] }}</p>
-                            <p class="text-sm text-slate-600">Rating Rendah</p>
+                            <p class="text-sm text-slate-600">Low Ratings</p>
                         </div>
                     </div>
 
                     <!-- Rating Distribution -->
                     <div class="bg-white rounded-2xl shadow-sm p-6 mb-8">
-                        <h3 class="text-lg font-bold text-slate-800 mb-6">Distribusi Rating</h3>
+                        <h3 class="text-lg font-bold text-slate-800 mb-6">Rating Distribution</h3>
                         <div class="space-y-3">
                             @foreach([5, 4, 3, 2, 1] as $star)
                                 @php
@@ -130,17 +130,17 @@
                     <form method="GET" action="{{ route('reviews.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <!-- Search -->
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Cari</label>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari ulasan, buku, atau user..." class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Search</label>
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search reviews, books, or users..." class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
                         </div>
 
                         <!-- Rating Filter -->
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-2">Rating</label>
                             <select name="rating" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
-                                <option value="">Semua Rating</option>
+                                <option value="">All Ratings</option>
                                 @for($i = 5; $i >= 1; $i--)
-                                    <option value="{{ $i }}" {{ request('rating') == $i ? 'selected' : '' }}>{{ $i }} Bintang</option>
+                                    <option value="{{ $i }}" {{ request('rating') == $i ? 'selected' : '' }}>{{ $i }} Star{{ $i > 1 ? 's' : '' }}</option>
                                 @endfor
                             </select>
                         </div>
@@ -148,9 +148,9 @@
                         <!-- Book Filter (Admin & Petugas Only) -->
                         @if(Auth::user()->isAdmin() || Auth::user()->isPetugas())
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Buku</label>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Book</label>
                                 <select name="book_id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
-                                    <option value="">Semua Buku</option>
+                                    <option value="">All Books</option>
                                     @foreach($books as $book)
                                         <option value="{{ $book->id }}" {{ request('book_id') == $book->id ? 'selected' : '' }}>{{ $book->title }}</option>
                                     @endforeach
@@ -176,12 +176,12 @@
                         <svg class="mx-auto h-16 w-16 text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
                         </svg>
-                        <h3 class="text-lg font-medium text-slate-900 mb-2">Belum Ada Ulasan</h3>
+                        <h3 class="text-lg font-medium text-slate-900 mb-2">No Reviews Yet</h3>
                         <p class="text-slate-600">
                             @if(Auth::user()->isUser())
-                                Anda belum memberikan ulasan untuk buku apapun
+                                You haven't given any reviews for books yet
                             @else
-                                Belum ada ulasan yang tersedia
+                                No reviews available yet
                             @endif
                         </p>
                     </div>
@@ -240,11 +240,11 @@
 
                                             <!-- Actions -->
                                             @if(Auth::user()->isAdmin() || Auth::user()->isPetugas())
-                                                <form action="{{ route('reviews.admin.destroy', $review) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus ulasan ini?')">
+                                                <form action="{{ route('reviews.admin.destroy', $review) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this review?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-red-600 hover:text-red-700 font-medium text-sm">
-                                                        Hapus
+                                                        Delete
                                                     </button>
                                                 </form>
                                             @endif

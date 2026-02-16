@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Koleksi Pribadi - E-SIPUS</title>
+    <title>My Collection - E-SIPUS</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-slate-50">
@@ -19,8 +19,8 @@
         <div class="flex-1 ml-64">
             <div class="p-8">
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-slate-800">Koleksi Pribadi</h1>
-                    <p class="text-slate-600 mt-2">Buku-buku favorit yang Anda simpan</p>
+                    <h1 class="text-3xl font-bold text-slate-800">My Collection</h1>
+                    <p class="text-slate-600 mt-2">Your favorite books saved</p>
                 </div>
 
                 @if(session('success'))
@@ -40,13 +40,13 @@
                         <svg class="w-24 h-24 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                         </svg>
-                        <h3 class="text-xl font-semibold text-slate-700 mb-2">Koleksi Masih Kosong</h3>
-                        <p class="text-slate-500 mb-6">Mulai tambahkan buku favorit Anda ke koleksi pribadi</p>
+                        <h3 class="text-xl font-semibold text-slate-700 mb-2">Collection is Empty</h3>
+                        <p class="text-slate-500 mb-6">Start adding your favorite books to your collection</p>
                         <a href="{{ route('books.index') }}" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
-                            Jelajahi Buku
+                            Browse Books
                         </a>
                     </div>
                 @else
@@ -70,9 +70,9 @@
                                     
                                     <div class="flex items-center gap-2">
                                         <a href="{{ route('books.show', $collection->book) }}" class="flex-1 text-center px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition">
-                                            Lihat Detail
+                                            View Details
                                         </a>
-                                        <form action="{{ route('collections.destroy', $collection) }}" method="POST" onsubmit="return confirm('Hapus dari koleksi?')">
+                                        <form action="{{ route('collections.destroy', $collection) }}" method="POST" onsubmit="return confirm('Remove from collection?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition">

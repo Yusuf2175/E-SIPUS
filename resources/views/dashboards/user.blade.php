@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard User - E-SIPUS</title>
+    <title>User Dashboard - E-SIPUS</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-slate-50">
@@ -28,8 +28,8 @@
             <!-- Content Area -->
             <div class="p-6 lg:p-8">
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-slate-800 mb-2">Selamat Datang, {{ $user->name }}!</h1>
-                    <p class="text-slate-600">Kelola aktivitas perpustakaan Anda dengan mudah</p>
+                    <h1 class="text-3xl font-bold text-slate-800 mb-2">Welcome, {{ $user->name }}!</h1>
+                    <p class="text-slate-600">Manage your library activities with ease</p>
                 </div>
 
                 @if(session('success'))
@@ -54,7 +54,7 @@
                             </div>
                         </div>
                         <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['active_borrowings'] }}</p>
-                        <p class="text-sm text-slate-600">Sedang Dipinjam</p>
+                        <p class="text-sm text-slate-600">Currently Borrowed</p>
                     </div>
 
                     <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-blue-500">
@@ -66,7 +66,7 @@
                             </div>
                         </div>
                         <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['total_borrowings'] }}</p>
-                        <p class="text-sm text-slate-600">Total Peminjaman</p>
+                        <p class="text-sm text-slate-600">Total Borrowings</p>
                     </div>
 
                     <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-pink-500">
@@ -78,7 +78,7 @@
                             </div>
                         </div>
                         <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['collections'] }}</p>
-                        <p class="text-sm text-slate-600">Koleksi Pribadi</p>
+                        <p class="text-sm text-slate-600">My Collection</p>
                     </div>
 
                     <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-yellow-500">
@@ -90,7 +90,7 @@
                             </div>
                         </div>
                         <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['reviews'] }}</p>
-                        <p class="text-sm text-slate-600">Ulasan Diberikan</p>
+                        <p class="text-sm text-slate-600">Reviews Given</p>
                     </div>
                 </div>
 
@@ -98,9 +98,9 @@
                     <div class="lg:col-span-2">
                         <div class="bg-white rounded-2xl shadow-sm p-6">
                             <div class="flex items-center justify-between mb-6">
-                                <h2 class="text-xl font-bold text-slate-800">Peminjaman Terbaru</h2>
+                                <h2 class="text-xl font-bold text-slate-800">Recent Borrowings</h2>
                                 <a href="{{ route('borrowings.index') }}" class="text-purple-600 hover:text-purple-700 text-sm font-medium">
-                                    Lihat Semua →
+                                    View All →
                                 </a>
                             </div>
 
@@ -109,9 +109,9 @@
                                     <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                                     </svg>
-                                    <p class="text-slate-500 mb-4">Belum ada peminjaman</p>
+                                    <p class="text-slate-500 mb-4">No borrowings yet</p>
                                     <a href="{{ route('books.index') }}" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
-                                        Jelajahi Buku
+                                        Browse Books
                                     </a>
                                 </div>
                             @else
@@ -132,7 +132,7 @@
                                                 <p class="text-sm text-slate-600">{{ $borrowing->book->author }}</p>
                                                 <div class="flex items-center gap-2 mt-1">
                                                     <span class="text-xs px-2 py-1 rounded-full {{ $borrowing->status === 'borrowed' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' }}">
-                                                        {{ $borrowing->status === 'borrowed' ? 'Dipinjam' : 'Dikembalikan' }}
+                                                        {{ $borrowing->status === 'borrowed' ? 'Borrowed' : 'Returned' }}
                                                     </span>
                                                     <span class="text-xs text-slate-500">{{ $borrowing->borrowed_date->format('d M Y') }}</span>
                                                 </div>
@@ -151,7 +151,7 @@
 
                     <div class="space-y-6">
                         <div class="bg-white rounded-2xl shadow-sm p-6">
-                            <h2 class="text-xl font-bold text-slate-800 mb-4">Aksi Cepat</h2>
+                            <h2 class="text-xl font-bold text-slate-800 mb-4">Quick Actions</h2>
                             <div class="space-y-3">
                                 <a href="{{ route('books.index') }}" class="flex items-center gap-3 p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition group">
                                     <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition">
@@ -160,8 +160,8 @@
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="font-semibold text-slate-800">Jelajahi Buku</p>
-                                        <p class="text-xs text-slate-600">Temukan buku favorit</p>
+                                        <p class="font-semibold text-slate-800">Browse Books</p>
+                                        <p class="text-xs text-slate-600">Find your favorite books</p>
                                     </div>
                                 </a>
 
@@ -172,8 +172,8 @@
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="font-semibold text-slate-800">Koleksi Saya</p>
-                                        <p class="text-xs text-slate-600">Lihat buku favorit</p>
+                                        <p class="font-semibold text-slate-800">My Collection</p>
+                                        <p class="text-xs text-slate-600">View favorite books</p>
                                     </div>
                                 </a>
 
@@ -184,8 +184,8 @@
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="font-semibold text-slate-800">Peminjaman</p>
-                                        <p class="text-xs text-slate-600">Kelola peminjaman</p>
+                                        <p class="font-semibold text-slate-800">Borrowings</p>
+                                        <p class="text-xs text-slate-600">Manage borrowings</p>
                                     </div>
                                 </a>
                             </div>
@@ -196,9 +196,9 @@
                 @if($recommendedBooks->isNotEmpty())
                     <div class="mt-8">
                         <div class="flex items-center justify-between mb-6">
-                            <h2 class="text-2xl font-bold text-slate-800">Rekomendasi Buku</h2>
+                            <h2 class="text-2xl font-bold text-slate-800">Recommended Books</h2>
                             <a href="{{ route('books.index') }}" class="text-purple-600 hover:text-purple-700 font-medium">
-                                Lihat Semua →
+                                View All →
                             </a>
                         </div>
                         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -233,7 +233,7 @@
     <div id="roleRequestModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-slate-800">Ajukan Permintaan Role</h2>
+                <h2 class="text-2xl font-bold text-slate-800">Request Role Change</h2>
                 <button onclick="document.getElementById('roleRequestModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -246,12 +246,12 @@
                 <input type="hidden" name="requested_role" value="petugas">
                 
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Alasan Pengajuan</label>
-                    <textarea name="reason" rows="4" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Jelaskan mengapa Anda ingin menjadi petugas..." required></textarea>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Reason for Request</label>
+                    <textarea name="reason" rows="4" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Explain why you want to become a staff member..." required></textarea>
                 </div>
 
                 <button type="submit" class="w-full px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition">
-                    Kirim Permintaan
+                    Submit Request
                 </button>
             </form>
         </div>

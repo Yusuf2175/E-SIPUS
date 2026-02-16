@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ Auth::user()->isUser() ? 'Peminjaman Saya' : 'Kelola Peminjaman' }} - E-SIPUS</title>
+    <title>{{ Auth::user()->isUser() ? 'My Borrowings' : 'Manage Borrowings' }} - E-SIPUS</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-slate-50">
@@ -21,10 +21,10 @@
                 <!-- Header -->
                 <div class="mb-8">
                     <h1 class="text-3xl font-bold text-slate-800 mb-2">
-                        {{ Auth::user()->isUser() ? 'Peminjaman Saya' : 'Kelola Peminjaman' }}
+                        {{ Auth::user()->isUser() ? 'My Borrowings' : 'Manage Borrowings' }}
                     </h1>
                     <p class="text-slate-600">
-                        {{ Auth::user()->isUser() ? 'Riwayat dan status peminjaman buku Anda' : 'Kelola semua peminjaman buku di perpustakaan' }}
+                        {{ Auth::user()->isUser() ? 'History and status of your book borrowings' : 'Manage all book borrowings in the library' }}
                     </p>
                 </div>
 
@@ -40,7 +40,7 @@
                     </div>
                 @endif
 
-                <!-- CTA Pengembalian Buku (for User) -->
+                <!-- CTA Return Books (for User) -->
                 @if(Auth::user()->isUser())
                     @php
                         $activeBorrowingsCount = \App\Models\Borrowing::where('user_id', Auth::id())
@@ -58,15 +58,15 @@
                                         </svg>
                                     </div>
                                     <div>
-                                        <h3 class="text-xl font-bold mb-1">Punya Buku yang Perlu Dikembalikan?</h3>
-                                        <p class="text-white/90">Anda memiliki {{ $activeBorrowingsCount }} buku yang sedang dipinjam. Kembalikan tepat waktu untuk menghindari denda!</p>
+                                        <h3 class="text-xl font-bold mb-1">Have Books to Return?</h3>
+                                        <p class="text-white/90">You have {{ $activeBorrowingsCount }} borrowed book{{ $activeBorrowingsCount > 1 ? 's' : '' }}. Return on time to avoid fines!</p>
                                     </div>
                                 </div>
                                 <a href="{{ route('borrowings.return.page') }}" class="flex-shrink-0 inline-flex items-center px-6 py-3 bg-white text-purple-600 font-semibold rounded-lg hover:bg-purple-50 transition-colors duration-200 shadow-lg">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
                                     </svg>
-                                    Kembalikan Buku
+                                    Return Books
                                 </a>
                             </div>
                         </div>
@@ -85,7 +85,7 @@
                                 </div>
                             </div>
                             <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['active'] ?? 0 }}</p>
-                            <p class="text-sm text-slate-600">Sedang Dipinjam</p>
+                            <p class="text-sm text-slate-600">Currently Borrowed</p>
                         </div>
 
                         <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-green-500">
@@ -97,7 +97,7 @@
                                 </div>
                             </div>
                             <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['returned'] ?? 0 }}</p>
-                            <p class="text-sm text-slate-600">Dikembalikan</p>
+                            <p class="text-sm text-slate-600">Returned</p>
                         </div>
 
                         <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-red-500">
@@ -109,7 +109,7 @@
                                 </div>
                             </div>
                             <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['overdue'] ?? 0 }}</p>
-                            <p class="text-sm text-slate-600">Terlambat</p>
+                            <p class="text-sm text-slate-600">Overdue</p>
                         </div>
 
                         <div class="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-purple-500">
@@ -121,7 +121,7 @@
                                 </div>
                             </div>
                             <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['total'] ?? 0 }}</p>
-                            <p class="text-sm text-slate-600">Total Peminjaman</p>
+                            <p class="text-sm text-slate-600">Total Borrowings</p>
                         </div>
                     </div>
                 @endif
@@ -131,16 +131,16 @@
                     <div class="border-b border-slate-200">
                         <nav class="flex -mb-px">
                             <a href="{{ route('borrowings.index') }}" class="px-6 py-4 text-sm font-medium {{ !request('status') ? 'border-b-2 border-purple-600 text-purple-600' : 'text-slate-600 hover:text-slate-800 hover:border-slate-300' }}">
-                                Semua
+                                All
                             </a>
                             <a href="{{ route('borrowings.index', ['status' => 'borrowed']) }}" class="px-6 py-4 text-sm font-medium {{ request('status') == 'borrowed' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-slate-600 hover:text-slate-800 hover:border-slate-300' }}">
-                                Sedang Dipinjam
+                                Currently Borrowed
                             </a>
                             <a href="{{ route('borrowings.index', ['status' => 'returned']) }}" class="px-6 py-4 text-sm font-medium {{ request('status') == 'returned' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-slate-600 hover:text-slate-800 hover:border-slate-300' }}">
-                                Dikembalikan
+                                Returned
                             </a>
                             <a href="{{ route('borrowings.index', ['status' => 'overdue']) }}" class="px-6 py-4 text-sm font-medium {{ request('status') == 'overdue' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-slate-600 hover:text-slate-800 hover:border-slate-300' }}">
-                                Terlambat
+                                Overdue
                             </a>
                         </nav>
                     </div>
@@ -152,14 +152,14 @@
                         <svg class="w-24 h-24 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                         </svg>
-                        <h3 class="text-xl font-semibold text-slate-700 mb-2">Belum Ada Peminjaman</h3>
-                        <p class="text-slate-500 mb-6">{{ Auth::user()->isUser() ? 'Mulai pinjam buku favorit Anda' : 'Belum ada data peminjaman' }}</p>
+                        <h3 class="text-xl font-semibold text-slate-700 mb-2">No Borrowings Yet</h3>
+                        <p class="text-slate-500 mb-6">{{ Auth::user()->isUser() ? 'Start borrowing your favorite books' : 'No borrowing data available' }}</p>
                         @if(Auth::user()->isUser())
                             <a href="{{ route('books.index') }}" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
-                                Jelajahi Buku
+                                Browse Books
                             </a>
                         @endif
                     </div>
@@ -169,14 +169,14 @@
                             <table class="min-w-full divide-y divide-slate-200">
                                 <thead class="bg-slate-50">
                                     <tr>
-                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Buku</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Book</th>
                                         @if(!Auth::user()->isUser())
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Peminjam</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Borrower</th>
                                         @endif
-                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Tanggal Pinjam</th>
-                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Jatuh Tempo</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Borrow Date</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Due Date</th>
                                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Aksi</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-slate-200">
@@ -219,7 +219,7 @@
                                                 {{ $borrowing->due_date->format('d M Y') }}
                                                 @if($borrowing->isOverdue())
                                                     <span class="block text-xs text-red-600 font-medium mt-1">
-                                                        Terlambat {{ $borrowing->getDaysOverdue() }} hari
+                                                        Overdue {{ $borrowing->getDaysOverdue() }} day{{ $borrowing->getDaysOverdue() > 1 ? 's' : '' }}
                                                     </span>
                                                 @endif
                                             </td>
@@ -227,23 +227,23 @@
                                                 @if($borrowing->status === 'borrowed')
                                                     @if($borrowing->isOverdue())
                                                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
-                                                            Terlambat
+                                                            Overdue
                                                         </span>
                                                     @else
                                                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-                                                            Dipinjam
+                                                            Borrowed
                                                         </span>
                                                     @endif
                                                 @else
                                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                                                        Dikembalikan
+                                                        Returned
                                                     </span>
                                                 @endif
                                             </td>
                                             <td class="px-6 py-4">
                                                 <div class="flex items-center gap-2">
                                                     <a href="{{ route('books.show', $borrowing->book) }}" class="text-purple-600 hover:text-purple-700 font-medium text-sm">
-                                                        Detail
+                                                        Details
                                                     </a>
                                                     @if($borrowing->status === 'borrowed')
                                                         @php
@@ -268,15 +268,15 @@
                                                             @if(($currentUser->isAdmin() || $currentUser->isPetugas()) && $borrower->isUser())
                                                                 {{-- Admin/Petugas returning user's book - show modal --}}
                                                                 <button type="button" onclick="openReturnModal({{ $borrowing->id }})" class="text-green-600 hover:text-green-700 font-medium text-sm">
-                                                                    Kembalikan
+                                                                    Return
                                                                 </button>
                                                             @else
                                                                 {{-- User returning own book or admin/petugas returning own book --}}
-                                                                <form action="{{ route('borrowings.return', $borrowing) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin mengembalikan buku ini?')">
+                                                                <form action="{{ route('borrowings.return', $borrowing) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to return this book?')">
                                                                     @csrf
                                                                     @method('PATCH')
                                                                     <button type="submit" class="text-green-600 hover:text-green-700 font-medium text-sm">
-                                                                        Kembalikan
+                                                                        Return
                                                                     </button>
                                                                 </form>
                                                             @endif
@@ -311,45 +311,45 @@
                 
                 <!-- Modal Header -->
                 <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-2xl">
-                    <h3 class="text-xl font-bold">Pengembalian Buku</h3>
-                    <p class="text-sm text-blue-100 mt-1">Pilih alasan pengembalian buku</p>
+                    <h3 class="text-xl font-bold">Book Return</h3>
+                    <p class="text-sm text-blue-100 mt-1">Select reason for book return</p>
                 </div>
 
                 <!-- Modal Body -->
                 <div class="p-6 space-y-4">
                     <!-- Return Reason -->
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-3">Alasan Pengembalian <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold text-slate-700 mb-3">Return Reason <span class="text-red-500">*</span></label>
                         <div class="space-y-2">
                             <label class="flex items-start p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition">
                                 <input type="radio" name="return_reason" value="normal" class="mt-1 text-green-600 focus:ring-green-500" required>
                                 <div class="ml-3">
                                     <span class="font-medium text-slate-800">Normal</span>
-                                    <p class="text-sm text-slate-600">Buku dikembalikan dalam kondisi baik</p>
+                                    <p class="text-sm text-slate-600">Book returned in good condition</p>
                                 </div>
                             </label>
 
                             <label class="flex items-start p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-yellow-500 hover:bg-yellow-50 transition">
                                 <input type="radio" name="return_reason" value="user_missing" class="mt-1 text-yellow-600 focus:ring-yellow-500" required>
                                 <div class="ml-3">
-                                    <span class="font-medium text-slate-800">User Menghilang</span>
-                                    <p class="text-sm text-slate-600">User tidak dapat dihubungi</p>
+                                    <span class="font-medium text-slate-800">User Missing</span>
+                                    <p class="text-sm text-slate-600">User cannot be contacted</p>
                                 </div>
                             </label>
 
                             <label class="flex items-start p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition">
                                 <input type="radio" name="return_reason" value="book_damaged" class="mt-1 text-orange-600 focus:ring-orange-500" required>
                                 <div class="ml-3">
-                                    <span class="font-medium text-slate-800">Buku Rusak</span>
-                                    <p class="text-sm text-slate-600">Buku dikembalikan dalam kondisi rusak</p>
+                                    <span class="font-medium text-slate-800">Book Damaged</span>
+                                    <p class="text-sm text-slate-600">Book returned in damaged condition</p>
                                 </div>
                             </label>
 
                             <label class="flex items-start p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-red-500 hover:bg-red-50 transition">
                                 <input type="radio" name="return_reason" value="book_lost" class="mt-1 text-red-600 focus:ring-red-500" required>
                                 <div class="ml-3">
-                                    <span class="font-medium text-slate-800">Buku Hilang</span>
-                                    <p class="text-sm text-slate-600">Buku tidak dapat dikembalikan</p>
+                                    <span class="font-medium text-slate-800">Book Lost</span>
+                                    <p class="text-sm text-slate-600">Book cannot be returned</p>
                                 </div>
                             </label>
                         </div>
@@ -357,18 +357,18 @@
 
                     <!-- Additional Notes -->
                     <div>
-                        <label for="return_notes" class="block text-sm font-semibold text-slate-700 mb-2">Catatan Tambahan (Opsional)</label>
-                        <textarea name="return_notes" id="return_notes" rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Tambahkan catatan jika diperlukan..."></textarea>
+                        <label for="return_notes" class="block text-sm font-semibold text-slate-700 mb-2">Additional Notes (Optional)</label>
+                        <textarea name="return_notes" id="return_notes" rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Add notes if needed..."></textarea>
                     </div>
                 </div>
 
                 <!-- Modal Footer -->
                 <div class="bg-slate-50 px-6 py-4 rounded-b-2xl flex items-center justify-end gap-3">
                     <button type="button" onclick="closeReturnModal()" class="px-5 py-2.5 text-slate-700 font-medium rounded-lg hover:bg-slate-200 transition">
-                        Batal
+                        Cancel
                     </button>
                     <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition">
-                        Kembalikan Buku
+                        Return Book
                     </button>
                 </div>
             </form>
