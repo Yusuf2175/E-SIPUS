@@ -11,14 +11,33 @@
                         <!-- Tabbar -->
                         <nav class="hidden md:block">
                             <div class="inline-flex items-center gap-1 text-[13px] font-semibold tracking-[0.12em] uppercase">
-                                <a href="#home" class="px-4 py-2 rounded-full text-slate-800 hover:bg-white/30 transition">
+                                <a href="#home" class="px-4 py-2 rounded-full transition  group flex flex-col items-center  ">
                                     Home
+                                    <span class=" relative h-[3px] -bottom-2 w-0 bg-ungu 
+                                                rounded-full transition-all duration-500 
+                                                group-hover:w-10 group-hover:left-0">
+                                    </span> 
                                 </a>
-                                <a href="#about" class="px-4 py-2 rounded-full text-slate-700 hover:bg-white/30 transition">
+                                <a href="#about" class="px-4 py-2 rounded-full transition group flex flex-col items-center">
                                     About
+                                    <span class=" relative h-[3px] -bottom-2 w-0 bg-ungu 
+                                            rounded-full transition-all duration-500 
+                                            group-hover:w-10 group-hover:left-0">
+                                    </span>
                                 </a>
-                                <a href="#book" class="px-4 py-2 rounded-full text-slate-700 hover:bg-white/30 transition">
+                                <a href="#categories" class="px-4 py-2 rounded-full transition group flex flex-col items-center">
+                                    Category
+                                     <span class=" relative h-[3px] -bottom-2 w-0 bg-ungu 
+                                            rounded-full transition-all duration-500 
+                                            group-hover:w-10 group-hover:left-0">
+                                    </span>
+                                </a>
+                                <a href="#book" class="px-4 py-2 rounded-full transition group flex flex-col items-center">
                                     Book
+                                     <span class=" relative h-[3px] -bottom-2 w-0 bg-ungu 
+                                            rounded-full transition-all duration-500 
+                                            group-hover:w-10 group-hover:left-0">
+                                    </span>
                                 </a>
                             </div>
                         </nav>
@@ -30,11 +49,11 @@
                     @auth
                         <!-- Jika sudah login, tampilkan dashboard link -->
                         <a href="{{ route('dashboard') }}">
-                            <button class="inline-flex items-center px-5 py-2.5 rounded-full bg-green-600 text-white text-xs font-semibold tracking-[0.18em] uppercase hover:bg-green-700 transition shadow-md">
+                            <button class="inline-flex items-center px-5 py-2.5 rounded-full bg-ungu text-white text-xs font-semibold tracking-[0.18em] uppercase hover:bg-secondrys transition shadow-md">
                                 Dashboard
                             </button>
                         </a>
-                        <div class="w-9 h-9 rounded-full bg-white/40 border border-white/50 flex items-center justify-center overflow-hidden ring-2 ring-white/30">
+                        <div class="w-9 h-9 rounded-full bg-white/40 flex items-center justify-center overflow-hidden ring-2 ring-ungu">
                             <span class="text-xs font-bold text-gray-700">{{ substr(Auth::user()->name, 0, 2) }}</span>
                         </div>
                     @else
