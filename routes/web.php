@@ -32,6 +32,18 @@ Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user
     Route::post('/request-role', [UserDashboardController::class, 'requestRole'])->name('request.role');
 });
 
+// Book Management Routes (Admin and Petugas only) - MUST BE BEFORE /books/{book}
+Route::middleware(['auth', 'verified', 'role:admin,petugas'])->group(function () {
+    Route::get('/books/create', [App\Http\Controllers\BookController::class, 'create'])->name('books.create');
+    Route::post('/books', [App\Http\Controllers\BookController::class, 'store'])->name('books.store');
+    Route::get('/books/{book}/edit', [App\Http\Controllers\BookController::class, 'edit'])->name('books.edit');
+    Route::patch('/books/{book}', [App\Http\Controllers\BookController::class, 'update'])->name('books.update');
+    Route::delete('/books/{book}', [App\Http\Controllers\BookController::class, 'destroy'])->name('books.destroy');
+    
+    // Admin delete review
+    Route::delete('/reviews/{review}/admin', [App\Http\Controllers\ReviewController::class, 'adminDestroy'])->name('reviews.admin.destroy');
+});
+
 // Books Routes (accessible by all authenticated users)
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/books', [App\Http\Controllers\BookController::class, 'index'])->name('books.index');
@@ -54,16 +66,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
     Route::patch('/reviews/{review}', [App\Http\Controllers\ReviewController::class, 'update'])->name('reviews.update');
     Route::delete('/reviews/{review}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
-});
-
-// Book Management Routes (Admin and Petugas only)
-Route::middleware(['auth', 'verified', 'role:admin,petugas'])->group(function () {
-    Route::post('/books', [App\Http\Controllers\BookController::class, 'store'])->name('books.store');
-    Route::patch('/books/{book}', [App\Http\Controllers\BookController::class, 'update'])->name('books.update');
-    Route::delete('/books/{book}', [App\Http\Controllers\BookController::class, 'destroy'])->name('books.destroy');
-    
-    // Admin delete review
-    Route::delete('/reviews/{review}/admin', [App\Http\Controllers\ReviewController::class, 'adminDestroy'])->name('reviews.admin.destroy');
 });
 
 // Petugas Dashboard Routes

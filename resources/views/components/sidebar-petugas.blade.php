@@ -24,52 +24,52 @@
 
         <!-- Manajemen Perpustakaan -->
         <div class="pt-4">
-            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Manajemen</p>
+            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Management</p>
             
-            <a href="{{ route('books.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('books.*') ? 'bg-green-50 text-green-700' : 'text-slate-700 hover:bg-slate-50' }}">
+            <a href="{{ route('books.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('books.index') || request()->routeIs('books.show') ? 'bg-green-50 text-green-700' : 'text-slate-700 hover:bg-slate-50' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
-                Kelola Buku
+                Manage Books
             </a>
 
             <a href="{{ route('borrowings.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('borrowings.index') ? 'bg-green-50 text-green-700' : 'text-slate-700 hover:bg-slate-50' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                 </svg>
-                Kelola Peminjaman
+                Manage Borrowings
             </a>
 
             <a href="{{ route('borrowings.return.page') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('borrowings.return.page') ? 'bg-green-50 text-green-700' : 'text-slate-700 hover:bg-slate-50' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
                 </svg>
-                Pengembalian Buku Saya
+                My Book Returns
             </a>
 
             <a href="{{ route('reviews.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('reviews.*') ? 'bg-green-50 text-green-700' : 'text-slate-700 hover:bg-slate-50' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
                 </svg>
-                Ulasan & Rating
+                Reviews & Ratings
             </a>
         </div>
 
         <!-- Laporan -->
         <div class="pt-4">
-            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Laporan</p>
+            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Reports</p>
             
             <a href="{{ route('reports.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('reports.*') ? 'bg-green-50 text-green-700' : 'text-slate-700 hover:bg-slate-50' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
-                Generate Laporan
+                Generate Reports
             </a>
         </div>
 
         <!-- Akun -->
         <div class="pt-4">
-            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Akun</p>
+            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Account</p>
             
             <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('profile.edit') ? 'bg-green-50 text-green-700' : 'text-slate-700 hover:bg-slate-50' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
