@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perpustakaan Digital - E-SIPUS</title>
+    <title>Digital Library - E-SIPUS</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-slate-50">
@@ -18,20 +18,33 @@
 
         <div class="flex-1 ml-64">
             <div class="p-8">
+                <!-- Success/Error Messages -->
+                @if(session('success'))
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 <!-- Header Section -->
                 <div class="mb-8">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h1 class="text-3xl font-bold text-slate-800 mb-2">Perpustakaan Digital</h1>
-                            <p class="text-slate-600">Jelajahi koleksi buku digital kami</p>
+                            <h1 class="text-3xl font-bold text-slate-800 mb-2">Digital Library</h1>
+                            <p class="text-slate-600">Explore our digital book collection</p>
                         </div>
                         @if(Auth::user()->isAdmin() || Auth::user()->isPetugas())
-                            <button class="inline-flex items-center px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition">
+                            <a href="{{ route('books.create') }}" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
-                                Tambah Buku
-                            </button>
+                                Add Book
+                            </a>
                         @endif
                     </div>
                 </div>
@@ -42,15 +55,15 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                             <!-- Search -->
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Cari Buku</label>
-                                <input type="text" name="search" value="{{ request('search') }}" placeholder="Judul, penulis, ISBN..." class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Search Books</label>
+                                <input type="text" name="search" value="{{ request('search') }}" placeholder="Title, author, ISBN..." class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-black">
                             </div>
 
                             <!-- Category Filter -->
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Kategori</label>
-                                <select name="category" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                                    <option value="">Semua Kategori</option>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Category</label>
+                                <select name="category" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-black">
+                                    <option value="">All Categories</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category }}" {{ request('category') == $category ? 'selected' : '' }}>
                                             {{ $category }}
@@ -61,21 +74,21 @@
 
                             <!-- Availability Filter -->
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Ketersediaan</label>
-                                <select name="available" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                                    <option value="">Semua Buku</option>
-                                    <option value="1" {{ request('available') == '1' ? 'selected' : '' }}>Tersedia</option>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Availability</label>
+                                <select name="available" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-black">
+                                    <option value="">All Books</option>
+                                    <option value="1" {{ request('available') == '1' ? 'selected' : '' }}>Available</option>
                                 </select>
                             </div>
 
                             <!-- Added By Filter -->
                             @if(Auth::user()->isAdmin() || Auth::user()->isPetugas())
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-2">Ditambahkan Oleh</label>
-                                    <select name="added_by" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                                        <option value="">Semua</option>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Added By</label>
+                                    <select name="added_by" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-black">
+                                        <option value="">All</option>
                                         <option value="admin" {{ request('added_by') == 'admin' ? 'selected' : '' }}>Admin</option>
-                                        <option value="petugas" {{ request('added_by') == 'petugas' ? 'selected' : '' }}>Petugas</option>
+                                        <option value="petugas" {{ request('added_by') == 'petugas' ? 'selected' : '' }}>Staff</option>
                                     </select>
                                 </div>
                             @endif
@@ -87,7 +100,7 @@
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
                                 </svg>
-                                Terapkan Filter
+                                Apply Filters
                             </button>
                             <a href="{{ route('books.index') }}" class="inline-flex items-center px-6 py-2 bg-slate-200 text-slate-700 font-semibold rounded-lg hover:bg-slate-300 transition">
                                 Reset
@@ -102,10 +115,10 @@
                         <svg class="w-24 h-24 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                         </svg>
-                        <h3 class="text-xl font-semibold text-slate-700 mb-2">Tidak Ada Buku Ditemukan</h3>
-                        <p class="text-slate-500 mb-6">Coba ubah filter pencarian Anda atau reset filter</p>
+                        <h3 class="text-xl font-semibold text-slate-700 mb-2">No Books Found</h3>
+                        <p class="text-slate-500 mb-6">Try changing your search filters or reset filters</p>
                         <a href="{{ route('books.index') }}" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
-                            Reset Filter
+                            Reset Filters
                         </a>
                     </div>
                 @else
@@ -126,9 +139,29 @@
                                     <!-- Availability Badge -->
                                     <div class="absolute top-3 right-3">
                                         <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $book->isAvailable() ? 'bg-green-500 text-white' : 'bg-red-500 text-white' }}">
-                                            {{ $book->isAvailable() ? 'Tersedia' : 'Dipinjam' }}
+                                            {{ $book->isAvailable() ? 'Available' : 'Borrowed' }}
                                         </span>
                                     </div>
+
+                                    <!-- Edit/Delete Buttons for Admin/Staff -->
+                                    @if(Auth::user()->isAdmin() || Auth::user()->isPetugas())
+                                        <div class="absolute top-3 left-3 flex gap-2">
+                                            <a href="{{ route('books.edit', $book) }}" class="p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition">
+                                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                </svg>
+                                            </a>
+                                            <form method="POST" action="{{ route('books.destroy', $book) }}" onsubmit="return confirm('Are you sure you want to delete this book?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition">
+                                                    <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @endif
                                 </div>
                                 
                                 <div class="p-4">
@@ -137,11 +170,11 @@
                                     
                                     <div class="flex items-center justify-between mb-3">
                                         <span class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-full">{{ $book->category }}</span>
-                                        <span class="text-xs text-slate-500">{{ $book->available_copies }}/{{ $book->total_copies }} tersedia</span>
+                                        <span class="text-xs text-slate-500">{{ $book->available_copies }}/{{ $book->total_copies }} available</span>
                                     </div>
                                     
                                     <a href="{{ route('books.show', $book) }}" class="block w-full text-center px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition">
-                                        Lihat Detail
+                                        View Details
                                     </a>
                                 </div>
                             </div>

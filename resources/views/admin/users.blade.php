@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('page-title', 'Kelola Users')
+@section('page-title', 'Manage Users')
 
 @section('content')
     <div class="bg-white rounded-lg shadow-sm p-6">
@@ -15,11 +15,11 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Terdaftar</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registered</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -41,7 +41,7 @@
                                 </span>
                             @elseif($user->role === 'petugas')
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                    Petugas
+                                    Staff
                                 </span>
                             @else
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
@@ -59,12 +59,12 @@
                                 @method('PATCH')
                                 <select name="role" onchange="this.form.submit()" class="text-sm border-gray-300 rounded">
                                     <option value="user" {{ $user->role === 'user' ? 'selected' : '' }}>User</option>
-                                    <option value="petugas" {{ $user->role === 'petugas' ? 'selected' : '' }}>Petugas</option>
+                                    <option value="petugas" {{ $user->role === 'petugas' ? 'selected' : '' }}>Staff</option>
                                     <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
                                 </select>
                             </form>
                             @else
-                                <span class="text-gray-400">Anda sendiri</span>
+                                <span class="text-gray-400">You (self)</span>
                             @endif
                         </td>
                     </tr>

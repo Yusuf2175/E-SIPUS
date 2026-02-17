@@ -1,6 +1,17 @@
 <!-- Admin Sidebar Component -->
 <aside class="fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-200 overflow-y-auto z-40">
     <!-- Logo/Header -->
+    <div class="h-16 flex items-center px-6 border-b border-slate-200">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+            </div>
+            <span class="text-xl font-bold text-slate-800">E-SIPUS</span>
+        </div>
+    </div>
+
     <!-- Navigation -->
     <nav class="p-4 space-y-1">
         <!-- Dashboard -->
@@ -19,65 +30,65 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                 </svg>
-                Kelola Users
+                Manage Users
             </a>
 
             <a href="{{ route('admin.role.requests') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('admin.role.requests') ? 'bg-red-50 text-red-700' : 'text-slate-700 hover:bg-slate-50' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                Permintaan Role
+                Role Requests
             </a>
         </div>
 
         <!-- Library Management -->
         <div class="pt-4">
-            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Perpustakaan</p>
+            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Library</p>
             
-            <a href="{{ route('books.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('books.*') ? 'bg-red-50 text-red-700' : 'text-slate-700 hover:bg-slate-50' }}">
+            <a href="{{ route('books.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('books.index') || request()->routeIs('books.show') ? 'bg-red-50 text-red-700' : 'text-slate-700 hover:bg-slate-50' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
-                Kelola Buku
+                Manage Books
             </a>
 
             <a href="{{ route('borrowings.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('borrowings.index') ? 'bg-red-50 text-red-700' : 'text-slate-700 hover:bg-slate-50' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                 </svg>
-                Kelola Peminjaman
+                Manage Borrowings
             </a>
 
             <a href="{{ route('borrowings.return.page') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('borrowings.return.page') ? 'bg-red-50 text-red-700' : 'text-slate-700 hover:bg-slate-50' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
                 </svg>
-                Pengembalian Buku Saya
+                My Book Returns
             </a>
 
             <a href="{{ route('reviews.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('reviews.*') ? 'bg-red-50 text-red-700' : 'text-slate-700 hover:bg-slate-50' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
                 </svg>
-                Ulasan & Rating
+                Reviews & Ratings
             </a>
         </div>
 
         <!-- Laporan -->
         <div class="pt-4">
-            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Laporan</p>
+            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Reports</p>
             
             <a href="{{ route('reports.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('reports.*') ? 'bg-red-50 text-red-700' : 'text-slate-700 hover:bg-slate-50' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
-                Generate Laporan
+                Generate Reports
             </a>
         </div>
 
         <!-- Account -->
         <div class="pt-4">
-            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Akun</p>
+            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Account</p>
             
             <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition {{ request()->routeIs('profile.edit') ? 'bg-red-50 text-red-700' : 'text-slate-700 hover:bg-slate-50' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

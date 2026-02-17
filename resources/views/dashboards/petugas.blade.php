@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Petugas - E-SIPUS</title>
+    <title>Staff Dashboard - E-SIPUS</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-slate-50">
@@ -15,7 +15,7 @@
             <!-- Top Bar -->
             <div class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
                 <div>
-                    <h2 class="text-lg font-semibold text-slate-800">Dashboard Petugas</h2>
+                    <h2 class="text-lg font-semibold text-slate-800">Staff Dashboard</h2>
                 </div>
                 <div class="flex items-center gap-4">
                     <span class="text-sm text-slate-600">{{ auth()->user()->name }}</span>
@@ -29,8 +29,8 @@
             <div class="p-6 lg:p-8">
                 <!-- Welcome Section -->
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-slate-800 mb-2">Selamat Datang, {{ $user->name }}!</h1>
-                    <p class="text-slate-600">Dashboard Petugas Perpustakaan</p>
+                    <h1 class="text-3xl font-bold text-slate-800 mb-2">Welcome, {{ $user->name }}!</h1>
+                    <p class="text-slate-600">Library Staff Dashboard</p>
                 </div>
 
                 <!-- Statistics Cards -->
@@ -45,8 +45,8 @@
                             </div>
                         </div>
                         <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['total_books'] }}</p>
-                        <p class="text-sm text-slate-600">Total Buku</p>
-                        <p class="text-xs text-green-600 mt-2">{{ $stats['available_books'] }} tersedia</p>
+                        <p class="text-sm text-slate-600">Total Books</p>
+                        <p class="text-xs text-green-600 mt-2">{{ $stats['available_books'] }} available</p>
                     </div>
 
                     <!-- Active Borrowings -->
@@ -59,9 +59,9 @@
                             </div>
                         </div>
                         <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['active_borrowings'] }}</p>
-                        <p class="text-sm text-slate-600">Sedang Dipinjam</p>
+                        <p class="text-sm text-slate-600">Currently Borrowed</p>
                         @if($stats['overdue_borrowings'] > 0)
-                            <p class="text-xs text-red-600 mt-2">{{ $stats['overdue_borrowings'] }} terlambat</p>
+                            <p class="text-xs text-red-600 mt-2">{{ $stats['overdue_borrowings'] }} overdue</p>
                         @endif
                     </div>
 
@@ -75,12 +75,12 @@
                             </div>
                         </div>
                         <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['total_users'] }}</p>
-                        <p class="text-sm text-slate-600">Total Siswa & Siswi</p>
-                        <p class="text-xs text-blue-600 mt-2">{{ $stats['books_added_by_me'] }} buku ditambahkan</p>
+                        <p class="text-sm text-slate-600">Total Students</p>
+                        <p class="text-xs text-blue-600 mt-2">{{ $stats['books_added_by_me'] }} books added</p>
                     </div>
                 </div>
 
-                <!-- CTA Pengembalian Buku -->
+                <!-- CTA Return Books -->
                 @if($myActiveBorrowings > 0)
                     <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6 mb-8">
                         <div class="flex items-center justify-between">
@@ -91,12 +91,12 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="text-lg font-bold text-slate-800 mb-1">Anda Memiliki Buku yang Dipinjam</h3>
-                                    <p class="text-sm text-slate-600">Anda memiliki <span class="font-semibold text-green-700">{{ $myActiveBorrowings }} buku</span> yang sedang dipinjam. Jangan lupa untuk mengembalikannya tepat waktu!</p>
+                                    <h3 class="text-lg font-bold text-slate-800 mb-1">You Have Borrowed Books</h3>
+                                    <p class="text-sm text-slate-600">You have <span class="font-semibold text-green-700">{{ $myActiveBorrowings }} book{{ $myActiveBorrowings > 1 ? 's' : '' }}</span> currently borrowed. Don't forget to return them on time!</p>
                                 </div>
                             </div>
                             <a href="{{ route('borrowings.return.page') }}" class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 shrink-0">
-                                Kembalikan Buku
+                                Return Books
                             </a>
                         </div>
                     </div>
@@ -108,9 +108,9 @@
                         <!-- Recent Borrowings Card -->
                         <div class="bg-white rounded-2xl shadow-sm p-6">
                             <div class="flex items-center justify-between mb-6">
-                                <h2 class="text-xl font-bold text-slate-800">Peminjaman Terbaru</h2>
+                                <h2 class="text-xl font-bold text-slate-800">Recent Borrowings</h2>
                                 <a href="{{ route('borrowings.index') }}" class="text-purple-600 hover:text-purple-700 text-sm font-medium">
-                                    Lihat Semua →
+                                    View All →
                                 </a>
                             </div>
 
@@ -119,7 +119,7 @@
                                     <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                                     </svg>
-                                    <p class="text-slate-500">Belum ada peminjaman</p>
+                                    <p class="text-slate-500">No borrowings yet</p>
                                 </div>
                             @else
                                 <div class="space-y-3">
@@ -139,7 +139,7 @@
                                                 <p class="text-sm text-slate-600">{{ $borrowing->user->name }}</p>
                                                 <div class="flex items-center gap-2 mt-1">
                                                     <span class="text-xs px-2 py-1 rounded-full {{ $borrowing->status === 'borrowed' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' }}">
-                                                        {{ $borrowing->status === 'borrowed' ? 'Dipinjam' : 'Dikembalikan' }}
+                                                        {{ $borrowing->status === 'borrowed' ? 'Borrowed' : 'Returned' }}
                                                     </span>
                                                     <span class="text-xs text-slate-500">{{ $borrowing->borrowed_date->format('d M Y') }}</span>
                                                 </div>
@@ -157,7 +157,7 @@
                                     <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
-                                    <h2 class="text-xl font-bold text-red-800">Peminjaman Terlambat</h2>
+                                    <h2 class="text-xl font-bold text-red-800">Overdue Borrowings</h2>
                                 </div>
                                 <div class="space-y-3">
                                     @foreach($overdueBorrowings as $borrowing)
@@ -167,14 +167,14 @@
                                                     <p class="font-semibold text-slate-800">{{ $borrowing->book->title }}</p>
                                                     <p class="text-sm text-slate-600">{{ $borrowing->user->name }}</p>
                                                     <p class="text-xs text-red-600 font-medium mt-1">
-                                                        Terlambat {{ $borrowing->getDaysOverdue() }} hari
+                                                        Overdue {{ $borrowing->getDaysOverdue() }} day{{ $borrowing->getDaysOverdue() > 1 ? 's' : '' }}
                                                     </p>
                                                 </div>
                                                 <form action="{{ route('borrowings.return', $borrowing) }}" method="POST">
                                                     @csrf
                                                     @method('PATCH')
                                                     <button type="submit" class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition">
-                                                        Kembalikan
+                                                        Return
                                                     </button>
                                                 </form>
                                             </div>

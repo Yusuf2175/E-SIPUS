@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
@@ -12,12 +13,10 @@ class BookController extends Controller
     {
         $query = Book::with('addedBy');
         
-        // Filter by category
         if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
         
-        // Search functionality
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -27,12 +26,10 @@ class BookController extends Controller
             });
         }
         
-        // Filter by availability
         if ($request->filled('available') && $request->available == '1') {
             $query->available();
         }
         
-        // Sort by added_by (admin/petugas)
         if ($request->filled('added_by')) {
             $query->whereHas('addedBy', function($q) use ($request) {
                 $q->where('role', $request->added_by);
@@ -40,9 +37,15 @@ class BookController extends Controller
         }
         
         $books = $query->paginate(12);
-        $categories = Book::distinct()->pluck('category');
+        $categories = \App\Models\Category::orderBy('name')->pluck('name');
         
         return view('books.index', compact('books', 'categories'));
+    }
+
+    public function create()
+    {
+        $categories = \App\Models\Category::orderBy('name')->get();
+        return view('books.create', compact('categories'));
     }
 
     public function show(Book $book)
@@ -65,7 +68,7 @@ class BookController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
             'isbn' => 'required|string|unique:books,isbn',
@@ -77,7 +80,7 @@ class BookController extends Controller
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $data = $request->all();
+        $data = $validated;
         $data['available_copies'] = $data['total_copies'];
         $data['added_by'] = Auth::id();
 
@@ -87,12 +90,18 @@ class BookController extends Controller
 
         Book::create($data);
 
-        return redirect()->back()->with('success', 'Buku berhasil ditambahkan!');
+        return redirect()->route('books.index')->with('success', 'Book added successfully!');
+    }
+
+    public function edit(Book $book)
+    {
+        $categories = \App\Models\Category::orderBy('name')->get();
+        return view('books.edit', compact('book', 'categories'));
     }
 
     public function update(Request $request, Book $book)
     {
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
             'isbn' => 'required|string|unique:books,isbn,' . $book->id,
@@ -104,26 +113,33 @@ class BookController extends Controller
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $data = $request->all();
+        $data = $validated;
 
         if ($request->hasFile('cover_image')) {
+            if ($book->cover_image && Storage::disk('public')->exists($book->cover_image)) {
+                Storage::disk('public')->delete($book->cover_image);
+            }
+            
             $data['cover_image'] = $request->file('cover_image')->store('book-covers', 'public');
         }
 
         $book->update($data);
 
-        return redirect()->back()->with('success', 'Buku berhasil diperbarui!');
+        return redirect()->route('books.index')->with('success', 'Book updated successfully!');
     }
 
     public function destroy(Book $book)
     {
-        // Check if book has active borrowings
         if ($book->activeBorrowings()->count() > 0) {
-            return redirect()->back()->with('error', 'Tidak dapat menghapus buku yang sedang dipinjam!');
+            return redirect()->route('books.index')->with('error', 'Cannot delete book that is currently borrowed!');
+        }
+
+        if ($book->cover_image && Storage::disk('public')->exists($book->cover_image)) {
+            Storage::disk('public')->delete($book->cover_image);
         }
 
         $book->delete();
 
-        return redirect()->back()->with('success', 'Buku berhasil dihapus!');
+        return redirect()->route('books.index')->with('success', 'Book deleted successfully!');
     }
 }

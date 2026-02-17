@@ -12,35 +12,19 @@ class CategorySeeder extends Seeder
         $categories = [
             [
                 'name' => 'Novel & Sastra',
-                'description' => 'Koleksi novel best-seller dan karya sastra klasik dari penulis ternama'
+                'description' => 'A collection of best-selling novels and classic literary works from renowned authors.'
             ],
             [
                 'name' => 'Sains & Teknologi',
-                'description' => 'Buku pengetahuan alam, komputer, dan inovasi teknologi terbaru'
+                'description' => 'The latest books on natural science, computers, and technological innovations.'
             ],
             [
                 'name' => 'Bisnis & Ekonomi',
-                'description' => 'Panduan bisnis, manajemen, dan ekonomi global'
+                'description' => 'A guide to global business, management, and economics.'
             ],
             [
                 'name' => 'Sejarah & Budaya',
-                'description' => 'Menjelajahi masa lalu dan ragam budaya dunia'
-            ],
-            [
-                'name' => 'Pendidikan',
-                'description' => 'Buku pelajaran dan referensi akademik'
-            ],
-            [
-                'name' => 'Agama & Filsafat',
-                'description' => 'Kajian keagamaan dan pemikiran filosofis'
-            ],
-            [
-                'name' => 'Anak & Remaja',
-                'description' => 'Bacaan untuk anak-anak dan remaja'
-            ],
-            [
-                'name' => 'Komik & Manga',
-                'description' => 'Komik lokal dan manga dari Jepang'
+                'description' => 'Exploring the past and various cultures of the world.'
             ]
         ];
 

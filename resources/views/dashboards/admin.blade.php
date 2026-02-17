@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - E-SIPUS</title>
+    <title>Admin Dashboard - E-SIPUS</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-slate-50">
@@ -15,7 +15,7 @@
             <!-- Top Bar -->
             <div class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
                 <div>
-                    <h2 class="text-lg font-semibold text-slate-800">Dashboard Admin</h2>
+                    <h2 class="text-lg font-semibold text-slate-800">Admin Dashboard</h2>
                 </div>
                 <div class="flex items-center gap-4">
                     <span class="text-sm text-slate-600">{{ auth()->user()->name }}</span>
@@ -28,8 +28,8 @@
             <!-- Content Area -->
             <div class="p-6 lg:p-8">
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-slate-800 mb-2">Selamat Datang, {{ $user->name }}!</h1>
-                    <p class="text-slate-600">Dashboard Administrator - Kelola seluruh sistem perpustakaan</p>
+                    <h1 class="text-3xl font-bold text-slate-800 mb-2">Welcome, {{ $user->name }}!</h1>
+                    <p class="text-slate-600">Administrator Dashboard - Manage the entire library system</p>
                 </div>
 
                 <!-- Statistics Cards -->
@@ -45,7 +45,7 @@
                         </div>
                         <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['total_users'] }}</p>
                         <p class="text-sm text-slate-600">Total Users</p>
-                        <p class="text-xs text-blue-600 mt-2">{{ $stats['total_regular_users'] }} user biasa</p>
+                        <p class="text-xs text-blue-600 mt-2">{{ $stats['total_regular_users'] }} regular users</p>
                     </div>
 
                     <!-- Total Books -->
@@ -58,8 +58,8 @@
                             </div>
                         </div>
                         <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['total_books'] }}</p>
-                        <p class="text-sm text-slate-600">Total Buku</p>
-                        <p class="text-xs text-green-600 mt-2">{{ $stats['available_books'] }} tersedia</p>
+                        <p class="text-sm text-slate-600">Total Books</p>
+                        <p class="text-xs text-green-600 mt-2">{{ $stats['available_books'] }} available</p>
                     </div>
 
                     <!-- Active Borrowings -->
@@ -72,9 +72,9 @@
                             </div>
                         </div>
                         <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['active_borrowings'] }}</p>
-                        <p class="text-sm text-slate-600">Sedang Dipinjam</p>
+                        <p class="text-sm text-slate-600">Currently Borrowed</p>
                         @if($stats['overdue_borrowings'] > 0)
-                            <p class="text-xs text-red-600 mt-2">{{ $stats['overdue_borrowings'] }} terlambat</p>
+                            <p class="text-xs text-red-600 mt-2">{{ $stats['overdue_borrowings'] }} overdue</p>
                         @endif
                     </div>
 
@@ -88,11 +88,11 @@
                             </div>
                         </div>
                         <p class="text-3xl font-bold text-slate-800 mb-1">{{ $stats['pending_requests'] }}</p>
-                        <p class="text-sm text-slate-600">Permintaan Pending</p>
+                        <p class="text-sm text-slate-600">Pending Requests</p>
                     </div>
                 </div>
 
-                <!-- CTA Pengembalian Buku -->
+                <!-- CTA Return Books -->
                 @if($myActiveBorrowings > 0)
                     <div class="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-2xl p-6 mb-8">
                         <div class="flex items-center justify-between">
@@ -103,12 +103,12 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="text-lg font-bold text-slate-800 mb-1">Anda Memiliki Buku yang Dipinjam</h3>
-                                    <p class="text-sm text-slate-600">Anda memiliki <span class="font-semibold text-red-700">{{ $myActiveBorrowings }} buku</span> yang sedang dipinjam. Jangan lupa untuk mengembalikannya tepat waktu!</p>
+                                    <h3 class="text-lg font-bold text-slate-800 mb-1">You Have Borrowed Books</h3>
+                                    <p class="text-sm text-slate-600">You have <span class="font-semibold text-red-700">{{ $myActiveBorrowings }} book{{ $myActiveBorrowings > 1 ? 's' : '' }}</span> currently borrowed. Don't forget to return them on time!</p>
                                 </div>
                             </div>
                             <a href="{{ route('borrowings.return.page') }}" class="bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 shrink-0">
-                                Kembalikan Buku
+                                Return Books
                             </a>
                         </div>
                     </div>
@@ -117,7 +117,7 @@
                 <!-- Staff Statistics -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div class="bg-white rounded-2xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-slate-800 mb-4">Statistik Staff</h3>
+                        <h3 class="text-lg font-bold text-slate-800 mb-4">Staff Statistics</h3>
                         <div class="space-y-4">
                             <div class="flex items-center justify-between p-4 bg-red-50 rounded-xl">
                                 <div class="flex items-center gap-3">
@@ -153,7 +153,7 @@
 
                     <!-- Quick Actions -->
                     <div class="bg-white rounded-2xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-slate-800 mb-4">Aksi Cepat</h3>
+                        <h3 class="text-lg font-bold text-slate-800 mb-4">Quick Actions</h3>
                         <div class="space-y-3">
                             <a href="{{ route('admin.users') }}" class="flex items-center gap-3 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition group">
                                 <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition">
@@ -162,7 +162,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-slate-800">Kelola Users</p>
+                                    <p class="font-semibold text-slate-800">Manage Users</p>
                                     <p class="text-xs text-slate-600">Manage all users</p>
                                 </div>
                             </a>
@@ -174,7 +174,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-slate-800">Permintaan Role</p>
+                                    <p class="font-semibold text-slate-800">Role Requests</p>
                                     <p class="text-xs text-slate-600">{{ $stats['pending_requests'] }} pending</p>
                                 </div>
                             </a>
@@ -186,7 +186,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-slate-800">Kelola Buku</p>
+                                    <p class="font-semibold text-slate-800">Manage Books</p>
                                     <p class="text-xs text-slate-600">Manage books</p>
                                 </div>
                             </a>
@@ -198,7 +198,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-slate-800">Kelola Peminjaman</p>
+                                    <p class="font-semibold text-slate-800">Manage Borrowings</p>
                                     <p class="text-xs text-slate-600">Manage borrowings</p>
                                 </div>
                             </a>
@@ -210,13 +210,13 @@
                     <!-- Recent Users -->
                     <div class="bg-white rounded-2xl shadow-sm p-6">
                         <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-lg font-bold text-slate-800">User Terbaru</h3>
+                            <h3 class="text-lg font-bold text-slate-800">Recent Users</h3>
                             <a href="{{ route('admin.users') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                                Lihat Semua →
+                                View All →
                             </a>
                         </div>
                         @if($recentUsers->isEmpty())
-                            <p class="text-center text-slate-500 py-8">Belum ada user</p>
+                            <p class="text-center text-slate-500 py-8">No users yet</p>
                         @else
                             <div class="space-y-3">
                                 @foreach($recentUsers as $recentUser)
@@ -242,13 +242,13 @@
                     <!-- Pending Role Requests -->
                     <div class="bg-white rounded-2xl shadow-sm p-6">
                         <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-lg font-bold text-slate-800">Permintaan Role Pending</h3>
+                            <h3 class="text-lg font-bold text-slate-800">Pending Role Requests</h3>
                             <a href="{{ route('admin.role.requests') }}" class="text-yellow-600 hover:text-yellow-700 text-sm font-medium">
-                                Lihat Semua →
+                                View All →
                             </a>
                         </div>
                         @if($pendingRoleRequests->isEmpty())
-                            <p class="text-center text-slate-500 py-8">Tidak ada permintaan pending</p>
+                            <p class="text-center text-slate-500 py-8">No pending requests</p>
                         @else
                             <div class="space-y-3">
                                 @foreach($pendingRoleRequests as $request)
