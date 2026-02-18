@@ -270,24 +270,19 @@
             </div>
         </div>
     </div>
-
-    <!-- Load SweetAlert2 Library -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
-        // Fungsi untuk membuka modal return dengan SweetAlert2
         function openReturnModal(borrowingId) {
-            // Tampilkan SweetAlert2 dengan form return
             Swal.fire({
                 title: 'Book Return',
-                html: createReturnForm(), // Panggil fungsi untuk membuat form
+                html: createReturnForm(),
                 width: '600px',
                 showCancelButton: true,
                 confirmButtonText: 'Return Book',
                 cancelButtonText: 'Cancel',
                 confirmButtonColor: '#2563eb',
                 cancelButtonColor: '#64748b',
-                // Fungsi yang dijalankan sebelum submit
                 preConfirm: () => {
                     return validateAndGetFormData();
                 }
@@ -299,7 +294,7 @@
             });
         }
 
-        // Fungsi untuk membuat HTML form return
+        // menampilkan pop up untuk return option
         function createReturnForm() {
             return `
                 <div class="text-left space-y-4">
@@ -308,7 +303,6 @@
                             Return Reason <span class="text-red-500">*</span>
                         </label>
                         <div class="space-y-2">
-                            <!-- Option 1: Normal -->
                             <label class="flex items-start p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition">
                                 <input type="radio" name="return_reason" value="normal" class="mt-1">
                                 <div class="ml-3">
@@ -317,7 +311,6 @@
                                 </div>
                             </label>
                             
-                            <!-- Option 2: User Missing -->
                             <label class="flex items-start p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-yellow-500 hover:bg-yellow-50 transition">
                                 <input type="radio" name="return_reason" value="user_missing" class="mt-1">
                                 <div class="ml-3">
@@ -326,7 +319,6 @@
                                 </div>
                             </label>
                             
-                            <!-- Option 3: Book Damaged -->
                             <label class="flex items-start p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition">
                                 <input type="radio" name="return_reason" value="book_damaged" class="mt-1">
                                 <div class="ml-3">
@@ -335,7 +327,6 @@
                                 </div>
                             </label>
                             
-                            <!-- Option 4: Book Lost -->
                             <label class="flex items-start p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-red-500 hover:bg-red-50 transition">
                                 <input type="radio" name="return_reason" value="book_lost" class="mt-1">
                                 <div class="ml-3">
@@ -346,7 +337,6 @@
                         </div>
                     </div>
                     
-                    <!-- Additional Notes -->
                     <div>
                         <label for="return_notes" class="block text-sm font-semibold text-gray-700 mb-2">
                             Additional Notes (Optional)
@@ -364,12 +354,9 @@
 
         // Fungsi untuk validasi dan ambil data dari form
         function validateAndGetFormData() {
-            // Cari radio button yang dipilih
             const selectedReason = document.querySelector('input[name="return_reason"]:checked');
-            // Ambil nilai notes
             const notes = document.getElementById('return_notes').value;
             
-            // Validasi: Pastikan user memilih return reason
             if (!selectedReason) {
                 Swal.showValidationMessage('Please select a return reason');
                 return false;
@@ -384,33 +371,28 @@
 
         // Fungsi untuk submit form return ke server
         function submitReturnForm(borrowingId, formData) {
-            // Buat form element
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = '/borrowings/' + borrowingId + '/return';
             
-            // Tambahkan CSRF token (Laravel requirement)
             const csrfToken = document.createElement('input');
             csrfToken.type = 'hidden';
             csrfToken.name = '_token';
             csrfToken.value = '{{ csrf_token() }}';
             form.appendChild(csrfToken);
             
-            // Tambahkan method PATCH (Laravel requirement)
             const methodField = document.createElement('input');
             methodField.type = 'hidden';
             methodField.name = '_method';
             methodField.value = 'PATCH';
             form.appendChild(methodField);
             
-            // Tambahkan return reason
             const reasonField = document.createElement('input');
             reasonField.type = 'hidden';
             reasonField.name = 'return_reason';
             reasonField.value = formData.return_reason;
             form.appendChild(reasonField);
             
-            // Tambahkan notes (jika ada)
             if (formData.return_notes) {
                 const notesField = document.createElement('input');
                 notesField.type = 'hidden';
@@ -419,7 +401,6 @@
                 form.appendChild(notesField);
             }
             
-            // Tambahkan form ke body dan submit
             document.body.appendChild(form);
             form.submit();
         }

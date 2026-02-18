@@ -57,12 +57,16 @@
                             <span class="text-xs font-bold text-gray-700">{{ substr(Auth::user()->name, 0, 2) }}</span>
                         </div>
                     @else
-                        <button onclick="openModal('registerModal')" class="inline-flex items-center px-5 py-2.5 rounded-full bg-secondrys text-white text-xs font-semibold tracking-[0.18em] uppercase hover:bg-[#9333EA] transition shadow-md">
-                            Sign Up
-                        </button>
-                        <div class="w-9 h-9 rounded-full bg-primarys/20  flex items-center justify-center overflow-hidden">
-                            <img src="{{ asset('assets/Character_avatar.png') }}" alt="Avatar" class="w-full h-full object-cover">
-                        </div>
+                        <a href="{{ route('register') }}">
+                            <button class="inline-flex items-center px-5 py-2.5 rounded-full bg-secondrys text-white text-xs font-semibold tracking-[0.18em] uppercase hover:bg-[#9333EA] transition shadow-md">
+                                Sign Up
+                            </button>
+                        </a>
+                        <a href="{{ route('login') }}">
+                            <div class="w-9 h-9 rounded-full bg-primarys/20 flex items-center justify-center overflow-hidden cursor-pointer hover:ring-2 hover:ring-purple-400 transition">
+                                <img src="{{ asset('assets/Character_avatar.png') }}" alt="Avatar" class="w-full h-full object-cover">
+                            </div>
+                        </a>
                     @endauth
                 </div>
             </div>
