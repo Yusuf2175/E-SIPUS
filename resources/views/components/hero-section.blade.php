@@ -19,9 +19,9 @@
                         Go to Dashboard 
                     </a>
                 @else
-                    <button onclick="openModal('loginModal')" class="inline-flex items-center px-8 py-3.5 rounded-full bg-secondrys text-white text-sm font-bold uppercase shadow-lg shadow-indigo-500/30 hover:bg-[#5f13af] transition-all duration-500">
+                    <a href="{{ route('login') }}" class="inline-flex items-center px-8 py-3.5 rounded-full bg-secondrys text-white text-sm font-bold uppercase shadow-lg shadow-indigo-500/30 hover:bg-[#5f13af] transition-all duration-500">
                         Explore E-SIPUS
-                    </button>
+                    </a>
                 @endauth
             </div>
         </div>

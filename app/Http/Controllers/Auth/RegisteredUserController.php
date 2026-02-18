@@ -10,21 +10,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
     /**
      * Display the registration view.
      */
-    public function create(): View
+    public function create()
     {
         // Jika sudah login, redirect ke dashboard
-        if (auth()->check()) {
+        if (Auth::check()) {
             return redirect()->route('dashboard');
         }
         
-        return view('auth.register');
+        return view('auth.registrasi.index');
     }
 
     /**
