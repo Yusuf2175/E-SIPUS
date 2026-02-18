@@ -245,42 +245,11 @@
                                                     <a href="{{ route('books.show', $borrowing->book) }}" class="text-purple-600 hover:text-purple-700 font-medium text-sm">
                                                         Details
                                                     </a>
-                                                    @if($borrowing->status === 'borrowed')
-                                                        @php
-                                                            $canReturn = false;
-                                                            $currentUser = Auth::user();
-                                                            $borrower = $borrowing->user;
-                                                            
-                                                            // Check if current user can return this book
-                                                            if ($borrower && $borrower->isAdmin()) {
-                                                                // Only admin can return books borrowed by admin
-                                                                $canReturn = $currentUser->isAdmin();
-                                                            } elseif ($borrower && $borrower->isPetugas()) {
-                                                                // Only petugas can return books borrowed by petugas
-                                                                $canReturn = $currentUser->isPetugas();
-                                                            } else {
-                                                                // Regular users or admin/petugas can return user books
-                                                                $canReturn = $currentUser->isAdmin() || $currentUser->isPetugas() || $borrowing->user_id === $currentUser->id;
-                                                            }
-                                                        @endphp
-                                                        
-                                                        @if($canReturn)
-                                                            @if(($currentUser->isAdmin() || $currentUser->isPetugas()) && $borrower->isUser())
-                                                                {{-- Admin/Petugas returning user's book - show modal --}}
-                                                                <button type="button" onclick="openReturnModal({{ $borrowing->id }})" class="text-green-600 hover:text-green-700 font-medium text-sm">
-                                                                    Return
-                                                                </button>
-                                                            @else
-                                                                {{-- User returning own book or admin/petugas returning own book --}}
-                                                                <form action="{{ route('borrowings.return', $borrowing) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to return this book?')">
-                                                                    @csrf
-                                                                    @method('PATCH')
-                                                                    <button type="submit" class="text-green-600 hover:text-green-700 font-medium text-sm">
-                                                                        Return
-                                                                    </button>
-                                                                </form>
-                                                            @endif
-                                                        @endif
+                                                    {{-- return button only for admin and petugas --}}
+                                                    @if($borrowing->status === 'borrowed' && (Auth::user()->isAdmin() || Auth::user()->isPetugas()))
+                                                        <button type="button" onclick="openReturnModal({{ $borrowing->id }})" class="text-green-600 hover:text-green-700 font-medium text-sm">
+                                                            Return
+                                                        </button>
                                                     @endif
                                                 </div>
                                             </td>
@@ -302,109 +271,159 @@
         </div>
     </div>
 
-    <!-- Return Modal -->
-    <div id="returnModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
-            <form id="returnForm" method="POST" action="">
-                @csrf
-                @method('PATCH')
-                
-                <!-- Modal Header -->
-                <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-2xl">
-                    <h3 class="text-xl font-bold">Book Return</h3>
-                    <p class="text-sm text-blue-100 mt-1">Select reason for book return</p>
-                </div>
+    <!-- Load SweetAlert2 Library -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        // Fungsi untuk membuka modal return dengan SweetAlert2
+        function openReturnModal(borrowingId) {
+            // Tampilkan SweetAlert2 dengan form return
+            Swal.fire({
+                title: 'Book Return',
+                html: createReturnForm(), // Panggil fungsi untuk membuat form
+                width: '600px',
+                showCancelButton: true,
+                confirmButtonText: 'Return Book',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#2563eb',
+                cancelButtonColor: '#64748b',
+                // Fungsi yang dijalankan sebelum submit
+                preConfirm: () => {
+                    return validateAndGetFormData();
+                }
+            }).then((result) => {
+                // Jika user klik "Return Book" dan form valid
+                if (result.isConfirmed) {
+                    submitReturnForm(borrowingId, result.value);
+                }
+            });
+        }
 
-                <!-- Modal Body -->
-                <div class="p-6 space-y-4">
-                    <!-- Return Reason -->
+        // Fungsi untuk membuat HTML form return
+        function createReturnForm() {
+            return `
+                <div class="text-left space-y-4">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-3">Return Reason <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">
+                            Return Reason <span class="text-red-500">*</span>
+                        </label>
                         <div class="space-y-2">
-                            <label class="flex items-start p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition">
-                                <input type="radio" name="return_reason" value="normal" class="mt-1 text-green-600 focus:ring-green-500" required>
+                            <!-- Option 1: Normal -->
+                            <label class="flex items-start p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition">
+                                <input type="radio" name="return_reason" value="normal" class="mt-1">
                                 <div class="ml-3">
-                                    <span class="font-medium text-slate-800">Normal</span>
-                                    <p class="text-sm text-slate-600">Book returned in good condition</p>
+                                    <span class="font-medium text-gray-800">Normal</span>
+                                    <p class="text-xs text-gray-600">Book returned in good condition</p>
                                 </div>
                             </label>
-
-                            <label class="flex items-start p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-yellow-500 hover:bg-yellow-50 transition">
-                                <input type="radio" name="return_reason" value="user_missing" class="mt-1 text-yellow-600 focus:ring-yellow-500" required>
+                            
+                            <!-- Option 2: User Missing -->
+                            <label class="flex items-start p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-yellow-500 hover:bg-yellow-50 transition">
+                                <input type="radio" name="return_reason" value="user_missing" class="mt-1">
                                 <div class="ml-3">
-                                    <span class="font-medium text-slate-800">User Missing</span>
-                                    <p class="text-sm text-slate-600">User cannot be contacted</p>
+                                    <span class="font-medium text-gray-800">User Missing</span>
+                                    <p class="text-xs text-gray-600">User cannot be contacted</p>
                                 </div>
                             </label>
-
-                            <label class="flex items-start p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition">
-                                <input type="radio" name="return_reason" value="book_damaged" class="mt-1 text-orange-600 focus:ring-orange-500" required>
+                            
+                            <!-- Option 3: Book Damaged -->
+                            <label class="flex items-start p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition">
+                                <input type="radio" name="return_reason" value="book_damaged" class="mt-1">
                                 <div class="ml-3">
-                                    <span class="font-medium text-slate-800">Book Damaged</span>
-                                    <p class="text-sm text-slate-600">Book returned in damaged condition</p>
+                                    <span class="font-medium text-gray-800">Book Damaged</span>
+                                    <p class="text-xs text-gray-600">Book returned in damaged condition</p>
                                 </div>
                             </label>
-
-                            <label class="flex items-start p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-red-500 hover:bg-red-50 transition">
-                                <input type="radio" name="return_reason" value="book_lost" class="mt-1 text-red-600 focus:ring-red-500" required>
+                            
+                            <!-- Option 4: Book Lost -->
+                            <label class="flex items-start p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-red-500 hover:bg-red-50 transition">
+                                <input type="radio" name="return_reason" value="book_lost" class="mt-1">
                                 <div class="ml-3">
-                                    <span class="font-medium text-slate-800">Book Lost</span>
-                                    <p class="text-sm text-slate-600">Book cannot be returned</p>
+                                    <span class="font-medium text-gray-800">Book Lost</span>
+                                    <p class="text-xs text-gray-600">Book cannot be returned</p>
                                 </div>
                             </label>
                         </div>
                     </div>
-
+                    
                     <!-- Additional Notes -->
                     <div>
-                        <label for="return_notes" class="block text-sm font-semibold text-slate-700 mb-2">Additional Notes (Optional)</label>
-                        <textarea name="return_notes" id="return_notes" rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Add notes if needed..."></textarea>
+                        <label for="return_notes" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Additional Notes (Optional)
+                        </label>
+                        <textarea 
+                            id="return_notes" 
+                            rows="3" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                            placeholder="Add notes if needed...">
+                        </textarea>
                     </div>
                 </div>
-
-                <!-- Modal Footer -->
-                <div class="bg-slate-50 px-6 py-4 rounded-b-2xl flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeReturnModal()" class="px-5 py-2.5 text-slate-700 font-medium rounded-lg hover:bg-slate-200 transition">
-                        Cancel
-                    </button>
-                    <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition">
-                        Return Book
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        function openReturnModal(borrowingId) {
-            const modal = document.getElementById('returnModal');
-            const form = document.getElementById('returnForm');
-            form.action = `/borrowings/${borrowingId}/return`;
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
+            `;
         }
 
-        function closeReturnModal() {
-            const modal = document.getElementById('returnModal');
-            const form = document.getElementById('returnForm');
-            form.reset();
-            modal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
+        // Fungsi untuk validasi dan ambil data dari form
+        function validateAndGetFormData() {
+            // Cari radio button yang dipilih
+            const selectedReason = document.querySelector('input[name="return_reason"]:checked');
+            // Ambil nilai notes
+            const notes = document.getElementById('return_notes').value;
+            
+            // Validasi: Pastikan user memilih return reason
+            if (!selectedReason) {
+                Swal.showValidationMessage('Please select a return reason');
+                return false;
+            }
+            
+            // Return data yang akan disubmit
+            return {
+                return_reason: selectedReason.value,
+                return_notes: notes
+            };
         }
 
-        // Close modal when clicking outside
-        document.getElementById('returnModal')?.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeReturnModal();
+        // Fungsi untuk submit form return ke server
+        function submitReturnForm(borrowingId, formData) {
+            // Buat form element
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/borrowings/' + borrowingId + '/return';
+            
+            // Tambahkan CSRF token (Laravel requirement)
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            form.appendChild(csrfToken);
+            
+            // Tambahkan method PATCH (Laravel requirement)
+            const methodField = document.createElement('input');
+            methodField.type = 'hidden';
+            methodField.name = '_method';
+            methodField.value = 'PATCH';
+            form.appendChild(methodField);
+            
+            // Tambahkan return reason
+            const reasonField = document.createElement('input');
+            reasonField.type = 'hidden';
+            reasonField.name = 'return_reason';
+            reasonField.value = formData.return_reason;
+            form.appendChild(reasonField);
+            
+            // Tambahkan notes (jika ada)
+            if (formData.return_notes) {
+                const notesField = document.createElement('input');
+                notesField.type = 'hidden';
+                notesField.name = 'return_notes';
+                notesField.value = formData.return_notes;
+                form.appendChild(notesField);
             }
-        });
-
-        // Close modal with Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeReturnModal();
-            }
-        });
+            
+            // Tambahkan form ke body dan submit
+            document.body.appendChild(form);
+            form.submit();
+        }
     </script>
+
 </body>
 </html>
