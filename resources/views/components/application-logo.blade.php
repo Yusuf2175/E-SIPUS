@@ -1,3 +1,3 @@
-<div>
-    <img src="{{ asset('assets/Logo_Sipus.png') }}" alt="Application Logo">
+<div class=" w-36 ">
+    <img src="{{ asset('assets/Logo_SipusV2.png') }}" alt="Application Logo">
 </div>

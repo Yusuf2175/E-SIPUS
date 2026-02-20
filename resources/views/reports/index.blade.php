@@ -1,14 +1,14 @@
 @extends('layouts.dashboard')
 
-@section('page-title', 'Generate Laporan')
+@section('page-title', 'Library Reports')
 
 @section('content')
     <!-- Header Section -->
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <h2 class="text-2xl font-bold text-gray-900">Generate Laporan</h2>
-                <p class="text-gray-600 mt-1">Buat laporan perpustakaan dalam format PDF atau Excel</p>
+                <h2 class="text-2xl font-bold text-gray-900">Report Generation Center</h2>
+                <p class="text-gray-600 mt-1">Generate comprehensive library reports in PDF or Excel format</p>
             </div>
             <div class="flex items-center space-x-2">
                 <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

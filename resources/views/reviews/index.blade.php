@@ -1,38 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Reviews & Ratings - E-SIPUS</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-slate-50">
-    <div class="flex min-h-screen">
-        @if(Auth::user()->isAdmin())
-            <x-sidebar-admin />
-        @elseif(Auth::user()->isPetugas())
-            <x-sidebar-petugas />
-        @else
-            <x-sidebar-user />
-        @endif
+@extends('layouts.dashboard')
 
-        <!-- Main Content -->
-        <main class="flex-1 ml-64">
-            <!-- Top Bar -->
-            <div class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
-                <div>
-                    <h2 class="text-lg font-semibold text-slate-800">Book Reviews & Ratings</h2>
-                </div>
-                <div class="flex items-center gap-4">
-                    <span class="text-sm text-slate-600">{{ auth()->user()->name }}</span>
-                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                        <span class="text-purple-700 font-semibold text-sm">{{ substr(auth()->user()->name, 0, 2) }}</span>
-                    </div>
-                </div>
-            </div>
+@section('page-title', 'Reviews & Ratings')
 
-            <!-- Content Area -->
-            <div class="p-6 lg:p-8">
+@section('content')
+        <div class="flex-1 -mt-10">
+            <div class="p-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-slate-800 mb-2">User Feedback Management</h1>
+                    <p class="text-slate-600">Monitor and manage book reviews from library members</p>
+                </div>
+
                 @if(session('success'))
                     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6">
                         {{ session('success') }}
@@ -261,7 +239,6 @@
                     </div>
                 @endif
             </div>
-        </main>
+        </div>
     </div>
-</body>
-</html>
+@endsection

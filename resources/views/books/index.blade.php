@@ -1,29 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Library - E-SIPUS</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-slate-50">
-    <div class="flex min-h-screen">
-        @if(auth()->user()->isAdmin())
-            <x-sidebar-admin />
-        @elseif(auth()->user()->isPetugas())
-            <x-sidebar-petugas />
-        @else
-            <x-sidebar-user />
-        @endif
+@extends('layouts.dashboard')
 
-        <div class="flex-1 ml-64">
+@section('page-title', 'Library Catalog Management')
+
+@section('content')
+        <div class="flex-1 -mt-10 ">
             <div class="p-8">
                 <!-- Header Section -->
                 <div class="mb-8">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h1 class="text-3xl font-bold text-slate-800 mb-2">Digital Library</h1>
-                            <p class="text-slate-600">Explore our digital book collection</p>
+                            <h1 class="text-3xl font-bold text-slate-800 mb-2">Book Inventory Overview</h1>
+                            <p class="text-slate-600">Comprehensive catalog management and collection administration</p>
                         </div>
                         @if(Auth::user()->isAdmin() || Auth::user()->isPetugas())
                             <a href="{{ route('books.create') }}" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition">
@@ -219,5 +206,4 @@
             });
         @endif
     </script>
-</body>
-</html>
+@endsection

@@ -1,22 +1,10 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $book->title }} - E-SIPUS</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-slate-50">
-    <div class="flex min-h-screen">
-        @if(auth()->user()->isAdmin())
-            <x-sidebar-admin />
-        @elseif(auth()->user()->isPetugas())
-            <x-sidebar-petugas />
-        @else
-            <x-sidebar-user />
-        @endif
+@extends('layouts.dashboard')
 
-        <div class="flex-1 ml-64">
+@section('page-title', 'Bibliographic Information')
+
+@section('content')
+
+        <div class="flex-1 -mt-10">
             <div class="p-8">
                 <!-- Back Button -->
                 <div class="mb-6">
@@ -24,7 +12,7 @@
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                         </svg>
-                        Kembali ke Perpustakaan
+                        Back to Books
                     </a>
                 </div>
 
@@ -268,5 +256,4 @@
             </div>
         </div>
     </div>
-</body>
-</html>
+@endsection
