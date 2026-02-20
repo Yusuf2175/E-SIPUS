@@ -30,12 +30,6 @@ class AdminDashboardController extends Controller
         // Recent users
         $recentUsers = User::latest()->take(5)->get();
         
-        // Pending role requests
-        $pendingRoleRequests = RoleRequest::with('user')
-            ->where('status', 'pending')
-            ->latest()
-            ->take(5)
-            ->get();
         
         // Recent borrowings
         $recentBorrowings = \App\Models\Borrowing::with(['book', 'user'])
@@ -52,7 +46,6 @@ class AdminDashboardController extends Controller
             'user', 
             'stats',
             'recentUsers',
-            'pendingRoleRequests',
             'recentBorrowings',
             'myActiveBorrowings'
         ));
@@ -60,19 +53,12 @@ class AdminDashboardController extends Controller
 
     public function manageUsers()
     {
-        $users = User::latest()->paginate(10);
+        $users = User::oldest()->paginate(10);
         
         return view('admin.users', compact('users'));
     }
 
-    public function manageRoleRequests()
-    {
-        $roleRequests = RoleRequest::with(['user', 'approver'])
-            ->latest()
-            ->paginate(10);
-        
-        return view('admin.role-requests', compact('roleRequests'));
-    }
+  
 
     public function updateUserRole(Request $request, User $user)
     {
@@ -85,37 +71,4 @@ class AdminDashboardController extends Controller
         return back()->with('success', 'Role user berhasil diupdate.');
     }
 
-    public function approveRoleRequest(Request $request, RoleRequest $roleRequest)
-    {
-        $request->validate([
-            'action' => 'required|in:approve,reject',
-        ]);
-
-        $admin = auth()->user();
-
-        if ($request->action === 'approve') {
-            $roleRequest->update([
-                'status' => 'approved',
-                'approved_by' => $admin->id,
-                'approved_at' => now(),
-            ]);
-
-            // Update user role
-            $roleRequest->user->update([
-                'role' => $roleRequest->requested_role
-            ]);
-
-            $message = 'Permintaan role berhasil disetujui.';
-        } else {
-            $roleRequest->update([
-                'status' => 'rejected',
-                'approved_by' => $admin->id,
-                'approved_at' => now(),
-            ]);
-
-            $message = 'Permintaan role berhasil ditolak.';
-        }
-
-        return back()->with('success', $message);
-    }
 }

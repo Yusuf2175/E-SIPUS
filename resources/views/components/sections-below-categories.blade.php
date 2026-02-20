@@ -7,9 +7,9 @@
             <div class="relative">
                 <div class="absolute left-6 md:left-1/2 top-0 bottom-0 w-1 bg-ungu md:-translate-x-1/2 rounded-full"></div>
 
-                <div class="relative flex items-center justify-between mb-14 md:mb-20 w-full">
+                <div class="relative flex items-center  justify-between mb-14 md:mb-20 w-full">
                     <div class="order-1 w-full md:w-5/12 md:text-left pl-20 md:pl-0 md:pr-16">
-                        <div class="bg-white p-6 md:p-8 rounded-4xl shadow-lg border border-purple-50 relative">
+                        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-purple-50 relative">
                             <h4 class="text-xl font-bold text-slate-800 mb-2">Novel & Sastra</h4>
                             <p class="text-sm text-slate-500 leading-relaxed">A collection of best-selling novels and classic literary works from renowned authors.</p>
                             <div class="absolute top-6 right-6 w-8 h-8 bg-purple-50 rounded-full flex items-center justify-center text-ungu">
@@ -25,7 +25,7 @@
                     <div class="order-1 hidden md:block w-5/12"></div>
                     <div class="absolute left-6 md:left-1/2 -translate-x-1/2 w-12 h-12 rounded-2xl bg-secondrys z-10 flex items-center justify-center text-white font-bold text-lg">02</div>
                     <div class="order-2 w-full md:w-5/12 pl-20 md:pl-16">
-                        <div class="bg-white p-6 md:p-8 rounded-4xl shadow-lg border border-green-50 relative">
+                        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-green-50 relative">
                             <h4 class="text-xl font-bold text-slate-800 mb-2">Sains & Teknologi</h4>
                             <p class="text-sm text-slate-500 leading-relaxed">The latest books on natural science, computers, and technological innovations.</p>
                             <div class="absolute top-6 right-6 w-8 h-8 bg-green-50 rounded-full flex items-center justify-center text-[#22C55E]">
@@ -37,7 +37,7 @@
 
                 <div class="relative flex items-center justify-between mb-14 md:mb-20 w-full">
                     <div class="order-1 w-full md:w-5/12 md:text-left pl-20 md:pl-0 md:pr-16">
-                        <div class="bg-white p-6 md:p-8 rounded-4xl shadow-lg border border-orange-50 relative">
+                        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-orange-50 relative">
                             <h4 class="text-xl font-bold text-slate-800 mb-2">Bisnis & Ekonomi</h4>
                             <p class="text-sm text-slate-500 leading-relaxed">A guide to global business, management, and economics.</p>
                             <div class="absolute top-6 right-6 w-8 h-8 bg-orange-50 rounded-full flex items-center justify-center text-orange-500">
@@ -53,7 +53,7 @@
                     <div class="order-1 hidden md:block w-5/12"></div>
                     <div class="absolute left-6 md:left-1/2 -translate-x-1/2 w-12 h-12 rounded-2xl bg-secondrys z-10 flex items-center justify-center text-white font-bold text-lg">04</div>
                     <div class="order-2 w-full md:w-5/12 pl-20 md:pl-16">
-                        <div class="bg-white p-6 md:p-8 rounded-4xl shadow-lg border border-blue-50 relative">
+                        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-blue-50 relative">
                             <h4 class="text-xl font-bold text-slate-800 mb-2">Sejarah & Budaya</h4>
                             <p class="text-sm text-slate-500 leading-relaxed">Exploring the past and various cultures of the world.</p>
                             <div class="absolute top-6 right-6 w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-[#3B82F6]">

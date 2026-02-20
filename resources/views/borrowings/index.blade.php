@@ -1,30 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ Auth::user()->isUser() ? 'My Borrowings' : 'Manage Borrowings' }} - E-SIPUS</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-slate-50">
-    <div class="flex min-h-screen">
-        @if(auth()->user()->isAdmin())
-            <x-sidebar-admin />
-        @elseif(auth()->user()->isPetugas())
-            <x-sidebar-petugas />
-        @else
-            <x-sidebar-user />
-        @endif
+@extends('layouts.dashboard')
 
-        <div class="flex-1 ml-64">
+@section('page-title', 'Borrowing Management')
+
+@section('content')
+        <div class="flex-1 -mt-10">
             <div class="p-8">
                 <!-- Header -->
                 <div class="mb-8">
                     <h1 class="text-3xl font-bold text-slate-800 mb-2">
-                        {{ Auth::user()->isUser() ? 'My Borrowings' : 'Manage Borrowings' }}
+                        {{ Auth::user()->isUser() ? 'Borrowing History' : 'Borrowing Records' }}
                     </h1>
                     <p class="text-slate-600">
-                        {{ Auth::user()->isUser() ? 'History and status of your book borrowings' : 'Manage all book borrowings in the library' }}
+                        {{ Auth::user()->isUser() ? 'Track your borrowed books and return status' : 'Monitor and manage all library borrowing transactions' }}
                     </p>
                 </div>
 
@@ -406,5 +393,4 @@
         }
     </script>
 
-</body>
-</html>
+@endsection

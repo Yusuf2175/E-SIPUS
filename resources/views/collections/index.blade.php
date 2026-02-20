@@ -1,26 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Collection - E-SIPUS</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-slate-50">
-    <div class="flex min-h-screen">
-        @if(auth()->user()->isAdmin())
-            <x-sidebar-admin />
-        @elseif(auth()->user()->isPetugas())
-            <x-sidebar-petugas />
-        @else
-            <x-sidebar-user />
-        @endif
+@extends('layouts.dashboard')
 
-        <div class="flex-1 ml-64">
+@section('page-title', 'My Book Collection')
+
+@section('content')
+        <div class="flex-1 -mt-10">
             <div class="p-8">
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-slate-800">My Collection</h1>
-                    <p class="text-slate-600 mt-2">Your favorite books saved</p>
+                    <h1 class="text-3xl font-bold text-slate-800">Personal Library</h1>
+                    <p class="text-slate-600 mt-2">Manage and organize your favorite books</p>
                 </div>
 
                 @if(session('success'))
@@ -90,5 +77,4 @@
             </div>
         </div>
     </div>
-</body>
-</html>
+@endsection

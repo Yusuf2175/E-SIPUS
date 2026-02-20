@@ -1,20 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Book - E-SIPUS</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-slate-50">
-    <div class="flex min-h-screen">
-        @if(auth()->user()->isAdmin())
-            <x-sidebar-admin />
-        @else
-            <x-sidebar-petugas />
-        @endif
+@extends('layouts.dashboard')
 
-        <div class="flex-1 ml-64">
+@section('page-title', 'Add New Book')
+
+@section('content')
+        <div class="flex-1 -mt-10">
             <div class="p-8">
                 <!-- Header Section -->
                 <div class="mb-8">
@@ -25,8 +14,8 @@
                             </svg>
                         </a>
                         <div>
-                            <h1 class="text-3xl font-bold text-slate-800">Add New Book</h1>
-                            <p class="text-slate-600">Fill in the form below to add a new book to the library</p>
+                            <h1 class="text-3xl font-bold text-slate-800">Book Registration</h1>
+                            <p class="text-slate-600">Fill in the form below to add a new book to the library collection</p>
                         </div>
                     </div>
                 </div>
@@ -238,5 +227,4 @@
             }
         }
     </script>
-</body>
-</html>
+@endsection

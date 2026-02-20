@@ -85,9 +85,7 @@ Route::middleware(['auth', 'verified', 'role:petugas,admin'])->prefix('reports')
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [AdminDashboardController::class, 'manageUsers'])->name('users');
-    Route::get('/role-requests', [AdminDashboardController::class, 'manageRoleRequests'])->name('role.requests');
     Route::patch('/users/{user}/role', [AdminDashboardController::class, 'updateUserRole'])->name('users.update.role');
-    Route::patch('/role-requests/{roleRequest}', [AdminDashboardController::class, 'approveRoleRequest'])->name('role.requests.approve');
 });
 
 Route::middleware('auth')->group(function () {
