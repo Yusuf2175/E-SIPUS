@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Str;
 
 class Book extends Model
 {
     protected $fillable = [
         'title',
+        'slug',
         'author',
         'isbn',
         'description',
@@ -28,6 +30,40 @@ class Book extends Model
         'total_copies' => 'integer',
         'available_copies' => 'integer',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($book) {
+            $book->slug = static::generateUniqueSlug($book->title);
+        });
+
+        static::updating(function ($book) {
+            if ($book->isDirty('title')) {
+                $book->slug = static::generateUniqueSlug($book->title, $book->id);
+            }
+        });
+    }
+
+    public static function generateUniqueSlug($title, $id = null)
+    {
+        $slug = Str::slug($title);
+        $originalSlug = $slug;
+        $count = 1;
+
+        while (static::where('slug', $slug)->where('id', '!=', $id)->exists()) {
+            $slug = $originalSlug . '-' . $count;
+            $count++;
+        }
+
+        return $slug;
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 
     public function addedBy(): BelongsTo
     {

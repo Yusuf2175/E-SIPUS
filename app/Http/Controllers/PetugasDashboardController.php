@@ -26,11 +26,10 @@ class PetugasDashboardController extends Controller
             'books_added_by_me' => Book::where('added_by', $user->id)->count(),
         ];
         
-        // Recent borrowings
+        // Recent borrowings with pagination
         $recentBorrowings = Borrowing::with(['book', 'user'])
             ->latest()
-            ->take(10)
-            ->get();
+            ->paginate(6);
         
         // Overdue borrowings
         $overdueBorrowings = Borrowing::with(['book', 'user'])
@@ -53,5 +52,15 @@ class PetugasDashboardController extends Controller
             ->count();
         
         return view('dashboards.petugas', compact('user', 'stats', 'recentBorrowings', 'overdueBorrowings', 'lowStockBooks', 'myActiveBorrowings'));
+    }
+
+    public function manageUsers()
+    {
+        // Only show regular users (not admin or petugas)
+        $users = User::where('role', 'user')
+            ->oldest()
+            ->paginate(10);
+        
+        return view('petugas.users', compact('users'));
     }
 }
