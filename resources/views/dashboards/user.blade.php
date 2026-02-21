@@ -4,17 +4,10 @@
 
 @section('content')
     <!-- Welcome Header -->
-    <div class="mb-8">
-        <div class="flex items-center gap-4 mb-3">
-            <div class="w-16 h-16 bg-gradient-to-br from-ungu to-primarys rounded-2xl flex items-center justify-center shadow-lg">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                </svg>
-            </div>
-            <div>
+    <div class="mb-16">
+        <div class="flex flex-col items-center">
                 <h1 class="text-3xl font-bold text-slate-800">Welcome back, {{ $user->name }}!</h1>
                 <p class="text-slate-600 mt-1">Manage your library activities with ease</p>
-            </div>
         </div>
     </div>
 

@@ -112,8 +112,11 @@
                                     
                                     <!-- Availability Badge -->
                                     <div class="absolute top-3 right-3">
-                                        <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $book->isAvailable() ? 'bg-green-500 text-white' : 'bg-red-500 text-white' }}">
-                                            {{ $book->isAvailable() ? 'Available' : 'Borrowed' }}
+                                        @php
+                                            $actualAvailableCopies = $book->getActualAvailableCopies();
+                                        @endphp
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $actualAvailableCopies > 0 ? 'bg-green-500 text-white' : 'bg-red-500 text-white' }}">
+                                            {{ $actualAvailableCopies > 0 ? 'Available' : 'Borrowed' }}
                                         </span>
                                     </div>
 
@@ -144,7 +147,7 @@
                                     
                                     <div class="flex items-center justify-between mb-3">
                                         <span class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-full">{{ $book->category }}</span>
-                                        <span class="text-xs text-slate-500">{{ $book->available_copies }}/{{ $book->total_copies }} available</span>
+                                        <span class="text-xs text-slate-500">{{ $book->getActualAvailableCopies() }}/{{ $book->total_copies }} available</span>
                                     </div>
                                     
                                     <a href="{{ route('books.show', $book) }}" class="block w-full text-center px-4 py-2 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white text-sm font-semibold rounded-lg transition">

@@ -21,23 +21,23 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        // // Create petugas user
-        // User::create([
-        //     'name' => 'Library Staff',
-        //     'email' => 'petugas@gmail.com',
-        //     'password' => bcrypt('password'),
-        //     'role' => 'petugas',
-        //     'email_verified_at' => now(),
-        // ]);
+        // Create petugas user
+        User::create([
+            'name' => 'Library Staff',
+            'email' => 'petugas@gmail.com',
+            'password' => bcrypt('12345678'),
+            'role' => 'petugas',
+            'email_verified_at' => now(),
+        ]);
 
-        // // Create regular user
-        // User::create([
-        //     'name' => 'Regular User',
-        //     'email' => 'user@gmail.com',
-        //     'password' => bcrypt('password'),
-        //     'role' => 'user',
-        //     'email_verified_at' => now(),
-        // ]);
+        // Create regular user
+        User::create([
+            'name' => 'Regular User',
+            'email' => 'user@gmail.com',
+            'password' => bcrypt('12345678'),
+            'role' => 'user',
+            'email_verified_at' => now(),
+        ]);
 
         // Seed categories first
         $this->call([

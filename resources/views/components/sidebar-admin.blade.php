@@ -7,7 +7,7 @@
     </div>
    
     <!-- Navigation -->
-    <nav class="p-3 pt-0 space-y-0.5 pb-6">
+    <nav class="p-4 space-y-1 pb-8">
         <!-- Dashboard -->
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition {{ request()->routeIs('admin.dashboard') ? 'bg-cstm text-primarys shadow-md' : 'text-cstm/90 hover:bg-primarys/30 hover:text-cstm' }}">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

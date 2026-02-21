@@ -47,7 +47,7 @@
                                     @keydown.up.prevent="navigateUp"
                                     @keydown.enter.prevent="selectResult"
                                     placeholder="Search pages in dashboard..." 
-                                    class="w-full pl-12 pr-4 py-3 bg-white/95 backdrop-blur-sm rounded-2xl text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white transition shadow-md">
+                                    class="w-full pl-12 pr-4 py-3 bg-white/95 backdrop-blur-sm rounded-2xl text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white transition ">
                             </div>
 
                             <!-- Search Results Dropdown -->
