@@ -57,27 +57,31 @@ class BorrowingController extends Controller
         ]);
 
         $book = Book::findOrFail($request->book_id);
-        
-        // Check if book is available
-        if (!$book->isAvailable()) {
-            return redirect()->back()->with('error', 'Buku tidak tersedia untuk dipinjam!');
+
+        // Hitung jumlah salinan yang benar-benar tersedia
+        $activeBorrowingsCount = $book->activeBorrowings()->count();
+        $actualAvailableCopies = $book->total_copies - $activeBorrowingsCount;
+
+        // Cek apakah buku masih tersedia
+        if ($actualAvailableCopies <= 0) {
+            return redirect()->back()->with('error', 'Buku tidak tersedia untuk dipinjam! Semua salinan sedang dipinjam.');
         }
-        
+
         // Check if user already borrowed this book and hasn't returned it
         $existingBorrowing = Borrowing::where('user_id', Auth::id())
             ->where('book_id', $book->id)
             ->where('status', 'borrowed')
             ->first();
-            
+
         if ($existingBorrowing) {
             return redirect()->back()->with('error', 'Anda sudah meminjam buku ini!');
         }
-        
+
         // Check borrowing limit (max 3 books per user)
         $activeBorrowings = Borrowing::where('user_id', Auth::id())
             ->where('status', 'borrowed')
             ->count();
-            
+
         if ($activeBorrowings >= 3) {
             return redirect()->back()->with('error', 'Anda sudah mencapai batas maksimal peminjaman (3 buku)!');
         }

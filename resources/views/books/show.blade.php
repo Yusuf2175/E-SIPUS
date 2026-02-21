@@ -69,9 +69,33 @@
                                 
                                 <!-- Availability Badge -->
                                 <div>
-                                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold {{ $book->isAvailable() ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                        {{ $book->isAvailable() ? 'Tersedia' : 'Dipinjam' }}
-                                    </span>
+                                    @php
+                                        $isBorrowedByCurrentUser = $book->isBorrowedByUser(auth()->id());
+                                        $actualAvailableCopies = $book->getActualAvailableCopies();
+                                    @endphp
+                                    
+                                    @if($isBorrowedByCurrentUser)
+                                        <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-ungu/50 text-white">
+                                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            Anda Sedang Meminjam
+                                        </span>
+                                    @elseif($actualAvailableCopies > 0)
+                                        <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-800">
+                                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            Tersedia ({{ $actualAvailableCopies }} salinan)
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-red-100 text-red-800">
+                                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                            Tidak Tersedia (Semua Dipinjam)
+                                        </span>
+                                    @endif
                                 </div>
                             </div>
 
@@ -95,7 +119,7 @@
                                 </div>
                                 <div>
                                     <p class="text-sm text-slate-500 mb-1">Stok Tersedia</p>
-                                    <p class="font-semibold text-slate-800">{{ $book->available_copies }} / {{ $book->total_copies }}</p>
+                                    <p class="font-semibold text-slate-800">{{ $book->getActualAvailableCopies() }} / {{ $book->total_copies }}</p>
                                 </div>
                                 <div>
                                     <p class="text-sm text-slate-500 mb-1">Ditambahkan</p>
@@ -113,11 +137,23 @@
 
                             <!-- Action Buttons -->
                             <div class="flex flex-wrap gap-3">
-                                @if($book->isAvailable())
+                                @php
+                                    $isBorrowedByCurrentUser = $book->isBorrowedByUser(auth()->id());
+                                    $actualAvailableCopies = $book->getActualAvailableCopies();
+                                @endphp
+                                
+                                @if($isBorrowedByCurrentUser)
+                                    <button disabled class="inline-flex items-center px-6 py-3 bg-blue-100 text-blue-700 font-semibold rounded-lg cursor-not-allowed">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        Anda Sudah Meminjam Buku Ini
+                                    </button>
+                                @elseif($actualAvailableCopies > 0)
                                     <form action="{{ route('borrowings.store') }}" method="POST">
                                         @csrf
                                         <input type="hidden" name="book_id" value="{{ $book->id }}">
-                                        <button type="submit" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold rounded-lg">
+                                        <button type="submit" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold rounded-lg transition-all">
                                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                             </svg>
@@ -126,7 +162,10 @@
                                     </form>
                                 @else
                                     <button disabled class="inline-flex items-center px-6 py-3 bg-slate-300 text-slate-600 font-semibold rounded-lg cursor-not-allowed">
-                                        Sedang Dipinjam
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Tidak Tersedia (Semua Dipinjam)
                                     </button>
                                 @endif
 

@@ -102,7 +102,25 @@ class Book extends Model
 
     public function isAvailable(): bool
     {
-        return $this->available_copies > 0;
+        // Hitung jumlah peminjaman aktif
+        $activeBorrowingsCount = $this->activeBorrowings()->count();
+        
+        // Hitung salinan yang benar-benar tersedia
+        $actualAvailableCopies = $this->total_copies - $activeBorrowingsCount;
+        
+        // Buku tersedia jika masih ada salinan yang belum dipinjam
+        return $actualAvailableCopies > 0;
+    }
+    
+    public function getActualAvailableCopies(): int
+    {
+        $activeBorrowingsCount = $this->activeBorrowings()->count();
+        return max(0, $this->total_copies - $activeBorrowingsCount);
+    }
+    
+    public function isBorrowedByUser($userId): bool
+    {
+        return $this->activeBorrowings()->where('user_id', $userId)->exists();
     }
 
     public function scopeAvailable($query)
