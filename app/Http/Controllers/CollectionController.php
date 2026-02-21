@@ -11,7 +11,16 @@ class CollectionController extends Controller
 {
     public function index()
     {
-        $collections = Auth::user()->collections()->with('book')->latest()->get();
+        $collections = Auth::user()->collections()
+            ->with(['book' => function($query) {
+                $query->where('available_copies', '>', 0);
+            }])
+            ->latest()
+            ->get()
+            ->filter(function($collection) {
+                return $collection->book !== null;
+            });
+        
         return view('collections.index', compact('collections'));
     }
 

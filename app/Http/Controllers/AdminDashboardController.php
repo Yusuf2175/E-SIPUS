@@ -27,15 +27,14 @@ class AdminDashboardController extends Controller
                 ->count(),
         ];
         
-        // Recent users
-        $recentUsers = User::latest()->take(5)->get();
+        // Recent users with pagination
+        $recentUsers = User::latest()->paginate(6, ['*'], 'users_page');
         
         
-        // Recent borrowings
+        // Recent borrowings with pagination
         $recentBorrowings = \App\Models\Borrowing::with(['book', 'user'])
             ->latest()
-            ->take(5)
-            ->get();
+            ->paginate(6);
         
         // My active borrowings (for CTA)
         $myActiveBorrowings = \App\Models\Borrowing::where('user_id', $user->id)

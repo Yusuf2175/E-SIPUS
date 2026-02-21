@@ -3,14 +3,34 @@
 @section('page-title', 'Book Return Service')
 
 @section('content')
-    <!-- Header Section -->
-    <div class="mb-8">
-        <div class="flex items-center justify-between">
+<!-- Header Section -->
+<div class="mb-8">
+    
+        @if(session('success'))
+            <div class="bg-green-50  text-green-800 px-6 py-4 rounded-lg mb-6 flex items-center gap-3 shadow-sm animate-fade-in">
+                <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="font-medium">{{ session('success') }}</p>
+            </div>
+        @endif
+    
+        @if(session('error'))
+            <div class="bg-red-50 border-l-4 border-red-500 text-red-800 px-6 py-4 rounded-lg mb-6 flex items-center gap-3 shadow-sm">
+                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="font-medium">{{ session('error') }}</p>
+            </div>
+        @endif
+
+
+    <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-slate-800 mb-2">Return Processing</h1>
                 <p class="text-slate-600">Complete your book return transactions</p>
             </div>
-            <a href="{{ route('borrowings.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 text-slate-700 font-medium rounded-lg hover:border-primarys hover:text-primarys transition-all shadow-sm">
+            <a href="{{ route('borrowings.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 text-slate-700 font-medium rounded-lg hover:border-ungu hover:bg-ungu  hover:text-white transition-all shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
@@ -19,49 +39,31 @@
         </div>
     </div>
 
-    @if(session('success'))
-        <div class="bg-green-50  text-green-800 px-6 py-4 rounded-lg mb-6 flex items-center gap-3 shadow-sm animate-fade-in">
-            <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <p class="font-medium">{{ session('success') }}</p>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="bg-red-50 border-l-4 border-red-500 text-red-800 px-6 py-4 rounded-lg mb-6 flex items-center gap-3 shadow-sm">
-            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <p class="font-medium">{{ session('error') }}</p>
-        </div>
-    @endif
-
     <!-- Info Card -->
-    <div class="bg-gradient-to-r from-purple-50 to-pink-50 border-l-4 border-primarys rounded-xl p-6 mb-8 shadow-sm">
+    <div class="bg-ungu/10 border-l-4 border-cstm rounded-xl p-6 mb-8 shadow-sm">
         <div class="flex items-start gap-4">
-            <div class="w-12 h-12 bg-primarys rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+            <div class="w-12 h-12 bg-ungu rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
             </div>
             <div class="flex-1">
-                <h3 class="text-primarys font-bold text-lg mb-2">Return Information</h3>
+                <h3 class="text-ungu font-bold text-lg mb-2">Return Information</h3>
                 <ul class="text-slate-700 text-sm space-y-2">
                     <li class="flex items-start gap-2">
-                        <svg class="w-5 h-5 text-primarys mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 text-ungu mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
                         Make sure the book is in good condition before returning
                     </li>
                     <li class="flex items-start gap-2">
-                        <svg class="w-5 h-5 text-primarys mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 text-ungu mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
                         Late returns will be subject to fines
                     </li>
                     <li class="flex items-start gap-2">
-                        <svg class="w-5 h-5 text-primarys mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 text-ungu mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
                         After returning, you can borrow other books
@@ -76,13 +78,13 @@
         <div class="bg-white rounded-2xl shadow-md p-16 text-center">
             <div class="max-w-md mx-auto">
                 <div class="w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg class="w-12 h-12 text-primarys" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-12 h-12 text-ungu" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                 </div>
                 <h3 class="text-2xl font-bold text-slate-800 mb-3">No Borrowed Books</h3>
                 <p class="text-slate-600 mb-8">You haven't borrowed any books at the moment. Start exploring our collection!</p>
-                <a href="{{ route('books.index') }}" class="inline-flex items-center gap-2 bg-gradient-to-r from-primarys to-secondrys hover:from-secondrys hover:to-primarys text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                <a href="{{ route('books.index') }}" class="inline-flex items-center gap-2 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                     </svg>
@@ -94,7 +96,7 @@
         <!-- Active Borrowings List -->
         <div class="space-y-6">
             @foreach($activeBorrowings as $borrowing)
-                <div class="bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 border border-slate-100">
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden  ">
                     <div class="p-6">
                         <div class="flex flex-col md:flex-row gap-6">
                             <!-- Book Cover -->
@@ -175,7 +177,7 @@
                                         <form method="POST" action="{{ route('borrowings.return', $borrowing) }}" id="return-form-{{ $borrowing->id }}">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="button" onclick="confirmReturn({{ $borrowing->id }}, '{{ $borrowing->book->title }}')" class="inline-flex items-center gap-2 bg-ungu hover:bg-primarys text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg">
+                                            <button type="button" onclick="confirmReturn({{ $borrowing->id }}, '{{ $borrowing->book->title }}')" class="inline-flex items-center gap-2 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold py-3 px-6 rounded-xl  shadow-lg">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
                                                 </svg>
@@ -222,38 +224,38 @@
         </div>
 
         <!-- Summary Card -->
-        <div class="mt-8 bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 rounded-2xl p-8 border-2 border-purple-100 shadow-lg">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div class="text-center md:text-left">
-                    <h3 class="text-lg font-semibold text-slate-700 mb-2">Total Borrowed Books</h3>
-                    <div class="flex items-baseline gap-2">
-                        <p class="text-5xl font-bold text-primarys">{{ $activeBorrowings->count() }}</p>
-                        <p class="text-slate-600">/ 3 books</p>
+        <div class="mt-8 bg-white rounded-2xl p-8 border-2 border-slate-100">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="text-center md:text-left flex-1">
+                    <p class="text-sm text-slate-500 font-medium mb-2">Total Borrowed Books</p>
+                    <div class="flex items-baseline gap-3 mb-4">
+                        <p class="text-6xl font-bold text-ungu">{{ $activeBorrowings->count() }}</p>
+                        <p class="text-2xl text-slate-400">/ 3</p>
                     </div>
-                    <div class="mt-3 w-full bg-slate-200 rounded-full h-2">
-                        <div class="bg-gradient-to-r from-primarys to-secondrys h-2 rounded-full transition-all duration-500" style="width: {{ ($activeBorrowings->count() / 3) * 100 }}%"></div>
+                    <div class="w-full max-w-md bg-slate-100 rounded-full h-3">
+                        <div class="bg-ungu h-3 rounded-full transition-all duration-500" style="width: {{ ($activeBorrowings->count() / 3) * 100 }}%"></div>
                     </div>
                 </div>
                 
                 <div class="flex gap-4">
                     @if($activeBorrowings->where('is_overdue', true)->count() > 0)
-                        <div class="bg-white rounded-xl p-6 shadow-md border-2 border-red-200 text-center min-w-[140px]">
-                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="bg-red-50 rounded-2xl p-6 border-2 border-red-100 text-center min-w-[140px]">
+                            <div class="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
-                            <p class="text-sm font-medium text-slate-600 mb-1">Overdue</p>
+                            <p class="text-xs font-medium text-slate-600 mb-1">Overdue</p>
                             <p class="text-3xl font-bold text-red-600">{{ $activeBorrowings->where('is_overdue', true)->count() }}</p>
                         </div>
                     @else
-                        <div class="bg-white rounded-xl p-6 shadow-md border-2 border-green-200 text-center min-w-[140px]">
-                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="bg-green-50 rounded-2xl p-6 border-2 border-green-100 text-center min-w-[140px]">
+                            <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
-                            <p class="text-sm font-medium text-slate-600 mb-1">Status</p>
+                            <p class="text-xs font-medium text-slate-600 mb-1">Status</p>
                             <p class="text-lg font-bold text-green-600">All On Time</p>
                         </div>
                     @endif

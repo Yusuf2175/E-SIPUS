@@ -13,7 +13,7 @@
                             <p class="text-slate-600">Comprehensive catalog management and collection administration</p>
                         </div>
                         @if(Auth::user()->isAdmin() || Auth::user()->isPetugas())
-                            <a href="{{ route('books.create') }}" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition">
+                            <a href="{{ route('books.create') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold rounded-lg">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
@@ -70,7 +70,7 @@
 
                         <!-- Filter Buttons -->
                         <div class="flex gap-3">
-                            <button type="submit" class="inline-flex items-center px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition">
+                            <button type="submit" class="inline-flex items-center px-6 py-2 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold rounded-lg ">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
                                 </svg>
@@ -91,7 +91,7 @@
                         </svg>
                         <h3 class="text-xl font-semibold text-slate-700 mb-2">No Books Found</h3>
                         <p class="text-slate-500 mb-6">Try changing your search filters or reset filters</p>
-                        <a href="{{ route('books.index') }}" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                        <a href="{{ route('books.index') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white rounded-lg">
                             Reset Filters
                         </a>
                     </div>
@@ -101,7 +101,7 @@
                             <div class="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 group">
                                 <div class="aspect-[3/4] bg-gradient-to-br from-purple-100 to-purple-200 relative overflow-hidden">
                                     @if($book->cover_image)
-                                        <img src="{{ asset('storage/' . $book->cover_image) }}" alt="{{ $book->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                        <img src="{{ asset('storage/' . $book->cover_image) }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center">
                                             <svg class="w-20 h-20 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,7 +147,7 @@
                                         <span class="text-xs text-slate-500">{{ $book->available_copies }}/{{ $book->total_copies }} available</span>
                                     </div>
                                     
-                                    <a href="{{ route('books.show', $book) }}" class="block w-full text-center px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition">
+                                    <a href="{{ route('books.show', $book) }}" class="block w-full text-center px-4 py-2 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white text-sm font-semibold rounded-lg transition">
                                         View Details
                                     </a>
                                 </div>

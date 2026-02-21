@@ -117,7 +117,7 @@
                                     <form action="{{ route('borrowings.store') }}" method="POST">
                                         @csrf
                                         <input type="hidden" name="book_id" value="{{ $book->id }}">
-                                        <button type="submit" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition">
+                                        <button type="submit" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold rounded-lg">
                                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                             </svg>
@@ -165,35 +165,114 @@
                     <!-- Add Review Form -->
                     @if(!$userReview)
                         <div class="mb-8 p-6 bg-slate-50 rounded-xl">
-                            <h3 class="text-lg font-semibold text-slate-800 mb-4">Tulis Ulasan Anda</h3>
-                            <form action="{{ route('reviews.store') }}" method="POST">
+                            <h3 class="text-lg font-semibold text-gray-400 mb-4">Tulis Ulasan Anda</h3>
+                            <form action="{{ route('reviews.store') }}" method="POST" id="reviewForm">
                                 @csrf
                                 <input type="hidden" name="book_id" value="{{ $book->id }}">
+                                <input type="hidden" name="rating" id="ratingInput" value="">
                                 
                                 <div class="mb-4">
-                                    <label class="block text-sm font-medium text-slate-700 mb-2">Rating</label>
-                                    <div class="flex gap-2">
+                                    <label class="block text-sm font-medium text-gray-400 mb-2">Rating</label>
+                                    <div class="flex gap-2" id="starRating">
                                         @for($i = 1; $i <= 5; $i++)
-                                            <label class="cursor-pointer">
-                                                <input type="radio" name="rating" value="{{ $i }}" class="sr-only peer" required>
-                                                <svg class="w-8 h-8 text-slate-300 peer-checked:text-yellow-400 hover:text-yellow-300 transition" fill="currentColor" viewBox="0 0 20 20">
+                                            <button type="button" class="star-btn focus:outline-none transition-transform hover:scale-110" data-rating="{{ $i }}">
+                                                <svg class="w-10 h-10 text-slate-300 transition-colors duration-200" fill="currentColor" viewBox="0 0 20 20">
                                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                                                 </svg>
-                                            </label>
+                                            </button>
                                         @endfor
                                     </div>
+                                    <p class="text-sm text-gray-400 mt-2" id="ratingText">Pilih rating Anda</p>
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="block text-sm font-medium text-slate-700 mb-2">Ulasan</label>
-                                    <textarea name="review" rows="4" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Bagikan pengalaman Anda tentang buku ini..." required></textarea>
+                                    <label class="block text-sm font-medium text-gray-400 mb-2">Ulasan</label>
+                                    <textarea name="review" rows="4" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-400" placeholder="Bagikan pengalaman Anda tentang buku ini..." required></textarea>
                                 </div>
 
-                                <button type="submit" class="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition">
+                                <button type="submit" class="px-6 py-3 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold rounded-lg transition-all">
                                     Kirim Ulasan
                                 </button>
                             </form>
                         </div>
+
+                        {{-- js untuk mengatur rating bintang option --}}
+                         <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const starButtons = document.querySelectorAll('.star-btn');
+                                const ratingInput = document.getElementById('ratingInput');
+                                const ratingText = document.getElementById('ratingText');
+                                const reviewForm = document.getElementById('reviewForm');
+                                let selectedRating = 0;
+
+                                // Rating text labels with colors
+                                const ratingLabels = {
+                                    1: { text: 'Sangat Buruk', color: 'text-red-600' },
+                                    2: { text: 'Buruk', color: 'text-orange-600' },
+                                    3: { text: 'Cukup', color: 'text-yellow-600' },
+                                    4: { text: 'Bagus', color: 'text-lime-600' },
+                                    5: { text: 'Sangat Bagus', color: 'text-green-600' }
+                                };
+
+                                // Function to update stars display
+                                function updateStars(rating, isHover = false) {
+                                    starButtons.forEach((btn, index) => {
+                                        const star = btn.querySelector('svg');
+                                        if (index < rating) {
+                                            star.classList.remove('text-slate-300');
+                                            star.classList.add('text-yellow-400');
+                                        } else {
+                                            star.classList.remove('text-yellow-400');
+                                            star.classList.add('text-slate-300');
+                                        }
+                                    });
+
+                                    if (rating > 0) {
+                                        const ratingData = ratingLabels[rating];
+                                        ratingText.textContent = ratingData.text;
+                                        
+                                        // Remove all color classes
+                                        ratingText.classList.remove('text-gray-400', 'text-red-600', 'text-orange-600', 'text-yellow-600', 'text-lime-600', 'text-green-600');
+                                        
+                                        // Add new color class
+                                        ratingText.classList.add(ratingData.color, 'font-semibold');
+                                    } else if (!isHover) {
+                                        ratingText.textContent = 'Pilih rating Anda';
+                                        ratingText.classList.remove('text-red-600', 'text-orange-600', 'text-yellow-600', 'text-lime-600', 'text-green-600', 'font-semibold');
+                                        ratingText.classList.add('text-gray-400');
+                                    }
+                                }
+
+                                // Click event
+                                starButtons.forEach((btn, index) => {
+                                    btn.addEventListener('click', function() {
+                                        selectedRating = index + 1;
+                                        ratingInput.value = selectedRating;
+                                        updateStars(selectedRating);
+                                    });
+
+                                    // Hover event
+                                    btn.addEventListener('mouseenter', function() {
+                                        updateStars(index + 1, true);
+                                    });
+                                });
+
+                                // Mouse leave - return to selected rating
+                                document.getElementById('starRating').addEventListener('mouseleave', function() {
+                                    updateStars(selectedRating);
+                                });
+
+                                // Form validation
+                                reviewForm.addEventListener('submit', function(e) {
+                                    if (!ratingInput.value) {
+                                        e.preventDefault();
+                                        alert('Silakan pilih rating terlebih dahulu!');
+                                        return false;
+                                    }
+                                });
+                            });
+                        </script>
+                       
                     @else
                         <!-- User's Review -->
                         <div class="mb-8 p-6 bg-purple-50 border-2 border-purple-200 rounded-xl">
@@ -256,4 +335,5 @@
             </div>
         </div>
     </div>
+    
 @endsection

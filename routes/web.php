@@ -71,6 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Petugas Dashboard Routes
 Route::middleware(['auth', 'verified', 'role:petugas'])->prefix('petugas')->name('petugas.')->group(function () {
     Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/users', [PetugasDashboardController::class, 'manageUsers'])->name('users');
 });
 
 // Reports Routes (Petugas and Admin only)
