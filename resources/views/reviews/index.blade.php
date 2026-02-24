@@ -223,7 +223,7 @@
                                     </div>
 
                                     <!-- Review Text -->
-                                    <div class="bg-slate-50 rounded-xl p-4 mb-4">
+                                    <div class="bg-ungu/10 rounded-xl p-4 mb-4">
                                         <p class="text-slate-700 leading-relaxed">{{ $review->review }}</p>
                                     </div>
 

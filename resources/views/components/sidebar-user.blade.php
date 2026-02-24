@@ -1,5 +1,5 @@
 <!-- User Sidebar Component -->
-<aside class="fixed left-3 top-5 w-64 size-cstm bg-ungu border-r border-primarys/30 z-40 shadow-xl">
+<aside class="fixed left-3 top-5 w-64 size-cstm bg-gradient-to-br from-ungu via-purple-600 to-secondrys z-40 shadow-xl">
     
     <!-- Logo/Header Section -->
     <div class="p-6 justify-center pl-12 pt-12 ">

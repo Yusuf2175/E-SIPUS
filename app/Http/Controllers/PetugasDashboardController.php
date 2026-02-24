@@ -56,9 +56,16 @@ class PetugasDashboardController extends Controller
 
     public function manageUsers()
     {
-        // Only show regular users (not admin or petugas)
+        // Get users who have borrowing records (either active or past)
         $users = User::where('role', 'user')
-            ->oldest()
+            ->whereHas('borrowings')
+            ->withCount(['borrowings as active_borrowings_count' => function($query) {
+                $query->where('status', 'borrowed');
+            }])
+            ->with(['activeBorrowings' => function($query) {
+                $query->with('book')->latest()->take(5);
+            }])
+            ->orderByDesc('active_borrowings_count')
             ->paginate(10);
         
         return view('petugas.users', compact('users'));
