@@ -31,12 +31,20 @@
         <div class="flex-1 ml-64">
             <!-- Top Bar -->
             <aside class="px-12 py-5 sticky top-0 z-30">
-                <header class="rounded-3xl bg-ungu  border border-white/10">
+                <header class="rounded-3xl bg-gradient-to-br from-ungu via-purple-600 to-secondrys">
                     <div class="flex items-center justify-between px-6 py-2">
                         
                         <!-- Search Bar -->
                         <div class="flex-1 max-w-3xl relative" x-data="searchComponent()">
                             <div class="relative">
+                                <!-- Search Icon -->
+                                <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-40">
+                                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                </div>
+                                
                                 <input 
                                     type="text" 
                                     x-model="query"
@@ -158,14 +166,14 @@
                     },
                     @endif
                     @if(Auth::user()->role === 'petugas')
-                    // Manage Students - Petugas only (students only)
+                    // Manage borrowings users - Petugas only
                     {
-                        title: 'Manage Students',
-                        description: 'View and manage student accounts',
+                        title: 'Manage Borrowings Users',
+                        description: 'View and manage borrowings users',
                         url: '{{ route("petugas.users") }}',
                         icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z',
                         color: 'bg-blue-600',
-                        keywords: ['students', 'manage students', 'student management', 'siswa', 'murid', 'pelajar'],
+                        keywords: ['students', 'manage borrowing users', 'borrowings users management', 'siswa', 'riwayat peminjaman siswa'],
                         roles: ['petugas']
                     },
                     @endif

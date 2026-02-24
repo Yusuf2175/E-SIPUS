@@ -301,8 +301,8 @@
                             </svg>
                         </div>
                         <div class="flex-1">
-                            <p class="font-semibold text-slate-800">Manage Students</p>
-                            <p class="text-xs text-slate-600">View all students</p>
+                            <p class="font-semibold text-slate-800">Manage Borrowings Students</p>
+                            <p class="text-xs text-slate-600">View all Borrowings students</p>
                         </div>
                         <svg class="w-5 h-5 text-slate-400 group-hover:text-amber-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>

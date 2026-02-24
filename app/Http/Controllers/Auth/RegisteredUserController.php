@@ -37,33 +37,22 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'in:user,petugas'],
         ]);
 
+        // All new registrations are automatically set to 'user' role
+        // Only admin can change user roles
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role,
+            'role' => 'user', // Default role for all new registrations
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        // Redirect berdasarkan role
-        return $this->redirectBasedOnRole($user);
-    }
-
-    private function redirectBasedOnRole($user)
-    {
-        switch ($user->role) {
-            case 'admin':
-                return redirect()->route('admin.dashboard');
-            case 'petugas':
-                return redirect()->route('petugas.dashboard');
-            default:
-                return redirect()->route('user.dashboard');
-        }
+        // Redirect to user dashboard
+        return redirect()->route('user.dashboard');
     }
 }

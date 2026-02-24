@@ -146,7 +146,7 @@
                     </div>
                 </div>
 
-                <!-- Borrowings List -->
+                <!-- Empty State untuk menampilkan data peminjaman belum ada  -->
                 @if($borrowings->isEmpty())
                     <div class="bg-white rounded-2xl border-2 border-slate-100 p-12 text-center">
                         <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -198,7 +198,7 @@
                                                     </div>
 
                                                     @if(!Auth::user()->isUser())
-                                                        <!-- Modern Borrower Badge -->
+                                                        <!-- Book Borrower Badge -->
                                                         <div class="inline-flex items-center gap-3 bg-gradient-to-r from-slate-100 via-slate-200 to-slate-100 rounded-2xl px-4 py-3 border-2 border-slate-200/70 shadow-sm">
                                                             <div class="relative">
                                                                 <div class="w-12 h-12 bg-ungu rounded-xl flex items-center justify-center shadow-md">
@@ -249,8 +249,8 @@
                                                     @endif
                                                 @else
                                                     <div class="relative">
-                                                        <div class="absolute inset-0 bg-green-500 rounded-2xl blur-md opacity-50"></div>
-                                                        <div class="relative bg-gradient-to-br from-green-500 to-green-600 text-white px-5 py-3 rounded-2xl shadow-xl">
+                                                        <div class="absolute inset-0  rounded-2xl blur-md opacity-50"></div>
+                                                        <div class="relative bg-green-500 text-white px-5 py-3 rounded-2xl ">
                                                             <div class="flex items-center gap-2">
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
@@ -295,11 +295,11 @@
                                                 </div>
 
                                                 <!-- Due Date Card -->
-                                                <div class="flex-1 relative overflow-hidden rounded-2xl bg-gradient-to-br from-{{ $borrowing->isOverdue() ? 'red' : 'orange' }}-50 to-{{ $borrowing->isOverdue() ? 'red' : 'orange' }}-100/50 p-4 border-2 border-{{ $borrowing->isOverdue() ? 'red' : 'orange' }}-200/50 ">
+                                                <div class="flex-1 relative overflow-hidden rounded-2xl {{ $borrowing->isOverdue() ? 'bg-red-50 border-red-200' : 'bg-orange-50 border-orange-200' }}  p-4 border-2 ">
                                                     <div class="absolute top-0 right-0 w-20 h-20 bg-{{ $borrowing->isOverdue() ? 'red' : 'orange' }}-500/10 rounded-full -mr-10 -mt-10"></div>
                                                     <div class="relative flex items-center gap-3">
-                                                        <div class="w-11 h-11 bg-gradient-to-br from-{{ $borrowing->isOverdue() ? 'red' : 'orange' }}-500 to-{{ $borrowing->isOverdue() ? 'red' : 'orange' }}-600 rounded-xl flex items-center justify-center shadow-md group-hover/date:scale-110 transition-transform">
-                                                            <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <div class="w-11 h-11  rounded-xl flex items-center justify-center  {{ $borrowing->isOverdue() ? 'bg-red-500' :' bg-orange-500' }}">
+                                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                             </svg>
                                                         </div>
@@ -307,7 +307,7 @@
                                                             <p class="text-xs font-semibold text-{{ $borrowing->isOverdue() ? 'red' : 'orange' }}-600 mb-0.5">Due Date</p>
                                                             <p class="text-sm font-black text-slate-900">{{ $borrowing->due_date->format('d M Y') }}</p>
                                                             @if($borrowing->isOverdue())
-                                                                <p class="text-xs text-red-600 font-black">⚠ {{ $borrowing->getDaysOverdue() }} day{{ $borrowing->getDaysOverdue() > 1 ? 's' : '' }} late!</p>
+                                                                <p class="text-xs text-red-600 font-black">{{ $borrowing->getDaysOverdue() }} day{{ $borrowing->getDaysOverdue() > 1 ? 's' : '' }} late!</p>
                                                             @else
                                                                 <p class="text-xs text-slate-600 font-medium">{{ $borrowing->due_date->diffForHumans() }}</p>
                                                             @endif
@@ -331,7 +331,7 @@
                                                 </a>
                                                 
                                                 @if($borrowing->status === 'borrowed' && (Auth::user()->isAdmin() || Auth::user()->isPetugas()))
-                                                    <button type="button" onclick="openReturnModal({{ $borrowing->id }})" class="group/btn">
+                                                    <button type="button" onclick="openReturnModal({{ $borrowing->id }}, '{{ $borrowing->due_date->format('Y-m-d') }}')" class="group/btn">
                                                         <div class="px-6 py-3 bg-red-400 hover:bg-red-500 text-white font-bold text-sm rounded-2xl shadow-md hover:shadow-lg transition-all duration-300">
                                                             <div class="flex items-center justify-center gap-2">
                                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -342,8 +342,120 @@
                                                         </div>
                                                     </button>
                                                 @endif
+
+                                                @if($borrowing->status === 'returned')
+                                                    @php
+                                                        $hasUnpaidPenalty = $borrowing->penalty_amount > 0 && !$borrowing->penalty_paid;
+                                                        $canDelete = !$hasUnpaidPenalty || Auth::user()->isAdmin() || Auth::user()->isPetugas();
+                                                    @endphp
+                                                    
+                                                    @if($canDelete)
+                                                        <button type="button" onclick="confirmDeleteHistory({{ $borrowing->id }}, '{{ addslashes($borrowing->book->title) }}')" class="group/btn">
+                                                            <div class="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold text-sm rounded-2xl shadow-md hover:shadow-lg transition-all duration-300">
+                                                                <div class="flex items-center justify-center gap-2">
+                                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                                    </svg>
+                                                                    <span>Delete</span>
+                                                                </div>
+                                                            </div>
+                                                        </button>
+                                                        <form id="delete-form-{{ $borrowing->id }}" action="{{ route('borrowings.destroy', $borrowing) }}" method="POST" class="hidden">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                        </form>
+                                                    @else
+                                                        <button type="button" onclick="showUnpaidPenaltyWarning()" class="group/btn cursor-not-allowed" title="Cannot delete with unpaid penalty">
+                                                            <div class="px-6 py-3 bg-gray-400 text-white font-bold text-sm rounded-2xl shadow-md opacity-60">
+                                                                <div class="flex items-center justify-center gap-2">
+                                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                                                    </svg>
+                                                                    <span>Locked</span>
+                                                                </div>
+                                                            </div>
+                                                        </button>
+                                                    @endif
+                                                @endif
                                             </div>
                                         </div>
+
+                                        <!-- Penalty Section (Below Timeline & Actions) -->
+                                        @if($borrowing->status === 'returned' && $borrowing->penalty_amount > 0)
+                                            <div class="mt-4 bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-200 rounded-2xl p-5 shadow-sm">
+                                                <div class="flex items-start justify-between gap-4 flex-wrap">
+                                                    <!-- Penalty Info -->
+                                                    <div class="flex-1 min-w-[250px]">
+                                                        <div class="flex items-center gap-3 mb-3">
+                                                            <div class="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center shadow-md">
+                                                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                                </svg>
+                                                            </div>
+                                                            <div>
+                                                                <p class="text-xs text-red-600 font-semibold mb-0.5"> Penalty Amount</p>
+                                                                <p class="text-2xl font-black text-red-700">Rp {{ number_format($borrowing->penalty_amount, 0, ',', '.') }}</p>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="flex items-center gap-2 mb-2">
+                                                            <span class="text-xs font-semibold text-gray-600">Type:</span>
+                                                            <span class="px-3 py-1 bg-white border-2 border-red-200 text-red-700 text-xs font-bold rounded-lg">
+                                                                {{ ucfirst(str_replace('_', ' ', $borrowing->penalty_type)) }}
+                                                            </span>
+                                                            @if($borrowing->penalty_paid)
+                                                                <span class="px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-lg ">
+                                                                     PAID
+                                                                </span>
+                                                            @else
+                                                                <span class="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-lg ">
+                                                                    UNPAID
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                        
+                                                        @if($borrowing->penalty_notes)
+                                                            <div class="mt-2 p-2 bg-white/70 rounded-lg border border-red-100">
+                                                                <p class="text-xs text-gray-600"><span class="font-semibold">Notes:</span> {{ $borrowing->penalty_notes }}</p>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                    
+                                                    <!-- Action Buttons -->
+                                                    @if(Auth::user()->isAdmin() || Auth::user()->isPetugas())
+                                                        <div class="flex flex-col gap-2 min-w-[140px]">
+                                                            @if(!$borrowing->penalty_paid)
+                                                                <button type="button" onclick="confirmMarkPaid({{ $borrowing->id }})" class="w-full px-4 py-2.5 bg-green-500 text-white text-sm font-bold rounded-xl  transition-all flex items-center justify-center gap-2">
+                                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                                    </svg>
+                                                                    Mark Paid
+                                                                </button>
+                                                            @endif
+                                                            
+                                                            <button type="button" onclick="confirmCancelPenalty({{ $borrowing->id }})" class="w-full px-4 py-2.5 bg-orange-500 text-white text-sm font-bold rounded-xl  transition-all flex items-center justify-center gap-2">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                </svg>
+                                                                Cancel
+                                                            </button>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+
+                                            <!-- Hidden Forms -->
+                                            <form id="mark-paid-form-{{ $borrowing->id }}" action="{{ route('borrowings.mark-penalty-paid', $borrowing) }}" method="POST" class="hidden">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="payment_notes" id="payment-notes-{{ $borrowing->id }}">
+                                            </form>
+                                            
+                                            <form id="cancel-penalty-form-{{ $borrowing->id }}" action="{{ route('borrowings.cancel-penalty', $borrowing) }}" method="POST" class="hidden">
+                                                @csrf
+                                                @method('PATCH')
+                                            </form>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -418,10 +530,162 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
-        function openReturnModal(borrowingId) {
+        // Fungsi untuk konfirmasi mark penalty as paid
+        function confirmMarkPaid(borrowingId) {
+            Swal.fire({
+                title: 'Mark Penalty as Paid',
+                html: `
+                    <div class="text-left">
+                        <p class="text-gray-700 mb-4">Confirm that the penalty has been paid by the user.</p>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Payment Notes (Optional)</label>
+                        <textarea id="payment-notes-input" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="Add payment confirmation notes..."></textarea>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#22c55e',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Mark as Paid',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-xl px-6 py-3 font-semibold',
+                    cancelButton: 'rounded-xl px-6 py-3 font-semibold'
+                },
+                preConfirm: () => {
+                    return document.getElementById('payment-notes-input').value;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Set notes and submit
+                    document.getElementById('payment-notes-' + borrowingId).value = result.value;
+                    document.getElementById('mark-paid-form-' + borrowingId).submit();
+                }
+            });
+        }
+
+        // Fungsi untuk konfirmasi cancel penalty
+        function confirmCancelPenalty(borrowingId) {
+            Swal.fire({
+                title: 'Cancel Penalty?',
+                html: `
+                    <div class="text-left">
+                        <div class="bg-orange-50 border-2 border-orange-200 rounded-lg p-4 mb-4">
+                            <p class="text-orange-800 font-semibold mb-2">⚠️ Warning</p>
+                            <p class="text-sm text-orange-700">This will:</p>
+                            <ul class="text-sm text-orange-700 list-disc list-inside mt-2 space-y-1">
+                                <li>Remove the penalty from this borrowing</li>
+                                <li>Change status back to "borrowed"</li>
+                                <li>Allow you to re-process the return</li>
+                            </ul>
+                        </div>
+                        <p class="text-gray-700">Are you sure you want to cancel this penalty?</p>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f97316',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, Cancel Penalty',
+                cancelButtonText: 'No, Keep It',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-xl px-6 py-3 font-semibold',
+                    cancelButton: 'rounded-xl px-6 py-3 font-semibold'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: 'Cancelling penalty and restoring status',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    // Submit form
+                    document.getElementById('cancel-penalty-form-' + borrowingId).submit();
+                }
+            });
+        }
+
+        // Fungsi untuk konfirmasi delete history
+        function confirmDeleteHistory(borrowingId, bookTitle) {
+            Swal.fire({
+                title: 'Delete History?',
+                html: `Are you sure you want to delete borrowing history for<br><strong>"${bookTitle}"</strong>?<br><br>This action cannot be undone.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, Delete',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-xl px-6 py-3 font-semibold',
+                    cancelButton: 'rounded-xl px-6 py-3 font-semibold'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading
+                    Swal.fire({
+                        title: 'Deleting...',
+                        text: 'Please wait',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    // Submit form
+                    document.getElementById('delete-form-' + borrowingId).submit();
+                }
+            });
+        }
+
+        // Fungsi untuk menampilkan peringatan unpaid penalty
+        function showUnpaidPenaltyWarning() {
+            Swal.fire({
+                title: 'Cannot Delete History',
+                html: `
+                    <div class="text-left">
+                        <div class="bg-red-50 border-2 border-red-200 rounded-lg p-4 mb-4">
+                            <p class="text-red-800 font-semibold mb-2">🔒 Locked Due to Unpaid Penalty</p>
+                            <p class="text-sm text-red-700">You cannot delete this borrowing history because you have an unpaid penalty.</p>
+                        </div>
+                        <p class="text-gray-700 text-sm">
+                            <strong>To delete this history:</strong><br>
+                            1. Contact admin or staff to pay your penalty<br>
+                            2. Once the penalty is marked as paid, you can delete the history
+                        </p>
+                    </div>
+                `,
+                icon: 'error',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'I Understand',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-xl px-6 py-3 font-semibold'
+                }
+            });
+        }
+
+
+        function openReturnModal(borrowingId, dueDate) {
+            // Store dueDate globally for penalty calculation
+            window.currentDueDate = dueDate;
+            window.currentBorrowingId = borrowingId;
+            
             Swal.fire({
                 title: 'Book Return',
-                html: createReturnForm(),
+                html: createReturnForm(dueDate),
                 width: '600px',
                 showCancelButton: true,
                 confirmButtonText: 'Return Book',
@@ -440,7 +704,7 @@
         }
 
         // menampilkan pop up untuk return option
-        function createReturnForm() {
+        function createReturnForm(dueDate) {
             return `
                 <div class="text-left space-y-4">
                     <div>
@@ -449,7 +713,7 @@
                         </label>
                         <div class="space-y-2">
                             <label class="flex items-start p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition">
-                                <input type="radio" name="return_reason" value="normal" class="mt-1">
+                                <input type="radio" name="return_reason" value="normal" class="mt-1" onchange="updatePenaltyVisibility()">
                                 <div class="ml-3">
                                     <span class="font-medium text-gray-800">Normal</span>
                                     <p class="text-xs text-gray-600">Book returned in good condition</p>
@@ -457,15 +721,23 @@
                             </label>
                             
                             <label class="flex items-start p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-yellow-500 hover:bg-yellow-50 transition">
-                                <input type="radio" name="return_reason" value="user_missing" class="mt-1">
+                                <input type="radio" name="return_reason" value="user_missing" class="mt-1" onchange="updatePenaltyVisibility()">
                                 <div class="ml-3">
                                     <span class="font-medium text-gray-800">User Missing</span>
                                     <p class="text-xs text-gray-600">User cannot be contacted</p>
                                 </div>
                             </label>
+
+                            <label class="flex items-start p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition">
+                                <input type="radio" name="return_reason" value="late_return" class="mt-1" onchange="updatePenaltyVisibility()">
+                                <div class="ml-3">
+                                    <span class="font-medium text-gray-800">Late Return</span>
+                                    <p class="text-xs text-gray-600">Book returned after due date</p>
+                                </div>
+                            </label>
                             
                             <label class="flex items-start p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition">
-                                <input type="radio" name="return_reason" value="book_damaged" class="mt-1">
+                                <input type="radio" name="return_reason" value="book_damaged" class="mt-1" onchange="updatePenaltyVisibility()">
                                 <div class="ml-3">
                                     <span class="font-medium text-gray-800">Book Damaged</span>
                                     <p class="text-xs text-gray-600">Book returned in damaged condition</p>
@@ -473,7 +745,7 @@
                             </label>
                             
                             <label class="flex items-start p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-red-500 hover:bg-red-50 transition">
-                                <input type="radio" name="return_reason" value="book_lost" class="mt-1">
+                                <input type="radio" name="return_reason" value="book_lost" class="mt-1" onchange="updatePenaltyVisibility()">
                                 <div class="ml-3">
                                     <span class="font-medium text-gray-800">Book Lost</span>
                                     <p class="text-xs text-gray-600">Book cannot be returned</p>
@@ -481,26 +753,70 @@
                             </label>
                         </div>
                     </div>
+
+                    <!-- Penalty Section -->
+                    <div id="penalty_section" class="bg-red-50 border-2 border-red-200 rounded-lg p-4" style="display: none;">
+                        <label class="block text-sm font-semibold text-red-700 mb-3">
+                            <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Penalty Amount (Optional - Manual Input)
+                        </label>
+                        <div class="mb-3">
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 font-semibold">Rp</span>
+                                <input 
+                                    type="number" 
+                                    id="penalty_amount" 
+                                    min="0" 
+                                    step="1000"
+                                    class="w-full pl-12 pr-3 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" 
+                                    placeholder="0">
+                            </div>
+                            <p class="text-xs text-red-600 mt-2">
+                                <strong>Auto-calculation:</strong><br>
+                                • Late: Rp 1,000/day<br>
+                                • Damaged: Rp 50,000<br>
+                                • Lost: Rp 100,000<br>
+                                Leave empty for auto-calculation or enter custom amount.
+                            </p>
+                        </div>
+                        
+                        <label for="penalty_notes" class="block text-sm font-semibold text-red-700 mb-2">
+                            Penalty Notes (Optional)
+                        </label>
+                        <textarea id="penalty_notes" rows="2" class="w-full px-3 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" placeholder="Reason for penalty amount..."></textarea>
+                    </div>
                     
                     <div>
                         <label for="return_notes" class="block text-sm font-semibold text-gray-700 mb-2">
                             Additional Notes (Optional)
                         </label>
-                        <textarea 
-                            id="return_notes" 
-                            rows="3" 
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                            placeholder="Add notes if needed...">
-                        </textarea>
+                        <textarea id="return_notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Add notes if needed..."></textarea>
                     </div>
                 </div>
             `;
+        }
+
+        // Update penalty visibility based on return reason
+        function updatePenaltyVisibility() {
+            const selectedReason = document.querySelector('input[name="return_reason"]:checked');
+            const penaltySection = document.getElementById('penalty_section');
+            
+            // Show penalty section if late_return, damaged, or lost
+            if (selectedReason && (selectedReason.value === 'late_return' || selectedReason.value === 'book_damaged' || selectedReason.value === 'book_lost')) {
+                penaltySection.style.display = 'block';
+            } else {
+                penaltySection.style.display = 'none';
+            }
         }
 
         // Fungsi untuk validasi dan ambil data dari form
         function validateAndGetFormData() {
             const selectedReason = document.querySelector('input[name="return_reason"]:checked');
             const notes = document.getElementById('return_notes').value;
+            const penaltyAmount = document.getElementById('penalty_amount').value;
+            const penaltyNotes = document.getElementById('penalty_notes').value;
             
             if (!selectedReason) {
                 Swal.showValidationMessage('Please select a return reason');
@@ -510,7 +826,9 @@
             // Return data yang akan disubmit
             return {
                 return_reason: selectedReason.value,
-                return_notes: notes
+                return_notes: notes,
+                penalty_amount: penaltyAmount,
+                penalty_notes: penaltyNotes
             };
         }
 
@@ -545,10 +863,55 @@
                 notesField.value = formData.return_notes;
                 form.appendChild(notesField);
             }
+
+            if (formData.penalty_amount) {
+                const penaltyAmountField = document.createElement('input');
+                penaltyAmountField.type = 'hidden';
+                penaltyAmountField.name = 'penalty_amount';
+                penaltyAmountField.value = formData.penalty_amount;
+                form.appendChild(penaltyAmountField);
+            }
+
+            if (formData.penalty_notes) {
+                const penaltyNotesField = document.createElement('input');
+                penaltyNotesField.type = 'hidden';
+                penaltyNotesField.name = 'penalty_notes';
+                penaltyNotesField.value = formData.penalty_notes;
+                form.appendChild(penaltyNotesField);
+            }
             
             document.body.appendChild(form);
             form.submit();
         }
+
+        // Show success/error messages with SweetAlert
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '{{ session('success') }}',
+                confirmButtonColor: '#8b5cf6',
+                confirmButtonText: 'OK',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-xl px-6 py-3 font-semibold'
+                }
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '{{ session('error') }}',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'OK',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-xl px-6 py-3 font-semibold'
+                }
+            });
+        @endif
     </script>
 
 @endsection

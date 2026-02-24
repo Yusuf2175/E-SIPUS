@@ -140,7 +140,45 @@
                                 @php
                                     $isBorrowedByCurrentUser = $book->isBorrowedByUser(auth()->id());
                                     $actualAvailableCopies = $book->getActualAvailableCopies();
+                                    
+                                    // Check for unpaid penalties
+                                    $unpaidPenalties = \App\Models\Borrowing::where('user_id', auth()->id())
+                                        ->where('penalty_amount', '>', 0)
+                                        ->where('penalty_paid', false)
+                                        ->get();
+                                    $hasUnpaidPenalty = $unpaidPenalties->count() > 0;
+                                    $totalUnpaidPenalty = $unpaidPenalties->sum('penalty_amount');
                                 @endphp
+                                
+                                <!-- Unpaid Penalty Warning Banner -->
+                                @if($hasUnpaidPenalty)
+                                    <div class="w-full bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-300 rounded-xl p-5 mb-2">
+                                        <div class="flex items-start gap-4">
+                                            <div class="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+                                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1">
+                                                <h4 class="text-lg font-bold text-red-800 mb-1">⚠️ Unpaid Penalty Alert</h4>
+                                                <p class="text-sm text-red-700 mb-2">
+                                                    You have <strong>{{ $unpaidPenalties->count() }} unpaid {{ $unpaidPenalties->count() > 1 ? 'penalties' : 'penalty' }}</strong> totaling 
+                                                    <strong class="text-lg">Rp {{ number_format($totalUnpaidPenalty, 0, ',', '.') }}</strong>
+                                                </p>
+                                                <p class="text-sm text-red-600 font-semibold">
+                                                    🔒 You cannot borrow new books until all penalties are paid. Please contact admin or staff for payment.
+                                                </p>
+                                                <a href="{{ route('borrowings.index', ['status' => 'returned']) }}" class="inline-flex items-center mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-all shadow-md">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                    </svg>
+                                                    View Penalty Details
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                                 
                                 @if($isBorrowedByCurrentUser)
                                     <button disabled class="inline-flex items-center px-6 py-3 bg-blue-100 text-blue-700 font-semibold rounded-lg cursor-not-allowed">
@@ -148,6 +186,13 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                         </svg>
                                         Anda Sudah Meminjam Buku Ini
+                                    </button>
+                                @elseif($hasUnpaidPenalty)
+                                    <button disabled class="inline-flex items-center px-6 py-3 bg-gray-300 text-gray-600 font-semibold rounded-lg cursor-not-allowed opacity-60" title="Cannot borrow with unpaid penalty">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                        </svg>
+                                        Pinjam Buku (Terkunci)
                                     </button>
                                 @elseif($actualAvailableCopies > 0)
                                     <form action="{{ route('borrowings.store') }}" method="POST">

@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        // Seed categories first
+        // Seed categories 
         $this->call([
             CategorySeeder::class,
         ]);

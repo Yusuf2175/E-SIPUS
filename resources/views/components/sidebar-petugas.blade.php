@@ -1,8 +1,8 @@
 <!-- Petugas Sidebar Component -->
-<aside class="fixed left-3 top-5 w-64 size-cstm bg-ungu border-r border-primarys/30 z-40 shadow-xl">
+<aside class="fixed left-3 top-5 w-64 size-cstm bg-gradient-to-br from-ungu via-purple-600 to-secondrys z-40 shadow-xl">
     
     <!-- Logo/Header Section -->
-    <div class="p-6 justify-center pl-12 pt-12 ">
+    <div class="p-1 justify-center pl-12 pt-9 ">
             <x-application-logo></x-application-logo>
     </div>
    
@@ -22,9 +22,9 @@
             
             <a href="{{ route('petugas.users') }}" class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition {{ request()->routeIs('petugas.users') ? 'bg-cstm text-primarys shadow-md' : 'text-cstm/90 hover:bg-primarys/30 hover:text-cstm' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                 </svg>
-                Manage Students
+                Borrowing Users
             </a>
         </div>
 
@@ -37,6 +37,13 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
                 Manage Books
+            </a>
+
+            <a href="{{ route('categories.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition {{ request()->routeIs('categories.*') ? 'bg-cstm text-primarys shadow-md' : 'text-cstm/90 hover:bg-primarys/30 hover:text-cstm' }}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                Manage Categories
             </a>
 
             <a href="{{ route('borrowings.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition {{ request()->routeIs('borrowings.index') ? 'bg-cstm text-primarys shadow-md' : 'text-cstm/90 hover:bg-primarys/30 hover:text-cstm' }}">

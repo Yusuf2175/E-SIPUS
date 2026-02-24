@@ -40,6 +40,12 @@ Route::middleware(['auth', 'verified', 'role:admin,petugas'])->group(function ()
     Route::patch('/books/{book}', [App\Http\Controllers\BookController::class, 'update'])->name('books.update');
     Route::delete('/books/{book}', [App\Http\Controllers\BookController::class, 'destroy'])->name('books.destroy');
     
+    // Category Management Routes
+    Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
+    Route::post('/categories', [App\Http\Controllers\CategoryController::class, 'store'])->name('categories.store');
+    Route::put('/categories/{category}', [App\Http\Controllers\CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [App\Http\Controllers\CategoryController::class, 'destroy'])->name('categories.destroy');
+    
     // Admin delete review
     Route::delete('/reviews/{review}/admin', [App\Http\Controllers\ReviewController::class, 'adminDestroy'])->name('reviews.admin.destroy');
 });
@@ -54,6 +60,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/borrowings', [App\Http\Controllers\BorrowingController::class, 'store'])->name('borrowings.store');
     Route::get('/borrowings/return', [App\Http\Controllers\BorrowingController::class, 'returnPage'])->name('borrowings.return.page');
     Route::patch('/borrowings/{borrowing}/return', [App\Http\Controllers\BorrowingController::class, 'return'])->name('borrowings.return');
+    Route::patch('/borrowings/{borrowing}/mark-penalty-paid', [App\Http\Controllers\BorrowingController::class, 'markPenaltyPaid'])->name('borrowings.mark-penalty-paid');
+    Route::patch('/borrowings/{borrowing}/cancel-penalty', [App\Http\Controllers\BorrowingController::class, 'cancelPenalty'])->name('borrowings.cancel-penalty');
+    Route::patch('/borrowings/{borrowing}/cancel-return', [App\Http\Controllers\BorrowingController::class, 'cancelReturn'])->name('borrowings.cancel-return');
+    Route::delete('/borrowings/{borrowing}', [App\Http\Controllers\BorrowingController::class, 'destroy'])->name('borrowings.destroy');
     Route::get('/borrowings/{borrowing}', [App\Http\Controllers\BorrowingController::class, 'show'])->name('borrowings.show');
     
     // Collection routes
