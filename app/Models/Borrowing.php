@@ -23,7 +23,14 @@ class Borrowing extends Model
         'penalty_amount',
         'penalty_type',
         'penalty_paid',
-        'penalty_notes'
+        'penalty_notes',
+        'approval_status',
+        'rejection_reason',
+        'approved_at',
+        'return_approval_status',
+        'return_rejection_reason',
+        'return_approved_at',
+        'should_be_approved_by'
     ];
 
     protected $casts = [
@@ -32,6 +39,8 @@ class Borrowing extends Model
         'returned_date' => 'date',
         'penalty_paid' => 'boolean',
         'penalty_amount' => 'decimal:2',
+        'approved_at' => 'datetime',
+        'return_approved_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -52,6 +61,11 @@ class Borrowing extends Model
     public function returnedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'returned_by');
+    }
+
+    public function shouldBeApprovedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'should_be_approved_by');
     }
 
     public function isOverdue(): bool
@@ -158,5 +172,37 @@ class Borrowing extends Model
             'penalty_paid' => true,
             'penalty_notes' => $notes,
         ]);
+    }
+
+    /**
+     * Scope for pending approval borrowings
+     */
+    public function scopePending($query)
+    {
+        return $query->where('approval_status', 'pending');
+    }
+
+    /**
+     * Scope for approved borrowings
+     */
+    public function scopeApproved($query)
+    {
+        return $query->where('approval_status', 'approved');
+    }
+
+    /**
+     * Scope for rejected borrowings
+     */
+    public function scopeRejected($query)
+    {
+        return $query->where('approval_status', 'rejected');
+    }
+
+    /**
+     * Scope for pending return approval
+     */
+    public function scopeReturnPending($query)
+    {
+        return $query->where('return_approval_status', 'pending');
     }
 }

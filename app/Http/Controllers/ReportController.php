@@ -148,6 +148,50 @@ class ReportController extends Controller
         return $this->generateStatisticsExcel($stats, $startDate, $endDate, $request->period);
     }
 
+    public function userReport(Request $request)
+    {
+        $request->validate([
+            'role' => 'nullable|in:all,user,petugas,admin',
+            'registration_start' => 'nullable|date',
+            'registration_end' => 'nullable|date|after_or_equal:registration_start',
+            'format' => 'required|in:pdf,excel'
+        ]);
+
+        $query = User::query();
+
+        // Filter by role
+        if ($request->filled('role') && $request->role !== 'all') {
+            $query->where('role', $request->role);
+        }
+
+        // Filter by registration date
+        if ($request->filled('registration_start') && $request->filled('registration_end')) {
+            $query->whereBetween('created_at', [
+                Carbon::parse($request->registration_start)->startOfDay(),
+                Carbon::parse($request->registration_end)->endOfDay()
+            ]);
+        }
+
+        $users = $query->withCount([
+            'borrowings',
+            'activeBorrowings',
+            'reviews'
+        ])->orderBy('created_at', 'desc')->get();
+
+        // Statistics
+        $stats = [
+            'total' => $users->count(),
+            'admins' => $users->where('role', 'admin')->count(),
+            'petugas' => $users->where('role', 'petugas')->count(),
+            'users' => $users->where('role', 'user')->count(),
+            'total_borrowings' => $users->sum('borrowings_count'),
+            'active_borrowings' => $users->sum('active_borrowings_count'),
+        ];
+
+        // Generate Excel/CSV format
+        return $this->generateUserExcel($users, $stats, $request->role, $request->registration_start, $request->registration_end);
+    }
+
     private function generateExcel($borrowings, $stats, $startDate, $endDate, $status)
     {
         // For now, return CSV format
@@ -294,6 +338,63 @@ class ReportController extends Controller
                     $user->name,
                     $user->email,
                     $user->borrowings_count
+                ]);
+            }
+            
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    private function generateUserExcel($users, $stats, $role, $startDate, $endDate)
+    {
+        $filename = 'laporan-user-' . Carbon::now()->format('Y-m-d') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function() use ($users, $stats, $role, $startDate, $endDate) {
+            $file = fopen('php://output', 'w');
+            
+            // Header
+            fputcsv($file, ['LAPORAN DATA USER']);
+            if ($startDate && $endDate) {
+                fputcsv($file, ['Periode Registrasi: ' . Carbon::parse($startDate)->format('d/m/Y') . ' - ' . Carbon::parse($endDate)->format('d/m/Y')]);
+            }
+            if ($role && $role !== 'all') {
+                fputcsv($file, ['Filter Role: ' . ucfirst($role)]);
+            }
+            fputcsv($file, ['Dibuat oleh: ' . Auth::user()->name]);
+            fputcsv($file, ['Tanggal: ' . Carbon::now()->format('d/m/Y H:i')]);
+            fputcsv($file, []);
+            
+            // Statistics
+            fputcsv($file, ['STATISTIK']);
+            fputcsv($file, ['Total User', $stats['total']]);
+            fputcsv($file, ['Administrator', $stats['admins']]);
+            fputcsv($file, ['Petugas', $stats['petugas']]);
+            fputcsv($file, ['User Biasa', $stats['users']]);
+            fputcsv($file, ['Total Peminjaman', $stats['total_borrowings']]);
+            fputcsv($file, ['Peminjaman Aktif', $stats['active_borrowings']]);
+            fputcsv($file, []);
+            
+            // Table header
+            fputcsv($file, ['No', 'Nama', 'Email', 'Role', 'Tanggal Registrasi', 'Total Peminjaman', 'Peminjaman Aktif', 'Total Review']);
+            
+            // Data
+            foreach ($users as $index => $user) {
+                fputcsv($file, [
+                    $index + 1,
+                    $user->name,
+                    $user->email,
+                    ucfirst($user->role),
+                    Carbon::parse($user->created_at)->format('d/m/Y'),
+                    $user->borrowings_count,
+                    $user->active_borrowings_count,
+                    $user->reviews_count
                 ]);
             }
             

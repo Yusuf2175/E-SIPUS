@@ -70,30 +70,47 @@
                                 <!-- Availability Badge -->
                                 <div>
                                     @php
-                                        $isBorrowedByCurrentUser = $book->isBorrowedByUser(auth()->id());
+                                        // Check if user has active or pending borrowing for this book
+                                        $userBorrowing = \App\Models\Borrowing::where('user_id', auth()->id())
+                                            ->where('book_id', $book->id)
+                                            ->where(function($query) {
+                                                $query->where('status', 'borrowed')
+                                                      ->orWhere('approval_status', 'pending');
+                                            })
+                                            ->first();
+                                        
+                                        $isBorrowedByCurrentUser = $userBorrowing && $userBorrowing->approval_status === 'approved';
+                                        $isPendingApproval = $userBorrowing && $userBorrowing->approval_status === 'pending';
                                         $actualAvailableCopies = $book->getActualAvailableCopies();
                                     @endphp
                                     
-                                    @if($isBorrowedByCurrentUser)
+                                    @if($isPendingApproval)
+                                        <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-orange-100 text-orange-800">
+                                            <svg class="w-4 h-4 mr-1.5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            Pending Approval
+                                        </span>
+                                    @elseif($isBorrowedByCurrentUser)
                                         <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-ungu/50 text-white">
                                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                             </svg>
-                                            Anda Sedang Meminjam
+                                            You Are Borrowing
                                         </span>
                                     @elseif($actualAvailableCopies > 0)
                                         <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-800">
                                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                             </svg>
-                                            Tersedia ({{ $actualAvailableCopies }} salinan)
+                                            Available ({{ $actualAvailableCopies }} {{ $actualAvailableCopies > 1 ? 'copies' : 'copy' }})
                                         </span>
                                     @else
                                         <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-red-100 text-red-800">
                                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                             </svg>
-                                            Tidak Tersedia (Semua Dipinjam)
+                                            Not Available (All Borrowed)
                                         </span>
                                     @endif
                                 </div>
@@ -138,7 +155,17 @@
                             <!-- Action Buttons -->
                             <div class="flex flex-wrap gap-3">
                                 @php
-                                    $isBorrowedByCurrentUser = $book->isBorrowedByUser(auth()->id());
+                                    // Check if user has active or pending borrowing for this book
+                                    $currentBorrowing = \App\Models\Borrowing::where('user_id', auth()->id())
+                                        ->where('book_id', $book->id)
+                                        ->where(function($query) {
+                                            $query->where('status', 'borrowed')
+                                                  ->orWhere('approval_status', 'pending');
+                                        })
+                                        ->first();
+                                    
+                                    $isBorrowedByCurrentUser = $currentBorrowing && $currentBorrowing->approval_status === 'approved';
+                                    $isPendingApproval = $currentBorrowing && $currentBorrowing->approval_status === 'pending';
                                     $actualAvailableCopies = $book->getActualAvailableCopies();
                                     
                                     // Check for unpaid penalties
@@ -160,13 +187,13 @@
                                                 </svg>
                                             </div>
                                             <div class="flex-1">
-                                                <h4 class="text-lg font-bold text-red-800 mb-1">⚠️ Unpaid Penalty Alert</h4>
+                                                <h4 class="text-lg font-bold text-red-800 mb-1">Unpaid Penalty Alert</h4>
                                                 <p class="text-sm text-red-700 mb-2">
                                                     You have <strong>{{ $unpaidPenalties->count() }} unpaid {{ $unpaidPenalties->count() > 1 ? 'penalties' : 'penalty' }}</strong> totaling 
                                                     <strong class="text-lg">Rp {{ number_format($totalUnpaidPenalty, 0, ',', '.') }}</strong>
                                                 </p>
                                                 <p class="text-sm text-red-600 font-semibold">
-                                                    🔒 You cannot borrow new books until all penalties are paid. Please contact admin or staff for payment.
+                                                    You cannot borrow new books until all penalties are paid. Please contact admin or staff for payment.
                                                 </p>
                                                 <a href="{{ route('borrowings.index', ['status' => 'returned']) }}" class="inline-flex items-center mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-all shadow-md">
                                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,12 +207,19 @@
                                     </div>
                                 @endif
                                 
-                                @if($isBorrowedByCurrentUser)
+                                @if($isPendingApproval)
+                                    <button disabled class="inline-flex items-center px-6 py-3 bg-orange-100 text-orange-700 font-semibold rounded-lg cursor-not-allowed">
+                                        <svg class="w-5 h-5 mr-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Pending
+                                    </button>
+                                @elseif($isBorrowedByCurrentUser)
                                     <button disabled class="inline-flex items-center px-6 py-3 bg-blue-100 text-blue-700 font-semibold rounded-lg cursor-not-allowed">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                         </svg>
-                                        Anda Sudah Meminjam Buku Ini
+                                        You Already Borrowed This Book
                                     </button>
                                 @elseif($hasUnpaidPenalty)
                                     <button disabled class="inline-flex items-center px-6 py-3 bg-gray-300 text-gray-600 font-semibold rounded-lg cursor-not-allowed opacity-60" title="Cannot borrow with unpaid penalty">
@@ -210,7 +244,7 @@
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
-                                        Tidak Tersedia (Semua Dipinjam)
+                                        Not availible (all books are borrowed)
                                     </button>
                                 @endif
 
@@ -222,7 +256,7 @@
                                             <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
                                             </svg>
-                                            Hapus dari Koleksi
+                                           Remove from Collection
                                         </button>
                                     </form>
                                 @else
@@ -233,7 +267,7 @@
                                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                                             </svg>
-                                            Tambah ke Koleksi
+                                            Add to Collection
                                         </button>
                                     </form>
                                 @endif
@@ -244,19 +278,19 @@
 
                 <!-- Reviews Section -->
                 <div class="bg-white rounded-2xl shadow-sm p-8">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-6">Ulasan & Rating</h2>
+                    <h2 class="text-2xl font-bold text-slate-800 mb-6">Reviews and Ratings</h2>
 
                     <!-- Add Review Form -->
                     @if(!$userReview)
                         <div class="mb-8 p-6 bg-slate-50 rounded-xl">
-                            <h3 class="text-lg font-semibold text-gray-400 mb-4">Tulis Ulasan Anda</h3>
+                            <h3 class="text-lg font-semibold text-gray-400 mb-4">Write Your Review</h3>
                             <form action="{{ route('reviews.store') }}" method="POST" id="reviewForm">
                                 @csrf
                                 <input type="hidden" name="book_id" value="{{ $book->id }}">
                                 <input type="hidden" name="rating" id="ratingInput" value="">
                                 
                                 <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-400 mb-2">Rating</label>
+                                    <label class="block text-sm font-medium text-gray-400 mb-2">Ratings</label>
                                     <div class="flex gap-2" id="starRating">
                                         @for($i = 1; $i <= 5; $i++)
                                             <button type="button" class="star-btn focus:outline-none transition-transform hover:scale-110" data-rating="{{ $i }}">
@@ -266,16 +300,16 @@
                                             </button>
                                         @endfor
                                     </div>
-                                    <p class="text-sm text-gray-400 mt-2" id="ratingText">Pilih rating Anda</p>
+                                    <p class="text-sm text-gray-400 mt-2" id="ratingText">Select is ratings you give</p>
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-400 mb-2">Ulasan</label>
+                                    <label class="block text-sm font-medium text-gray-400 mb-2">Review</label>
                                     <textarea name="review" rows="4" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-400" placeholder="Bagikan pengalaman Anda tentang buku ini..." required></textarea>
                                 </div>
 
                                 <button type="submit" class="px-6 py-3 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold rounded-lg transition-all">
-                                    Kirim Ulasan
+                                    Send Review
                                 </button>
                             </form>
                         </div>

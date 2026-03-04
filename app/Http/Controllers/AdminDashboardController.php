@@ -70,4 +70,34 @@ class AdminDashboardController extends Controller
         return back()->with('success', 'Role user berhasil diupdate.');
     }
 
+    public function destroyUser(User $user)
+    {
+        // Prevent deleting self
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot delete your own account!');
+        }
+
+        // Check if user has active borrowings
+        $activeBorrowings = $user->activeBorrowings()->count();
+        if ($activeBorrowings > 0) {
+            return back()->with('error', 'Cannot delete user with active borrowings! User has ' . $activeBorrowings . ' book(s) currently borrowed.');
+        }
+
+        // Check if user has unpaid penalties
+        $unpaidPenalties = $user->borrowings()
+            ->where('penalty_amount', '>', 0)
+            ->where('penalty_paid', false)
+            ->count();
+        
+        if ($unpaidPenalties > 0) {
+            return back()->with('error', 'Cannot delete user with unpaid penalties! Please settle all penalties first.');
+        }
+
+        // Soft delete the user
+        $userName = $user->name;
+        $user->delete();
+
+        return back()->with('success', 'User "' . $userName . '" has been deleted successfully!');
+    }
+
 }

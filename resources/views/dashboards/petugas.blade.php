@@ -343,10 +343,10 @@
                                 <p class="font-semibold text-slate-800 text-sm truncate">{{ $book->title }}</p>
                                 <div class="flex items-center justify-between mt-2">
                                     <p class="text-xs text-yellow-700 font-medium">
-                                        {{ $book->available_copies }} of {{ $book->total_copies }} left
+                                        {{ $book->getActualAvailableCopies() }} of {{ $book->total_copies }} left
                                     </p>
                                     <div class="w-16 bg-yellow-100 rounded-full h-2">
-                                        <div class="bg-yellow-500 h-2 rounded-full" style="width: {{ ($book->available_copies / $book->total_copies) * 100 }}%"></div>
+                                        <div class="bg-yellow-500 h-2 rounded-full" style="width: {{ $book->total_copies > 0 ? ($book->getActualAvailableCopies() / $book->total_copies) * 100 : 0 }}%"></div>
                                     </div>
                                 </div>
                             </div>

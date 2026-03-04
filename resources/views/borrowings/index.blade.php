@@ -36,8 +36,31 @@
                     @php
                         $activeBorrowingsCount = \App\Models\Borrowing::where('user_id', Auth::id())
                             ->where('status', 'borrowed')
+                            ->where('approval_status', 'approved')
+                            ->count();
+                        
+                        $pendingBorrowingsCount = \App\Models\Borrowing::where('user_id', Auth::id())
+                            ->where('approval_status', 'pending')
                             ->count();
                     @endphp
+                    
+                    @if($pendingBorrowingsCount > 0)
+                        <div class="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-6 mb-8 text-white">
+                            <div class="flex items-center justify-between flex-wrap gap-4">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0">
+                                        <svg class="w-6 h-6 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold mb-1">Pending Approval</h3>
+                                        <p class="text-white/90 text-sm">You have <span class="font-bold">{{ $pendingBorrowingsCount }} borrowing request{{ $pendingBorrowingsCount > 1 ? 's' : '' }}</span> waiting for admin/staff approval.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                     
                     @if($activeBorrowingsCount > 0)
                         <div class="bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl p-6 mb-8 text-white">
@@ -63,7 +86,37 @@
 
                 <!-- Statistics Cards (for Admin/Petugas) -->
                 @if(Auth::user()->isAdmin() || Auth::user()->isPetugas())
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
+                        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6 hover:border-ungu transition-all">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-14 h-14 bg-orange-500 rounded-xl flex items-center justify-center">
+                                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="bg-orange-50 px-3 py-1 rounded-full">
+                                    <span class="text-xs font-semibold text-orange-600">Pending</span>
+                                </div>
+                            </div>
+                            <p class="text-4xl font-bold text-slate-800 mb-2">{{ $stats['pending'] ?? 0 }}</p>
+                            <p class="text-sm font-medium text-slate-600">Pending Approval</p>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6 hover:border-ungu transition-all">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-14 h-14 bg-cyan-500 rounded-xl flex items-center justify-center">
+                                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
+                                    </svg>
+                                </div>
+                                <div class="bg-cyan-50 px-3 py-1 rounded-full">
+                                    <span class="text-xs font-semibold text-cyan-600">Return</span>
+                                </div>
+                            </div>
+                            <p class="text-4xl font-bold text-slate-800 mb-2">{{ $stats['return_pending'] ?? 0 }}</p>
+                            <p class="text-sm font-medium text-slate-600">Return Pending</p>
+                        </div>
+
                         <div class="bg-white rounded-2xl border-2 border-slate-100 p-6 hover:border-ungu transition-all">
                             <div class="flex items-start justify-between mb-4">
                                 <div class="w-14 h-14 bg-blue-500 rounded-xl flex items-center justify-center">
@@ -129,17 +182,35 @@
                 <!-- Filter Tabs -->
                 <div class="bg-white rounded-2xl border-2 border-slate-100 mb-6 overflow-hidden">
                     <div class="border-b-2 border-slate-100">
-                        <nav class="flex -mb-px">
-                            <a href="{{ route('borrowings.index') }}" class="px-6 py-4 text-sm font-semibold transition {{ !request('status') ? 'border-b-2 border-ungu text-ungu bg-cstm/30' : 'text-slate-600 hover:text-ungu hover:bg-slate-50' }}">
+                        <nav class="flex -mb-px overflow-x-auto">
+                            <a href="{{ route('borrowings.index') }}" class="px-6 py-4 text-sm font-semibold transition whitespace-nowrap {{ !request('status') ? 'border-b-2 border-ungu text-ungu bg-cstm/30' : 'text-slate-600 hover:text-ungu hover:bg-slate-50' }}">
                                 All Records
                             </a>
-                            <a href="{{ route('borrowings.index', ['status' => 'borrowed']) }}" class="px-6 py-4 text-sm font-semibold transition {{ request('status') == 'borrowed' ? 'border-b-2 border-ungu text-ungu bg-cstm/30' : 'text-slate-600 hover:text-ungu hover:bg-slate-50' }}">
+                            @if(Auth::user()->isAdmin() || Auth::user()->isPetugas())
+                                <a href="{{ route('borrowings.index', ['status' => 'pending']) }}" class="px-6 py-4 text-sm font-semibold transition whitespace-nowrap {{ request('status') == 'pending' ? 'border-b-2 border-ungu text-ungu bg-cstm/30' : 'text-slate-600 hover:text-ungu hover:bg-slate-50' }}">
+                                    <span class="flex items-center gap-2">
+                                        Pending Approval
+                                        @if(isset($stats['pending']) && $stats['pending'] > 0)
+                                            <span class="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $stats['pending'] }}</span>
+                                        @endif
+                                    </span>
+                                </a>
+                                <a href="{{ route('borrowings.index', ['status' => 'return_pending']) }}" class="px-6 py-4 text-sm font-semibold transition whitespace-nowrap {{ request('status') == 'return_pending' ? 'border-b-2 border-ungu text-ungu bg-cstm/30' : 'text-slate-600 hover:text-ungu hover:bg-slate-50' }}">
+                                    <span class="flex items-center gap-2">
+                                        Return Pending
+                                        @if(isset($stats['return_pending']) && $stats['return_pending'] > 0)
+                                            <span class="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $stats['return_pending'] }}</span>
+                                        @endif
+                                    </span>
+                                </a>
+                            @endif
+                            <a href="{{ route('borrowings.index', ['status' => 'borrowed']) }}" class="px-6 py-4 text-sm font-semibold transition whitespace-nowrap {{ request('status') == 'borrowed' ? 'border-b-2 border-ungu text-ungu bg-cstm/30' : 'text-slate-600 hover:text-ungu hover:bg-slate-50' }}">
                                 Currently Borrowed
                             </a>
-                            <a href="{{ route('borrowings.index', ['status' => 'returned']) }}" class="px-6 py-4 text-sm font-semibold transition {{ request('status') == 'returned' ? 'border-b-2 border-ungu text-ungu bg-cstm/30' : 'text-slate-600 hover:text-ungu hover:bg-slate-50' }}">
+                            <a href="{{ route('borrowings.index', ['status' => 'returned']) }}" class="px-6 py-4 text-sm font-semibold transition whitespace-nowrap {{ request('status') == 'returned' ? 'border-b-2 border-ungu text-ungu bg-cstm/30' : 'text-slate-600 hover:text-ungu hover:bg-slate-50' }}">
                                 Returned
                             </a>
-                            <a href="{{ route('borrowings.index', ['status' => 'overdue']) }}" class="px-6 py-4 text-sm font-semibold transition {{ request('status') == 'overdue' ? 'border-b-2 border-ungu text-ungu bg-cstm/30' : 'text-slate-600 hover:text-ungu hover:bg-slate-50' }}">
+                            <a href="{{ route('borrowings.index', ['status' => 'overdue']) }}" class="px-6 py-4 text-sm font-semibold transition whitespace-nowrap {{ request('status') == 'overdue' ? 'border-b-2 border-ungu text-ungu bg-cstm/30' : 'text-slate-600 hover:text-ungu hover:bg-slate-50' }}">
                                 Overdue
                             </a>
                         </nav>
@@ -227,40 +298,8 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Status Pill -->
-                                            <div class="flex-shrink-0">
-                                                @if($borrowing->status === 'borrowed')
-                                                    @if($borrowing->isOverdue())
-                                                        <div class="relative">
-                                                            <div class="absolute inset-0 bg-red-500 rounded-2xl "></div>
-                                                                <div class="flex items-center ">
-                                                                    <span class="text-xs font-black">Overdue</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    @else
-                                                        <div class="relative">
-                                                            <div class="relative bg-green-500/70 text-white px-5 py-3 rounded-2xl ">
-                                                                <div class="flex items-center ">
-                                                                    <span class="text-xs font-black ">Borrowed</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    @endif
-                                                @else
-                                                    <div class="relative">
-                                                        <div class="absolute inset-0  rounded-2xl blur-md opacity-50"></div>
-                                                        <div class="relative bg-green-500 text-white px-5 py-3 rounded-2xl ">
-                                                            <div class="flex items-center gap-2">
-                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                                                                </svg>
-                                                                <span class="text-xs font-black tracking-widest">RETURNED</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            </div>
+                                            <!-- Status Badges -->
+                                            @include('borrowings.partials.status-badges', ['borrowing' => $borrowing])
                                         </div>
 
                                         <div class="my-6 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
@@ -317,67 +356,7 @@
                                             </div>
 
                                             <!-- Action Buttons -->
-                                            <div class="flex gap-3">
-                                                <a href="{{ route('books.show', $borrowing->book) }}" class="group/btn">
-                                                    <div class="px-6 py-3 bg-ungu hover:bg-primarys text-white font-bold text-sm rounded-2xl shadow-md hover:shadow-lg transition-all duration-300">
-                                                        <div class="flex items-center justify-center gap-2">
-                                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                                            </svg>
-                                                            <span>View</span>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                                
-                                                @if($borrowing->status === 'borrowed' && (Auth::user()->isAdmin() || Auth::user()->isPetugas()))
-                                                    <button type="button" onclick="openReturnModal({{ $borrowing->id }}, '{{ $borrowing->due_date->format('Y-m-d') }}')" class="group/btn">
-                                                        <div class="px-6 py-3 bg-red-400 hover:bg-red-500 text-white font-bold text-sm rounded-2xl shadow-md hover:shadow-lg transition-all duration-300">
-                                                            <div class="flex items-center justify-center gap-2">
-                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
-                                                                </svg>
-                                                                <span>Return</span>
-                                                            </div>
-                                                        </div>
-                                                    </button>
-                                                @endif
-
-                                                @if($borrowing->status === 'returned')
-                                                    @php
-                                                        $hasUnpaidPenalty = $borrowing->penalty_amount > 0 && !$borrowing->penalty_paid;
-                                                        $canDelete = !$hasUnpaidPenalty || Auth::user()->isAdmin() || Auth::user()->isPetugas();
-                                                    @endphp
-                                                    
-                                                    @if($canDelete)
-                                                        <button type="button" onclick="confirmDeleteHistory({{ $borrowing->id }}, '{{ addslashes($borrowing->book->title) }}')" class="group/btn">
-                                                            <div class="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold text-sm rounded-2xl shadow-md hover:shadow-lg transition-all duration-300">
-                                                                <div class="flex items-center justify-center gap-2">
-                                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                                    </svg>
-                                                                    <span>Delete</span>
-                                                                </div>
-                                                            </div>
-                                                        </button>
-                                                        <form id="delete-form-{{ $borrowing->id }}" action="{{ route('borrowings.destroy', $borrowing) }}" method="POST" class="hidden">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                        </form>
-                                                    @else
-                                                        <button type="button" onclick="showUnpaidPenaltyWarning()" class="group/btn cursor-not-allowed" title="Cannot delete with unpaid penalty">
-                                                            <div class="px-6 py-3 bg-gray-400 text-white font-bold text-sm rounded-2xl shadow-md opacity-60">
-                                                                <div class="flex items-center justify-center gap-2">
-                                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                                                    </svg>
-                                                                    <span>Locked</span>
-                                                                </div>
-                                                            </div>
-                                                        </button>
-                                                    @endif
-                                                @endif
-                                            </div>
+                                            @include('borrowings.partials.action-buttons', ['borrowing' => $borrowing])
                                         </div>
 
                                         <!-- Penalty Section (Below Timeline & Actions) -->
@@ -657,6 +636,65 @@
                 html: `
                     <div class="text-left">
                         <div class="bg-red-50 border-2 border-red-200 rounded-lg p-4 mb-4">
+
+        // Fungsi untuk delete record (untuk approval workflow)
+        function deleteRecord(borrowingId) {
+            Swal.fire({
+                title: 'Delete Record?',
+                html: `Are you sure you want to delete this borrowing record?<br><br>This action cannot be undone.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, Delete',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-xl px-6 py-3 font-semibold',
+                    cancelButton: 'rounded-xl px-6 py-3 font-semibold'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Deleting...',
+                        text: 'Please wait',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/borrowings/' + borrowingId;
+                    
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = '{{ csrf_token() }}';
+                    form.appendChild(csrfToken);
+                    
+                    const methodField = document.createElement('input');
+                    methodField.type = 'hidden';
+                    methodField.name = '_method';
+                    methodField.value = 'DELETE';
+                    form.appendChild(methodField);
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        // Fungsi untuk menampilkan peringatan unpaid penalty
+        function showUnpaidPenaltyWarning() {
+            Swal.fire({
+                title: 'Cannot Delete History',
+                html: `
+                    <div class="text-left">
+                        <div class="bg-red-50 border-2 border-red-200 rounded-lg p-4 mb-4">
                             <p class="text-red-800 font-semibold mb-2">🔒 Locked Due to Unpaid Penalty</p>
                             <p class="text-sm text-red-700">You cannot delete this borrowing history because you have an unpaid penalty.</p>
                         </div>
@@ -913,5 +951,8 @@
             });
         @endif
     </script>
+
+    {{-- Include Approval Modals --}}
+    @include('borrowings.partials.approval-modals')
 
 @endsection
