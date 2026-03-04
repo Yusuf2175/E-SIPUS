@@ -169,7 +169,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                     <span class="text-sm font-semibold text-green-700">Available to Borrow</span>
-                                    <span class="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded-full">{{ $collection->book->available_copies }} {{ $collection->book->available_copies > 1 ? 'copies' : 'copy' }}</span>
+                                    <span class="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded-full">{{ $collection->book->getActualAvailableCopies() }} {{ $collection->book->getActualAvailableCopies() > 1 ? 'copies' : 'copy' }}</span>
                                 </div>
                             </div>
 

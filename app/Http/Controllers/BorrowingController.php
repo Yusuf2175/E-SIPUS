@@ -14,18 +14,36 @@ class BorrowingController extends Controller
     {
         $user = Auth::user();
         
-        $query = Borrowing::with(['book', 'user', 'approvedBy']);
+        $query = Borrowing::with(['book', 'user', 'approvedBy', 'shouldBeApprovedBy']);
         
         // Filter by user role
         if ($user->isUser()) {
             $query->where('user_id', $user->id);
+        } elseif ($user->isPetugas()) {
+            // Petugas can see:
+            // 1. Borrowings that need their approval (should_be_approved_by = their id)
+            // 2. Borrowings they made themselves
+            $query->where(function($q) use ($user) {
+                $q->where('should_be_approved_by', $user->id)
+                  ->orWhere('user_id', $user->id);
+            });
         }
+        // Admin can see all
         
         // Filter by status
         if ($request->filled('status')) {
             if ($request->status === 'overdue') {
                 $query->where('status', 'borrowed')
+                    ->where('approval_status', 'approved')
                     ->where('due_date', '<', Carbon::now()->toDateString());
+            } elseif ($request->status === 'pending') {
+                $query->where('approval_status', 'pending');
+            } elseif ($request->status === 'approved') {
+                $query->where('approval_status', 'approved');
+            } elseif ($request->status === 'rejected') {
+                $query->where('approval_status', 'rejected');
+            } elseif ($request->status === 'return_pending') {
+                $query->where('return_approval_status', 'pending');
             } else {
                 $query->where('status', $request->status);
             }
@@ -36,13 +54,28 @@ class BorrowingController extends Controller
         // Statistics for Admin/Petugas
         $stats = null;
         if ($user->isAdmin() || $user->isPetugas()) {
+            $statsQuery = Borrowing::query();
+            
+            // For petugas, only count borrowings they should approve
+            if ($user->isPetugas()) {
+                $statsQuery->where(function($q) use ($user) {
+                    $q->where('should_be_approved_by', $user->id)
+                      ->orWhere('user_id', $user->id);
+                });
+            }
+            
             $stats = [
-                'active' => Borrowing::where('status', 'borrowed')->count(),
-                'returned' => Borrowing::where('status', 'returned')->count(),
-                'overdue' => Borrowing::where('status', 'borrowed')
+                'active' => (clone $statsQuery)->where('status', 'borrowed')
+                    ->where('approval_status', 'approved')
+                    ->count(),
+                'returned' => (clone $statsQuery)->where('status', 'returned')->count(),
+                'overdue' => (clone $statsQuery)->where('status', 'borrowed')
+                    ->where('approval_status', 'approved')
                     ->where('due_date', '<', Carbon::now()->toDateString())
                     ->count(),
-                'total' => Borrowing::count()
+                'pending' => (clone $statsQuery)->where('approval_status', 'pending')->count(),
+                'return_pending' => (clone $statsQuery)->where('return_approval_status', 'pending')->count(),
+                'total' => (clone $statsQuery)->count()
             ];
         }
         
@@ -53,17 +86,22 @@ class BorrowingController extends Controller
     {
         $request->validate([
             'book_id' => 'required|exists:books,id',
+            'user_id' => 'nullable|exists:users,id',
             'notes' => 'nullable|string|max:500'
         ]);
 
+        $userId = $request->filled('user_id') && (Auth::user()->isAdmin() || Auth::user()->isPetugas()) 
+            ? $request->user_id 
+            : Auth::id();
+
         // Check if user has unpaid penalties
-        $unpaidPenalties = Borrowing::where('user_id', Auth::id())
+        $unpaidPenalties = Borrowing::where('user_id', $userId)
             ->where('penalty_amount', '>', 0)
             ->where('penalty_paid', false)
             ->count();
 
         if ($unpaidPenalties > 0) {
-            return redirect()->back()->with('error', 'You have unpaid penalties! Please pay your penalties before borrowing new books. Contact admin or staff for payment.');
+            return redirect()->back()->with('error', 'This user has unpaid penalties! Please pay penalties before borrowing new books.');
         }
 
         $book = Book::findOrFail($request->book_id);
@@ -77,40 +115,50 @@ class BorrowingController extends Controller
             return redirect()->back()->with('error', 'Book is not available for borrowing! All copies are currently borrowed.');
         }
 
-        // Check if user already borrowed this book and hasn't returned it
-        $existingBorrowing = Borrowing::where('user_id', Auth::id())
+        // Check if user already has pending or active borrowing for this book
+        $existingBorrowing = Borrowing::where('user_id', $userId)
             ->where('book_id', $book->id)
-            ->where('status', 'borrowed')
+            ->where(function($query) {
+                $query->where('status', 'borrowed')
+                      ->orWhere('approval_status', 'pending');
+            })
             ->first();
 
         if ($existingBorrowing) {
+            if ($existingBorrowing->approval_status === 'pending') {
+                return redirect()->back()->with('error', 'You already have a pending request for this book!');
+            }
             return redirect()->back()->with('error', 'You have already borrowed this book!');
         }
 
         // Check borrowing limit (max 3 books per user)
-        $activeBorrowings = Borrowing::where('user_id', Auth::id())
-            ->where('status', 'borrowed')
+        $activeBorrowings = Borrowing::where('user_id', $userId)
+            ->where(function($query) {
+                $query->where('status', 'borrowed')
+                      ->orWhere('approval_status', 'pending');
+            })
             ->count();
 
         if ($activeBorrowings >= 3) {
-            return redirect()->back()->with('error', 'You have reached the maximum borrowing limit (3 books)!');
+            return redirect()->back()->with('error', 'Borrowing limit reached (3 books maximum)!');
         }
 
-        // Create borrowing record
+        // Create borrowing record with PENDING status
         $borrowing = Borrowing::create([
-            'user_id' => Auth::id(),
+            'user_id' => $userId,
             'book_id' => $book->id,
             'borrowed_date' => Carbon::now()->toDateString(),
-            'due_date' => Carbon::now()->addDays(14)->toDateString(), // 2 weeks borrowing period
+            'due_date' => Carbon::now()->addDays(14)->toDateString(),
             'status' => 'borrowed',
+            'approval_status' => 'pending',
             'notes' => $request->notes,
-            'approved_by' => Auth::id() 
+            'approved_by' => null,
+            'should_be_approved_by' => $book->added_by // Set to the person who added the book
         ]);
 
-        // Decrease available copies
-        $book->decrement('available_copies');
+        // DO NOT decrease available copies yet - only after approval
 
-        return redirect()->back()->with('success', 'Book successfully borrowed! Please return before ' . $borrowing->due_date->format('d/m/Y'));
+        return redirect()->route('borrowings.index')->with('success', 'Borrowing request submitted successfully! You can track your request status in "My Borrowings" page. Waiting for approval from the staff who added this book.');
     }
 
     public function return(Request $request, Borrowing $borrowing)
@@ -227,17 +275,14 @@ class BorrowingController extends Controller
             $updateData['penalty_notes'] = $request->penalty_notes;
         }
 
+        // Set return approval status to pending
+        $updateData['return_approval_status'] = 'pending';
+
         $borrowing->update($updateData);
 
-        // Increase available copies (except if book is lost)
-        if ($request->return_reason !== 'book_lost') {
-            $borrowing->book->increment('available_copies');
-        }
+        // DO NOT increase available copies yet - only after return approval
 
-        $message = 'Book successfully returned!';
-        if ($penaltyAmount > 0) {
-            $message .= ' Penalty: Rp ' . number_format($penaltyAmount, 0, ',', '.');
-        }
+        $message = 'Return request submitted! Waiting for admin/staff approval.';
 
         return redirect()->back()->with('success', $message);
     }
@@ -246,10 +291,11 @@ class BorrowingController extends Controller
     {
         $user = Auth::user();
         
-        // Get active borrowings for the user
+        // Get active borrowings for the user (only approved borrowings can be returned)
         $activeBorrowings = Borrowing::with(['book'])
             ->where('user_id', $user->id)
             ->where('status', 'borrowed')
+            ->where('approval_status', 'approved') // Only show approved borrowings
             ->orderBy('due_date', 'asc')
             ->get();
         
@@ -403,5 +449,127 @@ class BorrowingController extends Controller
         }
         
         return redirect()->back()->with('success', 'Return cancelled successfully! Book status restored to borrowed.');
+    }
+
+    public function approveBorrowing(Borrowing $borrowing)
+    {
+        $user = Auth::user();
+        
+        // Only the person who added the book can approve (or admin can approve any)
+        if (!$user->isAdmin() && $borrowing->should_be_approved_by !== $user->id) {
+            return redirect()->back()->with('error', 'Only the staff who added this book or admin can approve this request!');
+        }
+        
+        // Check if already approved
+        if ($borrowing->approval_status === 'approved') {
+            return redirect()->back()->with('error', 'This borrowing has already been approved!');
+        }
+        
+        // Check if rejected
+        if ($borrowing->approval_status === 'rejected') {
+            return redirect()->back()->with('error', 'Cannot approve a rejected borrowing!');
+        }
+        
+        // Update borrowing status
+        $borrowing->update([
+            'approval_status' => 'approved',
+            'approved_by' => $user->id,
+            'approved_at' => Carbon::now()
+        ]);
+        
+        // NOW decrease available copies
+        $borrowing->book->decrement('available_copies');
+        
+        return redirect()->back()->with('success', 'Borrowing approved successfully! The book is now borrowed.');
+    }
+
+    public function rejectBorrowing(Request $request, Borrowing $borrowing)
+    {
+        $user = Auth::user();
+        
+        // Only the person who added the book can reject (or admin can reject any)
+        if (!$user->isAdmin() && $borrowing->should_be_approved_by !== $user->id) {
+            return redirect()->back()->with('error', 'Only the staff who added this book or admin can reject this request!');
+        }
+        
+        $request->validate([
+            'rejection_reason' => 'required|string|max:500'
+        ]);
+        
+        // Check if already processed
+        if ($borrowing->approval_status !== 'pending') {
+            return redirect()->back()->with('error', 'This borrowing has already been processed!');
+        }
+        
+        // Update borrowing status
+        $borrowing->update([
+            'approval_status' => 'rejected',
+            'rejection_reason' => $request->rejection_reason
+        ]);
+        
+        return redirect()->back()->with('success', 'Borrowing request rejected.');
+    }
+
+    public function approveReturn(Request $request, Borrowing $borrowing)
+    {
+        $user = Auth::user();
+        
+        // Only the person who added the book can approve return (or admin can approve any)
+        if (!$user->isAdmin() && $borrowing->should_be_approved_by !== $user->id) {
+            return redirect()->back()->with('error', 'Only the staff who added this book or admin can approve this return!');
+        }
+        
+        // Check if return is pending
+        if ($borrowing->return_approval_status !== 'pending') {
+            return redirect()->back()->with('error', 'This return is not pending approval!');
+        }
+        
+        // Update return approval status
+        $borrowing->update([
+            'return_approval_status' => 'approved',
+            'return_approved_at' => Carbon::now(),
+            'status' => 'returned'
+        ]);
+        
+        // NOW increase available copies (except if book is lost)
+        if ($borrowing->return_reason !== 'book_lost') {
+            $borrowing->book->increment('available_copies');
+        }
+        
+        $message = 'Return approved successfully! The book has been returned.';
+        if ($borrowing->penalty_amount > 0) {
+            $message .= ' Penalty: Rp ' . number_format($borrowing->penalty_amount, 0, ',', '.');
+        }
+        
+        return redirect()->back()->with('success', $message);
+    }
+
+    public function rejectReturn(Request $request, Borrowing $borrowing)
+    {
+        $user = Auth::user();
+        
+        // Only the person who added the book can reject return (or admin can reject any)
+        if (!$user->isAdmin() && $borrowing->should_be_approved_by !== $user->id) {
+            return redirect()->back()->with('error', 'Only the staff who added this book or admin can reject this return!');
+        }
+        
+        $request->validate([
+            'return_rejection_reason' => 'required|string|max:500'
+        ]);
+        
+        // Check if return is pending
+        if ($borrowing->return_approval_status !== 'pending') {
+            return redirect()->back()->with('error', 'This return is not pending approval!');
+        }
+        
+        // Update return approval status
+        $borrowing->update([
+            'return_approval_status' => 'rejected',
+            'return_rejection_reason' => $request->return_rejection_reason,
+            'status' => 'borrowed',
+            'returned_date' => null
+        ]);
+        
+        return redirect()->back()->with('success', 'Return request rejected. Book remains borrowed.');
     }
 }

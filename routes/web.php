@@ -60,6 +60,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/borrowings', [App\Http\Controllers\BorrowingController::class, 'store'])->name('borrowings.store');
     Route::get('/borrowings/return', [App\Http\Controllers\BorrowingController::class, 'returnPage'])->name('borrowings.return.page');
     Route::patch('/borrowings/{borrowing}/return', [App\Http\Controllers\BorrowingController::class, 'return'])->name('borrowings.return');
+    Route::patch('/borrowings/{borrowing}/approve', [App\Http\Controllers\BorrowingController::class, 'approveBorrowing'])->name('borrowings.approve')->middleware('role:admin,petugas');
+    Route::patch('/borrowings/{borrowing}/reject', [App\Http\Controllers\BorrowingController::class, 'rejectBorrowing'])->name('borrowings.reject')->middleware('role:admin,petugas');
+    Route::patch('/borrowings/{borrowing}/approve-return', [App\Http\Controllers\BorrowingController::class, 'approveReturn'])->name('borrowings.approve-return')->middleware('role:admin,petugas');
+    Route::patch('/borrowings/{borrowing}/reject-return', [App\Http\Controllers\BorrowingController::class, 'rejectReturn'])->name('borrowings.reject-return')->middleware('role:admin,petugas');
     Route::patch('/borrowings/{borrowing}/mark-penalty-paid', [App\Http\Controllers\BorrowingController::class, 'markPenaltyPaid'])->name('borrowings.mark-penalty-paid');
     Route::patch('/borrowings/{borrowing}/cancel-penalty', [App\Http\Controllers\BorrowingController::class, 'cancelPenalty'])->name('borrowings.cancel-penalty');
     Route::patch('/borrowings/{borrowing}/cancel-return', [App\Http\Controllers\BorrowingController::class, 'cancelReturn'])->name('borrowings.cancel-return');
@@ -89,6 +93,7 @@ Route::middleware(['auth', 'verified', 'role:petugas,admin'])->prefix('reports')
     Route::get('/', [App\Http\Controllers\ReportController::class, 'index'])->name('index');
     Route::post('/borrowing', [App\Http\Controllers\ReportController::class, 'borrowingReport'])->name('borrowing');
     Route::post('/book', [App\Http\Controllers\ReportController::class, 'bookReport'])->name('book');
+    Route::post('/user', [App\Http\Controllers\ReportController::class, 'userReport'])->name('user');
     Route::post('/statistics', [App\Http\Controllers\ReportController::class, 'statisticsReport'])->name('statistics');
 });
 
@@ -97,6 +102,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [AdminDashboardController::class, 'manageUsers'])->name('users');
     Route::patch('/users/{user}/role', [AdminDashboardController::class, 'updateUserRole'])->name('users.update.role');
+    Route::delete('/users/{user}', [AdminDashboardController::class, 'destroyUser'])->name('users.destroy');
 });
 
 Route::middleware('auth')->group(function () {

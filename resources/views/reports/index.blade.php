@@ -139,6 +139,58 @@
                 </button>
             </form>
         </div>
+
+        <!-- Laporan User -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-r from-green-500 to-green-600 p-6 text-white">
+                <div class="flex items-center justify-between mb-4">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Laporan User</h3>
+                <p class="text-green-100 text-sm">Data pengguna perpustakaan</p>
+            </div>
+            
+            <form action="{{ route('reports.user') }}" method="POST" class="p-6 space-y-4">
+                @csrf
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                    <select name="role" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500">
+                        <option value="all">Semua Role</option>
+                        <option value="user">User</option>
+                        <option value="petugas">Petugas</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Registrasi Mulai</label>
+                    <input type="date" name="registration_start" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Registrasi Akhir</label>
+                    <input type="date" name="registration_end" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Format</label>
+                    <select name="format" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500">
+                        <option value="excel">Excel (CSV)</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">Format PDF akan tersedia segera</p>
+                </div>
+
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Generate Laporan
+                </button>
+            </form>
+        </div>
     </div>
 
     <!-- Info Section -->
@@ -152,7 +204,7 @@
                 <ul class="text-blue-800 text-sm space-y-1">
                     <li>• <strong>Laporan Peminjaman:</strong> Berisi data peminjaman buku dalam periode tertentu dengan filter status</li>
                     <li>• <strong>Laporan Buku:</strong> Berisi data koleksi buku dengan filter kategori dan ketersediaan</li>
-                    <li>• <strong>Laporan Statistik:</strong> Berisi analisis peminjaman, buku terpopuler, dan pengguna aktif</li>
+                    <li>• <strong>Laporan User:</strong> Berisi data pengguna dengan statistik peminjaman dan aktivitas</li>
                     <li>• Format PDF cocok untuk presentasi dan arsip, format Excel cocok untuk analisis data lebih lanjut</li>
                 </ul>
             </div>

@@ -120,15 +120,27 @@
                         <!-- Actions -->
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($user->id !== auth()->id())
-                                <form method="POST" action="{{ route('admin.users.update.role', $user) }}" class="inline-block">
-                                    @csrf
-                                    @method('PATCH')
-                                    <select name="role" onchange="this.form.submit()" class="text-sm font-medium text-gray-500 border-2 border-slate-200 rounded-lg px-7 py-2 focus:outline-none focus:ring-2 focus:ring-primarys/20 focus:border-primarys transition cursor-pointer hover:border-primarys">
-                                        <option value="user" {{ $user->role === 'user' ? 'selected' : '' }}>User</option>
-                                        <option value="petugas" {{ $user->role === 'petugas' ? 'selected' : '' }}>Staff</option>
-                                        <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
-                                    </select>
-                                </form>
+                                <div class="flex items-center gap-2">
+                                    <form method="POST" action="{{ route('admin.users.update.role', $user) }}" class="inline-block">
+                                        @csrf
+                                        @method('PATCH')
+                                        <select name="role" onchange="this.form.submit()" class="text-sm font-medium text-gray-500 border-2 border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primarys/20 focus:border-primarys transition cursor-pointer hover:border-primarys">
+                                            <option value="user" {{ $user->role === 'user' ? 'selected' : '' }}>User</option>
+                                            <option value="petugas" {{ $user->role === 'petugas' ? 'selected' : '' }}>Staff</option>
+                                            <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
+                                        </select>
+                                    </form>
+                                    <button onclick="confirmDeleteUser({{ $user->id }}, '{{ addslashes($user->name) }}')" class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg border border-red-200 hover:bg-red-100 transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        Delete
+                                    </button>
+                                    <form id="delete-user-form-{{ $user->id }}" action="{{ route('admin.users.destroy', $user) }}" method="POST" class="hidden">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                </div>
                             @else
                                 <span class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-400 bg-slate-50 rounded-lg border border-slate-200">
                                     <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
@@ -162,4 +174,77 @@
         </div>
         @endif
     </div>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDeleteUser(userId, userName) {
+            Swal.fire({
+                title: 'Delete User?',
+                html: `Are you sure you want to delete user "<strong>${userName}</strong>"?<br><br>
+                       <div class="text-left bg-red-50 border border-red-200 rounded-lg p-3 mt-3">
+                           <p class="text-sm text-red-800"><strong>⚠️ Warning:</strong></p>
+                           <ul class="text-xs text-red-700 mt-2 space-y-1">
+                               <li>• User must not have active borrowings</li>
+                               <li>• User must not have unpaid penalties</li>
+                               <li>• This action cannot be undone</li>
+                           </ul>
+                       </div>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, Delete User',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-xl px-6 py-3 font-semibold',
+                    cancelButton: 'rounded-xl px-6 py-3 font-semibold'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Deleting...',
+                        text: 'Please wait',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    document.getElementById('delete-user-form-' + userId).submit();
+                }
+            });
+        }
+
+        // Show success/error messages
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '{{ session('success') }}',
+                confirmButtonColor: '#10b981',
+                confirmButtonText: 'OK',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-xl px-6 py-3 font-semibold'
+                }
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '{{ session('error') }}',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'OK',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-xl px-6 py-3 font-semibold'
+                }
+            });
+        @endif
+    </script>
 @endsection

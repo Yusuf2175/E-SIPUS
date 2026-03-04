@@ -77,7 +77,9 @@ class Book extends Model
 
     public function activeBorrowings(): HasMany
     {
-        return $this->hasMany(Borrowing::class)->where('status', 'borrowed');
+        return $this->hasMany(Borrowing::class)
+            ->where('status', 'borrowed')
+            ->where('approval_status', 'approved');
     }
 
     public function categories(): BelongsToMany
@@ -102,24 +104,26 @@ class Book extends Model
 
     public function isAvailable(): bool
     {
-        // Hitung jumlah peminjaman aktif
+        // Only count approved borrowings
         $activeBorrowingsCount = $this->activeBorrowings()->count();
         
-        // Hitung salinan yang benar-benar tersedia
+        // Calculate actual available copies
         $actualAvailableCopies = $this->total_copies - $activeBorrowingsCount;
         
-        // Buku tersedia jika masih ada salinan yang belum dipinjam
+        // Book is available if there are still copies not borrowed
         return $actualAvailableCopies > 0;
     }
     
     public function getActualAvailableCopies(): int
     {
+        // Only count approved borrowings
         $activeBorrowingsCount = $this->activeBorrowings()->count();
         return max(0, $this->total_copies - $activeBorrowingsCount);
     }
     
     public function isBorrowedByUser($userId): bool
     {
+        // Only check approved borrowings
         return $this->activeBorrowings()->where('user_id', $userId)->exists();
     }
 
