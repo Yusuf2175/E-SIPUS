@@ -1,4 +1,4 @@
-# 📚 E-SIPUS — Digital Library Management System
+# E-SIPUS — Digital Library Management System
 
 <div align="center">
 
