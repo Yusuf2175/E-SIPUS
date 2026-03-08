@@ -122,10 +122,3 @@ https://github.com/Yusuf2175
 
 ---
 
-# ⭐ Project
-
-Digital Library Information System
-
-Made for modern web library management
-
-# 🔄 Borrowing Workflow
