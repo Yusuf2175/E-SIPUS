@@ -78,8 +78,7 @@ class Book extends Model
     public function activeBorrowings(): HasMany
     {
         return $this->hasMany(Borrowing::class)
-            ->where('status', 'borrowed')
-            ->where('approval_status', 'approved');
+            ->whereIn('status', ['approved', 'borrowed']);
     }
 
     public function categories(): BelongsToMany

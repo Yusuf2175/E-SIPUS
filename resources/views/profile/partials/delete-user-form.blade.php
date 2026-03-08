@@ -17,15 +17,16 @@
             class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200">
         Hapus Akun
     </button>
+</section>
 
-    <!-- Delete Confirmation Modal -->
-    <div x-data="{ show: @js($errors->userDeletion->isNotEmpty()) }" 
-         x-show="show" 
-         x-on:open-modal.window="$event.detail == 'confirm-user-deletion' ? show = true : null"
-         x-on:close.stop="show = false"
-         x-on:keydown.escape.window="show = false"
-         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-         style="display: none;">
+<!-- Delete Confirmation Modal - Moved outside section for full screen overlay -->
+<div x-data="{ show: @js($errors->userDeletion->isNotEmpty()) }" 
+     x-show="show" 
+     x-on:open-modal.window="$event.detail == 'confirm-user-deletion' ? show = true : null"
+     x-on:close.stop="show = false"
+     x-on:keydown.escape.window="show = false"
+     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+     style="display: none; z-index: 9999;">
         
         <div x-show="show" 
              x-transition:enter="ease-out duration-300"
@@ -34,6 +35,7 @@
              x-transition:leave="ease-in duration-200"
              x-transition:leave-start="opacity-100 transform scale-100"
              x-transition:leave-end="opacity-0 transform scale-95"
+             @click.away="show = false"
              class="bg-white rounded-lg max-w-md w-full">
             
             <form method="post" action="{{ route('profile.destroy') }}" class="p-6">
@@ -76,4 +78,3 @@
             </form>
         </div>
     </div>
-</section>

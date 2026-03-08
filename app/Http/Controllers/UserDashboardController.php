@@ -2,12 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\RoleRequest;
 use App\Models\Book;
-use App\Models\Borrowing;
-use App\Models\Collection;
-use App\Models\Review;
 
 class UserDashboardController extends Controller
 {
@@ -16,7 +11,7 @@ class UserDashboardController extends Controller
         $user = auth()->user();        
         // Statistics
         $stats = [
-            'active_borrowings' => $user->borrowings()->where('status', 'borrowed')->count(),
+            'active_borrowings' => $user->borrowings()->whereIn('status', ['approved', 'borrowed'])->count(),
             'total_borrowings' => $user->borrowings()->count(),
             'collections' => $user->collections()->count(),
             'reviews' => $user->reviews()->count(),

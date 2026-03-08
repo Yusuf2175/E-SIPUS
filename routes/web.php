@@ -59,15 +59,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/borrowings', [App\Http\Controllers\BorrowingController::class, 'index'])->name('borrowings.index');
     Route::post('/borrowings', [App\Http\Controllers\BorrowingController::class, 'store'])->name('borrowings.store');
     Route::get('/borrowings/return', [App\Http\Controllers\BorrowingController::class, 'returnPage'])->name('borrowings.return.page');
+    
+    // Hide/Unhide borrowing history (User, Petugas, Admin bisa hide history mereka sendiri)
+    Route::delete('/borrowings/{borrowing}/hide', [App\Http\Controllers\BorrowingController::class, 'hideHistory'])->name('borrowings.hide');
+    Route::patch('/borrowings/{borrowing}/unhide', [App\Http\Controllers\BorrowingController::class, 'unhideHistory'])->name('borrowings.unhide');
+    
+    // Permanent delete (Admin only)
+    Route::delete('/borrowings/{borrowing}', [App\Http\Controllers\BorrowingController::class, 'destroy'])->name('borrowings.destroy')->middleware('role:admin');
+    
+    // Borrowing approval routes (Admin and Petugas only)
+    Route::patch('/borrowings/{borrowing}/approve', [App\Http\Controllers\BorrowingController::class, 'approve'])->name('borrowings.approve')->middleware('role:admin,petugas');
+    Route::patch('/borrowings/{borrowing}/reject', [App\Http\Controllers\BorrowingController::class, 'reject'])->name('borrowings.reject')->middleware('role:admin,petugas');
+    Route::patch('/borrowings/{borrowing}/approve-return', [App\Http\Controllers\BorrowingController::class, 'approveReturn'])->name('borrowings.approve.return')->middleware('role:admin,petugas');
+    
     Route::patch('/borrowings/{borrowing}/return', [App\Http\Controllers\BorrowingController::class, 'return'])->name('borrowings.return');
-    Route::patch('/borrowings/{borrowing}/approve', [App\Http\Controllers\BorrowingController::class, 'approveBorrowing'])->name('borrowings.approve')->middleware('role:admin,petugas');
-    Route::patch('/borrowings/{borrowing}/reject', [App\Http\Controllers\BorrowingController::class, 'rejectBorrowing'])->name('borrowings.reject')->middleware('role:admin,petugas');
-    Route::patch('/borrowings/{borrowing}/approve-return', [App\Http\Controllers\BorrowingController::class, 'approveReturn'])->name('borrowings.approve-return')->middleware('role:admin,petugas');
-    Route::patch('/borrowings/{borrowing}/reject-return', [App\Http\Controllers\BorrowingController::class, 'rejectReturn'])->name('borrowings.reject-return')->middleware('role:admin,petugas');
-    Route::patch('/borrowings/{borrowing}/mark-penalty-paid', [App\Http\Controllers\BorrowingController::class, 'markPenaltyPaid'])->name('borrowings.mark-penalty-paid');
-    Route::patch('/borrowings/{borrowing}/cancel-penalty', [App\Http\Controllers\BorrowingController::class, 'cancelPenalty'])->name('borrowings.cancel-penalty');
-    Route::patch('/borrowings/{borrowing}/cancel-return', [App\Http\Controllers\BorrowingController::class, 'cancelReturn'])->name('borrowings.cancel-return');
-    Route::delete('/borrowings/{borrowing}', [App\Http\Controllers\BorrowingController::class, 'destroy'])->name('borrowings.destroy');
     Route::get('/borrowings/{borrowing}', [App\Http\Controllers\BorrowingController::class, 'show'])->name('borrowings.show');
     
     // Collection routes

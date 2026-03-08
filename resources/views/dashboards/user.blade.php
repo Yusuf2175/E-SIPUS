@@ -295,32 +295,4 @@
             </div>
         </div>
     @endif
-
-    <!-- Role Request Modal -->
-    <div id="roleRequestModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-slate-800">Request Role Change</h2>
-                <button onclick="document.getElementById('roleRequestModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-
-            <form action="{{ route('user.request.role') }}" method="POST">
-                @csrf
-                <input type="hidden" name="requested_role" value="petugas">
-                
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Reason for Request</label>
-                    <textarea name="reason" rows="4" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-ungu focus:border-ungu transition" placeholder="Explain why you want to become a staff member..." required></textarea>
-                </div>
-
-                <button type="submit" class="w-full px-6 py-3 bg-ungu hover:bg-primarys text-white font-semibold rounded-xl transition">
-                    Submit Request
-                </button>
-            </form>
-        </div>
-    </div>
 @endsection

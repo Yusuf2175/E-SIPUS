@@ -4,16 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <title>{{ config('app.name') }} - @yield('page-title', 'Dashboard')</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/Logo_E-Sipus.png') }}">
-    
-    <!-- Alpine.js Cloak Style -->
     <style>
         [x-cloak] { display: none !important; }
     </style>
-    
-    <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased bg-slate-50">
@@ -103,19 +98,21 @@
                         </div>
 
                         <!-- User Info -->
-                        <div class="flex items-center gap-3 ml-6">
-                            <div class="flex items-center gap-3 px-3 py-2 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition cursor-pointer border border-white/20">
-                                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-ungu font-bold shadow-md ring-2 ring-white/30">
-                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                </div>
-                                <div class="text-left">
-                                    <p class="text-sm font-bold text-white">{{ Auth::user()->name }}</p>
-                                    <p class="text-xs text-white/90 font-semibold flex items-center gap-1.5">
-                                        {{ ucfirst(Auth::user()->role) }}
-                                    </p>
+                        <a href="{{ route('profile.edit')}}">
+                            <div class="flex items-center gap-3 ml-6">
+                                <div class="flex items-center gap-3 px-3 py-2 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition cursor-pointer border border-white/20">
+                                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-ungu font-bold shadow-md ring-2 ring-white/30">
+                                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-sm font-bold text-white">{{ Auth::user()->name }}</p>
+                                        <p class="text-xs text-white/90 font-semibold flex items-center gap-1.5">
+                                            {{ ucfirst(Auth::user()->role) }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </header>
             </aside>
@@ -231,16 +228,16 @@
                         keywords: ['collection', 'favorites', 'saved books', 'wishlist', 'koleksi'],
                         roles: ['admin', 'petugas', 'user']
                     },
-                    // Reviews & Ratings - All roles
-                    {
-                        title: 'Reviews & Ratings',
-                        description: 'View and manage book reviews',
-                        url: '{{ route("reviews.index") }}',
-                        icon: 'M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z',
-                        color: 'bg-indigo-500',
-                        keywords: ['reviews', 'ratings', 'comments', 'feedback', 'ulasan'],
-                        roles: ['admin', 'petugas', 'user']
-                    },
+                    // // Reviews & Ratings - All roles
+                    // {
+                    //     title: 'Reviews & Ratings',
+                    //     description: 'View and manage book reviews',
+                    //     url: '{{ route("reviews.index") }}',
+                    //     icon: 'M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z',
+                    //     color: 'bg-indigo-500',
+                    //     keywords: ['reviews', 'ratings', 'comments', 'feedback', 'ulasan'],
+                    //     roles: ['admin', 'petugas', 'user']
+                    // },
                     @if(Auth::user()->role === 'admin')
                     // Generate Reports - Admin only
                     {

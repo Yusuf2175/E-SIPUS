@@ -154,7 +154,14 @@
 
                                         <!-- Status Badge -->
                                         <div class="flex flex-wrap gap-2">
-                                            @if($borrowing->is_overdue)
+                                            @if($borrowing->status === 'pending_return')
+                                                <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold bg-orange-100 text-orange-700 border border-orange-200">
+                                                    <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    Pending Return Approval
+                                                </span>
+                                            @elseif($borrowing->is_overdue)
                                                 <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold bg-red-100 text-red-700 border border-red-200">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -174,18 +181,47 @@
 
                                     <!-- Return Button -->
                                     <div class="flex-shrink-0">
-                                        <form method="POST" action="{{ route('borrowings.return', $borrowing) }}" id="return-form-{{ $borrowing->id }}">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="button" onclick="confirmReturn({{ $borrowing->id }}, '{{ $borrowing->book->title }}')" class="inline-flex items-center gap-2 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold py-3 px-6 rounded-xl  shadow-lg">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
+                                        @if($borrowing->status === 'pending_return')
+                                            <!-- Pending Return - Disabled Button -->
+                                            <button disabled class="inline-flex items-center gap-2 bg-orange-100 text-orange-700 font-semibold py-3 px-6 rounded-xl cursor-not-allowed opacity-75">
+                                                <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                 </svg>
-                                                Return Book
+                                                Waiting for Approval
                                             </button>
-                                        </form>
+                                        @else
+                                            <!-- Active Borrowing - Return Button -->
+                                            <form method="POST" action="{{ route('borrowings.return', $borrowing) }}" id="return-form-{{ $borrowing->id }}">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="button" onclick="confirmReturn({{ $borrowing->id }}, '{{ $borrowing->book->title }}')" class="inline-flex items-center gap-2 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold py-3 px-6 rounded-xl shadow-lg">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
+                                                    </svg>
+                                                    Return Book
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </div>
+
+                                @if($borrowing->status === 'pending_return')
+                                    <!-- Pending Return Info -->
+                                    <div class="mt-4 p-4 bg-orange-50 border-l-4 border-orange-400 rounded-lg">
+                                        <div class="flex items-start gap-2">
+                                            <svg class="w-5 h-5 text-orange-600 mt-0.5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <div>
+                                                <p class="text-sm font-semibold text-orange-800">Return Request Submitted</p>
+                                                <p class="text-sm text-orange-700 mt-1">Your return request is waiting for approval from admin/staff. The book will be marked as returned once approved.</p>
+                                                @if($borrowing->return_requested_at)
+                                                    <p class="text-xs text-orange-600 mt-2">Requested on: {{ $borrowing->return_requested_at->format('d M Y, H:i') }}</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
 
                                 @if($borrowing->notes)
                                     <div class="mt-4 p-4 bg-amber-50 border-l-4 border-amber-400 rounded-lg">
@@ -238,7 +274,24 @@
                 </div>
                 
                 <div class="flex gap-4">
-                    @if($activeBorrowings->where('is_overdue', true)->count() > 0)
+                    @php
+                        $pendingReturnCount = $activeBorrowings->where('status', 'pending_return')->count();
+                        $overdueCount = $activeBorrowings->where('is_overdue', true)->where('status', '!=', 'pending_return')->count();
+                    @endphp
+                    
+                    @if($pendingReturnCount > 0)
+                        <div class="bg-orange-50 rounded-2xl p-6 border-2 border-orange-100 text-center min-w-[140px]">
+                            <div class="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-xs font-medium text-slate-600 mb-1">Pending Return</p>
+                            <p class="text-3xl font-bold text-orange-600">{{ $pendingReturnCount }}</p>
+                        </div>
+                    @endif
+                    
+                    @if($overdueCount > 0)
                         <div class="bg-red-50 rounded-2xl p-6 border-2 border-red-100 text-center min-w-[140px]">
                             <div class="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center mx-auto mb-3">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,9 +299,11 @@
                                 </svg>
                             </div>
                             <p class="text-xs font-medium text-slate-600 mb-1">Overdue</p>
-                            <p class="text-3xl font-bold text-red-600">{{ $activeBorrowings->where('is_overdue', true)->count() }}</p>
+                            <p class="text-3xl font-bold text-red-600">{{ $overdueCount }}</p>
                         </div>
-                    @else
+                    @endif
+                    
+                    @if($pendingReturnCount == 0 && $overdueCount == 0)
                         <div class="bg-green-50 rounded-2xl p-6 border-2 border-green-100 text-center min-w-[140px]">
                             <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center mx-auto mb-3">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
