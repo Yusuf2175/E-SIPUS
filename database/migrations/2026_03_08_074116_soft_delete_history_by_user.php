@@ -12,10 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('borrowings', function (Blueprint $table) {
-            $table->decimal('penalty_amount', 10, 2)->default(0)->after('return_notes');
-            $table->enum('penalty_type', ['none', 'late', 'damaged', 'lost'])->default('none')->after('penalty_amount');
-            $table->boolean('penalty_paid')->default(false)->after('penalty_type');
-            $table->text('penalty_notes')->nullable()->after('penalty_paid');
+            $table->boolean('hidden_by_user')->default(false)->after('returned_by');
+            $table->timestamp('hidden_at')->nullable()->after('hidden_by_user');
         });
     }
 
@@ -25,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('borrowings', function (Blueprint $table) {
-            $table->dropColumn(['penalty_amount', 'penalty_type', 'penalty_paid', 'penalty_notes']);
+            $table->dropColumn(['hidden_by_user', 'hidden_at']);
         });
     }
 };

@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('page-title', 'Bibliographic Information')
+@section('page-title', $book->title)
 
 @section('content')
 
@@ -70,34 +70,31 @@
                                 <!-- Availability Badge -->
                                 <div>
                                     @php
-                                        // Check if user has active or pending borrowing for this book
+                                        // Check if user has any borrowing for this book (pending, approved, or borrowed)
                                         $userBorrowing = \App\Models\Borrowing::where('user_id', auth()->id())
                                             ->where('book_id', $book->id)
-                                            ->where(function($query) {
-                                                $query->where('status', 'borrowed')
-                                                      ->orWhere('approval_status', 'pending');
-                                            })
+                                            ->whereIn('status', ['pending', 'approved', 'borrowed'])
                                             ->first();
                                         
-                                        $isBorrowedByCurrentUser = $userBorrowing && $userBorrowing->approval_status === 'approved';
-                                        $isPendingApproval = $userBorrowing && $userBorrowing->approval_status === 'pending';
                                         $actualAvailableCopies = $book->getActualAvailableCopies();
                                     @endphp
                                     
-                                    @if($isPendingApproval)
-                                        <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-orange-100 text-orange-800">
-                                            <svg class="w-4 h-4 mr-1.5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            Pending Approval
-                                        </span>
-                                    @elseif($isBorrowedByCurrentUser)
-                                        <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-ungu/50 text-white">
-                                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                            </svg>
-                                            You Are Borrowing
-                                        </span>
+                                    @if($userBorrowing)
+                                        @if($userBorrowing->status === 'pending')
+                                            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">
+                                                <svg class="w-4 h-4 mr-1.5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                                Waiting for Approval
+                                            </span>
+                                        @elseif($userBorrowing->status === 'approved' || $userBorrowing->status === 'borrowed')
+                                            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-ungu/50 text-white">
+                                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                                You Are Borrowing
+                                            </span>
+                                        @endif
                                     @elseif($actualAvailableCopies > 0)
                                         <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-800">
                                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,96 +152,70 @@
                             <!-- Action Buttons -->
                             <div class="flex flex-wrap gap-3">
                                 @php
-                                    // Check if user has active or pending borrowing for this book
+                                    // Check if user has any borrowing for this book (pending, approved, or borrowed)
                                     $currentBorrowing = \App\Models\Borrowing::where('user_id', auth()->id())
                                         ->where('book_id', $book->id)
-                                        ->where(function($query) {
-                                            $query->where('status', 'borrowed')
-                                                  ->orWhere('approval_status', 'pending');
-                                        })
+                                        ->whereIn('status', ['pending', 'approved', 'borrowed'])
                                         ->first();
                                     
-                                    $isBorrowedByCurrentUser = $currentBorrowing && $currentBorrowing->approval_status === 'approved';
-                                    $isPendingApproval = $currentBorrowing && $currentBorrowing->approval_status === 'pending';
                                     $actualAvailableCopies = $book->getActualAvailableCopies();
-                                    
-                                    // Check for unpaid penalties
-                                    $unpaidPenalties = \App\Models\Borrowing::where('user_id', auth()->id())
-                                        ->where('penalty_amount', '>', 0)
-                                        ->where('penalty_paid', false)
-                                        ->get();
-                                    $hasUnpaidPenalty = $unpaidPenalties->count() > 0;
-                                    $totalUnpaidPenalty = $unpaidPenalties->sum('penalty_amount');
                                 @endphp
                                 
-                                <!-- Unpaid Penalty Warning Banner -->
-                                @if($hasUnpaidPenalty)
-                                    <div class="w-full bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-300 rounded-xl p-5 mb-2">
-                                        <div class="flex items-start gap-4">
-                                            <div class="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
-                                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                @if($currentBorrowing)
+                                    @if($currentBorrowing->status === 'pending')
+                                        <!-- Pending Status - Button Only -->
+                                        <button disabled class="inline-flex items-center px-6 py-3 bg-yellow-100 text-yellow-700 font-semibold rounded-lg cursor-not-allowed">
+                                            <svg class="w-5 h-5 mr-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            Waiting for Approval
+                                        </button>
+                                    @elseif($currentBorrowing->status === 'approved' || $currentBorrowing->status === 'borrowed')
+                                        <!-- Approved/Borrowed Status -->
+                                        <div class="w-full p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+                                            <div class="flex items-start gap-3">
+                                                <svg class="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                 </svg>
-                                            </div>
-                                            <div class="flex-1">
-                                                <h4 class="text-lg font-bold text-red-800 mb-1">Unpaid Penalty Alert</h4>
-                                                <p class="text-sm text-red-700 mb-2">
-                                                    You have <strong>{{ $unpaidPenalties->count() }} unpaid {{ $unpaidPenalties->count() > 1 ? 'penalties' : 'penalty' }}</strong> totaling 
-                                                    <strong class="text-lg">Rp {{ number_format($totalUnpaidPenalty, 0, ',', '.') }}</strong>
-                                                </p>
-                                                <p class="text-sm text-red-600 font-semibold">
-                                                    You cannot borrow new books until all penalties are paid. Please contact admin or staff for payment.
-                                                </p>
-                                                <a href="{{ route('borrowings.index', ['status' => 'returned']) }}" class="inline-flex items-center mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-all shadow-md">
-                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                                    </svg>
-                                                    View Penalty Details
-                                                </a>
+                                                <div class="flex-1">
+                                                    <h4 class="font-semibold text-blue-800 mb-1">You Are Currently Borrowing This Book</h4>
+                                                    <p class="text-sm text-blue-700 mb-2">Please return the book before the due date to avoid late fees.</p>
+                                                    <div class="text-xs text-blue-600">
+                                                        <p>Borrowed on: {{ $currentBorrowing->borrowed_date->format('d M Y') }}</p>
+                                                        <p>Due date: {{ $currentBorrowing->due_date->format('d M Y') }}</p>
+                                                        @if($currentBorrowing->approved_by)
+                                                            <p>Approved by: {{ $currentBorrowing->approvedBy->name }}</p>
+                                                        @endif
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                @endif
-                                
-                                @if($isPendingApproval)
-                                    <button disabled class="inline-flex items-center px-6 py-3 bg-orange-100 text-orange-700 font-semibold rounded-lg cursor-not-allowed">
-                                        <svg class="w-5 h-5 mr-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                        Pending
-                                    </button>
-                                @elseif($isBorrowedByCurrentUser)
-                                    <button disabled class="inline-flex items-center px-6 py-3 bg-blue-100 text-blue-700 font-semibold rounded-lg cursor-not-allowed">
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        You Already Borrowed This Book
-                                    </button>
-                                @elseif($hasUnpaidPenalty)
-                                    <button disabled class="inline-flex items-center px-6 py-3 bg-gray-300 text-gray-600 font-semibold rounded-lg cursor-not-allowed opacity-60" title="Cannot borrow with unpaid penalty">
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                        </svg>
-                                        Pinjam Buku (Terkunci)
-                                    </button>
+                                        <button disabled class="inline-flex items-center px-6 py-3 bg-blue-100 text-blue-700 font-semibold rounded-lg cursor-not-allowed">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            You Already Borrowed This Book
+                                        </button>
+                                    @endif
                                 @elseif($actualAvailableCopies > 0)
-                                    <form action="{{ route('borrowings.store') }}" method="POST">
+                                    <!-- Available to Borrow -->
+                                    <form action="{{ route('borrowings.store') }}" method="POST" id="borrowForm">
                                         @csrf
                                         <input type="hidden" name="book_id" value="{{ $book->id }}">
-                                        <button type="submit" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold rounded-lg transition-all">
+                                        <button type="button" onclick="showBorrowModal()" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg">
                                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                             </svg>
-                                            Pinjam Buku
+                                            Request to Borrow
                                         </button>
                                     </form>
                                 @else
+                                    <!-- Not Available -->
                                     <button disabled class="inline-flex items-center px-6 py-3 bg-slate-300 text-slate-600 font-semibold rounded-lg cursor-not-allowed">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
-                                        Not availible (all books are borrowed)
+                                        Not Available (All Borrowed)
                                     </button>
                                 @endif
 
@@ -453,5 +424,132 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Borrow Confirmation Modal -->
+    <div id="borrowModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4" onclick="closeBorrowModal(event)">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-auto transform transition-all max-h-[90vh] flex flex-col" onclick="event.stopPropagation()">
+            <!-- Header - Fixed -->
+            <div class="relative p-6 border-b border-slate-100 flex-shrink-0">
+                <h3 class="text-2xl font-bold text-slate-800 text-center">Confirm Borrowing Request</h3>
+                <button onclick="closeBorrowModal()" class="absolute right-6 top-6 text-slate-400 hover:text-slate-600 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Content - Scrollable -->
+            <div class="p-6 space-y-6 overflow-y-auto flex-1">
+                <!-- Important Information Alert -->
+                <div class="flex items-start gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                    <div class="flex-shrink-0 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-blue-900 mb-1">Important Information</h4>
+                        <p class="text-sm text-blue-800 leading-relaxed">Your borrowing request will be sent to admin/staff for approval. You will be notified once your request is processed.</p>
+                    </div>
+                </div>
+
+                <!-- Book Details -->
+                <div class="bg-slate-50 rounded-xl p-5 space-y-4">
+                    <h4 class="font-semibold text-slate-800 text-lg mb-3">Borrowing Details</h4>
+                    
+                    <div class="grid grid-cols-1 gap-3">
+                        <div class="flex items-start justify-between py-3 border-b border-slate-200">
+                            <span class="text-sm font-medium text-slate-500">Book Title</span>
+                            <span class="font-semibold text-slate-800 text-right max-w-xs">{{ $book->title }}</span>
+                        </div>
+                        <div class="flex items-start justify-between py-3 border-b border-slate-200">
+                            <span class="text-sm font-medium text-slate-500">Author</span>
+                            <span class="font-semibold text-slate-800 text-right">{{ $book->author }}</span>
+                        </div>
+                        <div class="flex items-start justify-between py-3 border-b border-slate-200">
+                            <span class="text-sm font-medium text-slate-500">Borrow Date</span>
+                            <span class="font-semibold text-slate-800">{{ \Carbon\Carbon::now()->format('d M Y') }}</span>
+                        </div>
+                        <div class="flex items-start justify-between py-3 border-b border-slate-200">
+                            <span class="text-sm font-medium text-slate-500">Due Date</span>
+                            <span class="font-semibold text-slate-800">{{ \Carbon\Carbon::now()->addDays(14)->format('d M Y') }}</span>
+                        </div>
+                        <div class="flex items-start justify-between py-3">
+                            <span class="text-sm font-medium text-slate-500">Borrow Period</span>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-800">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                14 days
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Section -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                        Notes <span class="text-slate-400 font-normal">(Optional)</span>
+                    </label>
+                    <textarea 
+                        name="notes" 
+                        form="borrowForm" 
+                        rows="3" 
+                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none text-slate-600 placeholder-slate-400" 
+                        placeholder="Add any notes for your borrowing request..."></textarea>
+                    <p class="text-xs text-slate-400 mt-1.5">You can add special requests or information here</p>
+                </div>
+            </div>
+
+            <!-- Footer - Fixed -->
+            <div class="p-6 border-t border-slate-100 flex-shrink-0 bg-slate-50">
+                <div class="flex gap-3">
+                    <button 
+                        type="button" 
+                        onclick="closeBorrowModal()" 
+                        class="flex-1 px-6 py-3.5 border-2 border-slate-300 text-slate-700 font-semibold rounded-xl hover:bg-white hover:border-slate-400 transition-all">
+                        Cancel
+                    </button>
+                    <button 
+                        type="submit" 
+                        form="borrowForm" 
+                        class="flex-1 px-6 py-3.5 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        <span class="flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Submit Request
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showBorrowModal() {
+            const modal = document.getElementById('borrowModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeBorrowModal(event) {
+            if (!event || event.target.id === 'borrowModal') {
+                const modal = document.getElementById('borrowModal');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeBorrowModal();
+            }
+        });
+    </script>
+
+    <x-book-alert />
 @endsection

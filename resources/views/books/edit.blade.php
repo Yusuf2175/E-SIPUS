@@ -242,4 +242,6 @@
             }
         }
     </script>
+
+    <x-book-alert />
 @endsection

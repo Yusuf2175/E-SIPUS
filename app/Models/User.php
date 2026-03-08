@@ -66,15 +66,7 @@ class User extends Authenticatable
     }
 
     // Relationship with role requests
-    public function roleRequests()
-    {
-        return $this->hasMany(RoleRequest::class);
-    }
 
-    public function approvedRoleRequests()
-    {
-        return $this->hasMany(RoleRequest::class, 'approved_by');
-    }
 
     // Relationship with books
     public function addedBooks()
@@ -90,7 +82,7 @@ class User extends Authenticatable
 
     public function activeBorrowings()
     {
-        return $this->hasMany(Borrowing::class)->where('status', 'borrowed');
+        return $this->hasMany(Borrowing::class)->whereIn('status', ['approved', 'borrowed', 'pending_return']);
     }
 
     public function approvedBorrowings()

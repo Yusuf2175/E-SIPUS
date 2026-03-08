@@ -57,7 +57,7 @@
                             <span class="text-xs font-bold text-gray-700">{{ substr(Auth::user()->name, 0, 2) }}</span>
                         </div>
                     @else
-                        <a href="{{ route('register') }}">
+                        <a href="{{ route('login') }}">
                             <button class="inline-flex items-center px-5 py-2.5 rounded-full bg-secondrys text-white text-xs font-semibold tracking-[0.18em] uppercase hover:bg-[#9333EA] transition shadow-md">
                                 Sign Up
                             </button>

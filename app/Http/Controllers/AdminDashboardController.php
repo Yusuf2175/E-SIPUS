@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\RoleRequest;
 
 class AdminDashboardController extends Controller
 {
@@ -18,7 +17,6 @@ class AdminDashboardController extends Controller
             'total_admins' => User::where('role', 'admin')->count(),
             'total_petugas' => User::where('role', 'petugas')->count(),
             'total_regular_users' => User::where('role', 'user')->count(),
-            'pending_requests' => RoleRequest::pending()->count(),
             'total_books' => \App\Models\Book::count(),
             'available_books' => \App\Models\Book::where('available_copies', '>', 0)->count(),
             'active_borrowings' => \App\Models\Borrowing::where('status', 'borrowed')->count(),
@@ -81,16 +79,6 @@ class AdminDashboardController extends Controller
         $activeBorrowings = $user->activeBorrowings()->count();
         if ($activeBorrowings > 0) {
             return back()->with('error', 'Cannot delete user with active borrowings! User has ' . $activeBorrowings . ' book(s) currently borrowed.');
-        }
-
-        // Check if user has unpaid penalties
-        $unpaidPenalties = $user->borrowings()
-            ->where('penalty_amount', '>', 0)
-            ->where('penalty_paid', false)
-            ->count();
-        
-        if ($unpaidPenalties > 0) {
-            return back()->with('error', 'Cannot delete user with unpaid penalties! Please settle all penalties first.');
         }
 
         // Soft delete the user
