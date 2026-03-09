@@ -70,4 +70,14 @@ class PetugasDashboardController extends Controller
         
         return view('petugas.users', compact('users'));
     }
+
+    public function viewUsersList()
+    {
+        // Get all users with role 'user' (read-only view)
+        $users = User::where('role', 'user')
+            ->oldest()
+            ->paginate(10);
+        
+        return view('petugas.users-list', compact('users'));
+    }
 }

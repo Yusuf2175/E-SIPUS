@@ -95,7 +95,6 @@
                             <th class="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Name</th>
                             <th class="px-6 py-4 text-center text-xs font-bold text-slate-700 uppercase tracking-wider">Status</th>
                             <th class="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Borrowed Books</th>
-                            <th class="px-6 py-4 text-center text-xs font-bold text-slate-700 uppercase tracking-wider">Penalty</th>
                             <th class="px-6 py-4 text-center text-xs font-bold text-slate-700 uppercase tracking-wider">Action</th>
                         </tr>
                     </thead>
@@ -105,21 +104,6 @@
                                 $activeBorrowings = $user->activeBorrowings;
                                 $hasOverdue = $activeBorrowings->where('due_date', '<', now())->count() > 0;
                                 $overdueCount = $activeBorrowings->where('due_date', '<', now())->count();
-                                
-                                // Calculate total penalty from active borrowings
-                                $totalPenalty = 0;
-                                foreach ($activeBorrowings as $borrowing) {
-                                    $totalPenalty += $borrowing->calculatePenalty();
-                                }
-                                
-                                // Also add unpaid penalties from returned borrowings
-                                $unpaidPenalties = \App\Models\Borrowing::where('user_id', $user->id)
-                                    ->where('status', 'returned')
-                                    ->where('penalty_paid', false)
-                                    ->where('penalty_amount', '>', 0)
-                                    ->sum('penalty_amount');
-                                
-                                $totalPenalty += $unpaidPenalties;
                             @endphp
                             <tr class="hover:bg-slate-50 transition">
                                 <td class="px-6 py-5 whitespace-nowrap">
@@ -174,21 +158,6 @@
                                         </div>
                                     @else
                                         <span class="text-sm text-slate-400 italic">No active borrowings</span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-5 whitespace-nowrap text-center">
-                                    @if($totalPenalty > 0)
-                                        <div class="inline-flex flex-col items-center">
-                                            <span class="text-lg font-bold text-red-600">Rp {{ number_format($totalPenalty, 0, ',', '.') }}</span>
-                                            @if($overdueCount > 0)
-                                                <span class="text-xs text-slate-500">{{ $overdueCount }} overdue</span>
-                                            @endif
-                                            @if($unpaidPenalties > 0)
-                                                <span class="text-xs text-amber-600 font-medium">+ unpaid penalties</span>
-                                            @endif
-                                        </div>
-                                    @else
-                                        <span class="text-sm text-slate-400">-</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-5 whitespace-nowrap text-center">

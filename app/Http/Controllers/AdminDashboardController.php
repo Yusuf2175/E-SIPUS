@@ -50,7 +50,10 @@ class AdminDashboardController extends Controller
 
     public function manageUsers()
     {
-        $users = User::oldest()->paginate(10);
+        // Only show users with role 'user'
+        $users = User::where('role', 'user')
+            ->oldest()
+            ->paginate(10);
         
         return view('admin.users', compact('users'));
     }

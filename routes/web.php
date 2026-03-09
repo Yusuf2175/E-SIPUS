@@ -91,6 +91,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified', 'role:petugas'])->prefix('petugas')->name('petugas.')->group(function () {
     Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [PetugasDashboardController::class, 'manageUsers'])->name('users');
+    Route::get('/users/list', [PetugasDashboardController::class, 'viewUsersList'])->name('users.list');
 });
 
 // Reports Routes (Petugas and Admin only)
@@ -108,6 +109,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/users', [AdminDashboardController::class, 'manageUsers'])->name('users');
     Route::patch('/users/{user}/role', [AdminDashboardController::class, 'updateUserRole'])->name('users.update.role');
     Route::delete('/users/{user}', [AdminDashboardController::class, 'destroyUser'])->name('users.destroy');
+    
+    // Petugas Management Routes
+    Route::get('/petugas', [App\Http\Controllers\PetugasController::class, 'index'])->name('petugas.index');
+    Route::post('/petugas', [App\Http\Controllers\PetugasController::class, 'store'])->name('petugas.store');
+    Route::put('/petugas/{petugas}', [App\Http\Controllers\PetugasController::class, 'update'])->name('petugas.update');
+    Route::delete('/petugas/{petugas}', [App\Http\Controllers\PetugasController::class, 'destroy'])->name('petugas.destroy');
 });
 
 Route::middleware('auth')->group(function () {

@@ -1,26 +1,17 @@
 @extends('layouts.dashboard')
 
-@section('page-title', 'Manage Users')
+@section('page-title', 'View Users')
 
 @section('content')
     <!-- Header Section -->
     <div class="mb-8">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-slate-800 mb-2">Manage Users</h1>
-                <p class="text-slate-600">View and manage all library members</p>
+                <h1 class="text-3xl font-bold text-slate-800 mb-2">View Users</h1>
+                <p class="text-slate-600">View all library members information</p>
             </div>
         </div>
     </div>
-
-    @if(session('success'))
-        <div class="bg-green-50 border-l-4 border-green-500 text-green-800 px-6 py-4 rounded-lg mb-6 flex items-center gap-3 shadow-sm">
-            <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <p class="font-medium">{{ session('success') }}</p>
-        </div>
-    @endif
 
     <!-- Users Table Card -->
     <div class="bg-white rounded-2xl shadow-md overflow-hidden">
@@ -43,7 +34,7 @@
                         <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Email</th>
                         <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Role</th>
                         <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Registered</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Status</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-slate-100">
@@ -64,12 +55,6 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-semibold text-slate-800">{{ $user->name }}</p>
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
-                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-                                        </svg>
-                                        Member
-                                    </span>
                                 </div>
                             </div>
                         </td>
@@ -104,20 +89,26 @@
                             </div>
                         </td>
 
-                        <!-- Actions -->
+                        <!-- Status -->
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center gap-2">
-                                <button onclick="confirmDeleteUser({{ $user->id }}, '{{ addslashes($user->name) }}')" class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg border border-red-200 hover:bg-red-100 transition">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            @php
+                                $activeBorrowings = $user->borrowings()->whereIn('status', ['borrowed', 'pending_return'])->count();
+                            @endphp
+                            @if($activeBorrowings > 0)
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full bg-green-100 text-green-700 border border-green-200">
+                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                     </svg>
-                                    Delete
-                                </button>
-                                <form id="delete-user-form-{{ $user->id }}" action="{{ route('admin.users.destroy', $user) }}" method="POST" class="hidden">
-                                    @csrf
-                                    @method('DELETE')
-                                </form>
-                            </div>
+                                    Active ({{ $activeBorrowings }} books)
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                    No Active Borrowing
+                                </span>
+                            @endif
                         </td>
                     </tr>
                     @empty
@@ -144,75 +135,4 @@
         @endif
     </div>
 
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function confirmDeleteUser(userId, userName) {
-            Swal.fire({
-                title: 'Delete Member?',
-                html: `Are you sure you want to delete member "<strong>${userName}</strong>"?<br><br>
-                       <div class="text-left bg-red-50 border border-red-200 rounded-lg p-3 mt-3">
-                           <p class="text-sm text-red-800"><strong>⚠️ Warning:</strong></p>
-                           <ul class="text-xs text-red-700 mt-2 space-y-1">
-                               <li>• Member must not have active borrowings</li>
-                               <li>• This action cannot be undone</li>
-                           </ul>
-                       </div>`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'Yes, Delete Member',
-                cancelButtonText: 'Cancel',
-                reverseButtons: true,
-                customClass: {
-                    popup: 'rounded-2xl',
-                    confirmButton: 'rounded-xl px-6 py-3 font-semibold',
-                    cancelButton: 'rounded-xl px-6 py-3 font-semibold'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Deleting...',
-                        text: 'Please wait',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-                    document.getElementById('delete-user-form-' + userId).submit();
-                }
-            });
-        }
-
-        // Show success/error messages
-        @if(session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: '{{ session('success') }}',
-                confirmButtonColor: '#10b981',
-                confirmButtonText: 'OK',
-                customClass: {
-                    popup: 'rounded-2xl',
-                    confirmButton: 'rounded-xl px-6 py-3 font-semibold'
-                }
-            });
-        @endif
-
-        @if(session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: '{{ session('error') }}',
-                confirmButtonColor: '#ef4444',
-                confirmButtonText: 'OK',
-                customClass: {
-                    popup: 'rounded-2xl',
-                    confirmButton: 'rounded-xl px-6 py-3 font-semibold'
-                }
-            });
-        @endif
-    </script>
 @endsection
