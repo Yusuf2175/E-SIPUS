@@ -3,56 +3,57 @@
 namespace App\Http\Controllers;
 
 use App\Models\Collection;
-use App\Models\Book;
-use Illuminate\Http\Request;
+use App\Http\Requests\CollectionStoreRequest;
+use App\Services\CollectionService;
 use Illuminate\Support\Facades\Auth;
 
 class CollectionController extends Controller
 {
+    protected $collectionService;
+
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct(CollectionService $collectionService)
+    {
+        $this->collectionService = $collectionService;
+    }
+
+    /**
+     * Display user's collection.
+     */
     public function index()
     {
-        $collections = Auth::user()->collections()
-            ->with(['book' => function($query) {
-                $query->where('available_copies', '>', 0);
-            }])
-            ->latest()
-            ->get()
-            ->filter(function($collection) {
-                return $collection->book !== null;
-            });
+        $collections = $this->collectionService->getUserCollections(Auth::id());
         
         return view('collections.index', compact('collections'));
     }
 
-    public function store(Request $request)
+    /**
+     * Add a book to user's collection.
+     */
+    public function store(CollectionStoreRequest $request)
     {
-        $request->validate([
-            'book_id' => 'required|exists:books,id'
-        ]);
-
-        $exists = Collection::where('user_id', Auth::id())
-            ->where('book_id', $request->book_id)
-            ->exists();
-
-        if ($exists) {
-            return back()->with('error', 'Buku sudah ada di koleksi Anda');
+        try {
+            $this->collectionService->addToCollection(Auth::id(), $request->book_id);
+            
+            return back()->with('success', 'Buku berhasil ditambahkan ke koleksi');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        Collection::create([
-            'user_id' => Auth::id(),
-            'book_id' => $request->book_id
-        ]);
-
-        return back()->with('success', 'Buku berhasil ditambahkan ke koleksi');
     }
 
+    /**
+     * Remove a book from user's collection.
+     */
     public function destroy(Collection $collection)
     {
-        if ($collection->user_id !== Auth::id()) {
-            abort(403);
+        try {
+            $this->collectionService->removeFromCollection($collection, Auth::id());
+            
+            return back()->with('success', 'Buku berhasil dihapus dari koleksi');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        $collection->delete();
-        return back()->with('success', 'Buku berhasil dihapus dari koleksi');
     }
 }

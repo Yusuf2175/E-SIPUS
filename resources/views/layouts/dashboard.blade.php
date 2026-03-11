@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name') }} - @yield('page-title', 'Dashboard')</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('assets/Logo_E-Sipus.png') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('assets/Logo_E-Sipus.webp') }}">
     <style>
         [x-cloak] { display: none !important; }
     </style>
@@ -26,8 +26,8 @@
         <div class="flex-1 ml-64">
             <!-- Top Bar -->
             <aside class="px-8 py-3 sticky top-0 z-30">
-                <header class="bg-white rounded-xl shadow-sm border border-r-2 border-slate-200">
-                    <div class="flex items-center justify-between gap-8 px-4 py-4">
+                <header class="bg-white/70 backdrop-blur-sm rounded-xl shadow-sm border-2 border-slate-200">
+                    <div class="flex items-center justify-between gap-8 px-4 py-2">
                         
                         <!-- Search Bar -->
                         <div class="flex-1 max-w-xl relative" x-data="searchComponent()">
@@ -234,16 +234,16 @@
                         keywords: ['collection', 'favorites', 'saved books', 'wishlist', 'koleksi'],
                         roles: ['admin', 'petugas', 'user']
                     },
-                    // // Reviews & Ratings - All roles
-                    // {
-                    //     title: 'Reviews & Ratings',
-                    //     description: 'View and manage book reviews',
-                    //     url: '{{ route("reviews.index") }}',
-                    //     icon: 'M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z',
-                    //     color: 'bg-indigo-500',
-                    //     keywords: ['reviews', 'ratings', 'comments', 'feedback', 'ulasan'],
-                    //     roles: ['admin', 'petugas', 'user']
-                    // },
+                     // Reviews & Ratings - All roles
+                    {
+                        title: 'Reviews & Ratings',
+                        description: 'View and manage book reviews',
+                        url: '{{ route("reviews.index") }}',
+                        icon: 'M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z',
+                        color: 'bg-indigo-500',
+                        keywords: ['reviews', 'ratings', 'comments', 'feedback', 'ulasan'],
+                        roles: ['admin', 'petugas', 'user']
+                    },
                     @if(Auth::user()->role === 'admin')
                     // Generate Reports - Admin only
                     {

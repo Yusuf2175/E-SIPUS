@@ -3,84 +3,81 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
+use App\Http\Requests\PetugasStoreRequest;
+use App\Http\Requests\PetugasUpdateRequest;
+use App\Services\PetugasManagementService;
 
 class PetugasController extends Controller
 {
+    protected $petugasService;
+
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct(PetugasManagementService $petugasService)
+    {
+        $this->petugasService = $petugasService;
+        $this->middleware('auth');
+    }
+
+    /**
+     * Display a listing of petugas.
+     */
     public function index()
     {
-        $petugas = User::where('role', 'petugas')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $petugas = $this->petugasService->getAllPetugas();
         
         return view('admin.petugas', compact('petugas'));
     }
 
-    public function store(Request $request)
+    /**
+     * Store a newly created petugas.
+     */
+    public function store(PetugasStoreRequest $request)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8'],
-        ]);
-
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'petugas',
-        ]);
-
-        return redirect()->route('admin.petugas.index')
-            ->with('success', 'Staff member added successfully!');
-    }
-
-    public function update(Request $request, User $petugas)
-    {
-        // Ensure we're only updating petugas
-        if ($petugas->role !== 'petugas') {
+        try {
+            $this->petugasService->createPetugas($request->validated());
+            
             return redirect()->route('admin.petugas.index')
-                ->with('error', 'Invalid staff member!');
+                ->with('success', 'Staff member added successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to add staff member: ' . $e->getMessage())
+                ->withInput();
         }
-
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $petugas->id],
-            'password' => ['nullable', 'string', 'min:8'],
-        ]);
-
-        $petugas->name = $request->name;
-        $petugas->email = $request->email;
-        
-        if ($request->filled('password')) {
-            $petugas->password = Hash::make($request->password);
-        }
-        
-        $petugas->save();
-
-        return redirect()->route('admin.petugas.index')
-            ->with('success', 'Staff member updated successfully!');
     }
 
+    /**
+     * Update the specified petugas.
+     */
+    public function update(PetugasUpdateRequest $request, User $petugas)
+    {
+        try {
+            $this->petugasService->updatePetugas($petugas, $request->validated());
+            
+            return redirect()->route('admin.petugas.index')
+                ->with('success', 'Staff member updated successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    /**
+     * Remove the specified petugas.
+     */
     public function destroy(User $petugas)
     {
-        // Ensure we're only deleting petugas
-        if ($petugas->role !== 'petugas') {
+        try {
+            $this->petugasService->deletePetugas($petugas);
+            
             return redirect()->route('admin.petugas.index')
-                ->with('error', 'Invalid staff member!');
-        }
-
-        // Check if petugas has active borrowings
-        if ($petugas->borrowings()->whereIn('status', ['borrowed', 'pending_return'])->exists()) {
+                ->with('success', 'Staff member deleted successfully!');
+        } catch (\Exception $e) {
             return redirect()->route('admin.petugas.index')
-                ->with('error', 'Cannot delete staff member with active borrowings!');
+                ->with('error', $e->getMessage());
         }
-
-        $petugas->delete();
-
-        return redirect()->route('admin.petugas.index')
-            ->with('success', 'Staff member deleted successfully!');
     }
 }
+
