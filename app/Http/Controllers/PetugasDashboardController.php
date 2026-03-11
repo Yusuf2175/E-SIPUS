@@ -2,84 +2,60 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Book;
-use App\Models\Borrowing;
-use App\Models\User;
-use Carbon\Carbon;
+use App\Services\PetugasDashboardService;
+use Illuminate\Support\Facades\Auth;
 
 class PetugasDashboardController extends Controller
 {
-    public function index()
+    protected $dashboardService;
+
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct(PetugasDashboardService $dashboardService)
     {
-        $user = auth()->user();
-        
-        // Statistics
-        $stats = [
-            'total_books' => Book::count(),
-            'available_books' => Book::where('available_copies', '>', 0)->count(),
-            'active_borrowings' => Borrowing::where('status', 'borrowed')->count(),
-            'overdue_borrowings' => Borrowing::where('status', 'borrowed')
-                ->where('due_date', '<', Carbon::now()->toDateString())
-                ->count(),
-            'total_users' => User::where('role', 'user')->count(),
-            'books_added_by_me' => Book::where('added_by', $user->id)->count(),
-            'my_active_borrowings' => Borrowing::where('user_id', $user->id)
-                ->whereIn('status', ['approved', 'borrowed'])
-                ->count(),
-        ];
-        
-        // Recent borrowings with pagination
-        $recentBorrowings = Borrowing::with(['book', 'user'])
-            ->latest()
-            ->paginate(6);
-        
-        // Overdue borrowings
-        $overdueBorrowings = Borrowing::with(['book', 'user'])
-            ->where('status', 'borrowed')
-            ->where('due_date', '<', Carbon::now()->toDateString())
-            ->orderBy('due_date', 'asc')
-            ->take(5)
-            ->get();
-        
-        // Books with low stock
-        $lowStockBooks = Book::where('available_copies', '<=', 2)
-            ->where('available_copies', '>', 0)
-            ->orderBy('available_copies', 'asc')
-            ->take(5)
-            ->get();
-        
-        // My active borrowings (for CTA)
-        $myActiveBorrowings = Borrowing::where('user_id', $user->id)
-            ->whereIn('status', ['approved', 'borrowed'])
-            ->count();
-        
-        return view('dashboards.petugas', compact('user', 'stats', 'recentBorrowings', 'overdueBorrowings', 'lowStockBooks', 'myActiveBorrowings'));
+        $this->dashboardService = $dashboardService;
     }
 
+    /**
+     * Display petugas dashboard.
+     */
+    public function index()
+    {
+        $user = Auth::user();
+        
+        $stats = $this->dashboardService->getDashboardStats($user->id);
+        $recentBorrowings = $this->dashboardService->getRecentBorrowings(6);
+        $overdueBorrowings = $this->dashboardService->getOverdueBorrowingsList(5);
+        $lowStockBooks = $this->dashboardService->getLowStockBooks(2, 5);
+        $myActiveBorrowings = $this->dashboardService->getUserActiveBorrowingsCount($user->id);
+        
+        return view('dashboards.petugas', compact(
+            'user', 
+            'stats', 
+            'recentBorrowings', 
+            'overdueBorrowings', 
+            'lowStockBooks', 
+            'myActiveBorrowings'
+        ));
+    }
+
+    /**
+     * Display users with borrowing records.
+     */
     public function manageUsers()
     {
-        // Get users who have borrowing records (either active or past)
-        $users = User::where('role', 'user')
-            ->whereHas('borrowings')
-            ->withCount(['borrowings as active_borrowings_count' => function($query) {
-                $query->where('status', 'borrowed');
-            }])
-            ->with(['activeBorrowings' => function($query) {
-                $query->with('book')->latest()->take(5);
-            }])
-            ->orderByDesc('active_borrowings_count')
-            ->paginate(10);
+        $users = $this->dashboardService->getUsersWithBorrowings(10);
         
         return view('petugas.users', compact('users'));
     }
 
+    /**
+     * Display all users (read-only view).
+     */
     public function viewUsersList()
     {
-        // Get all users with role 'user' (read-only view)
-        $users = User::where('role', 'user')
-            ->oldest()
-            ->paginate(10);
+        $users = $this->dashboardService->getAllUsers(10);
         
         return view('petugas.users-list', compact('users'));
     }

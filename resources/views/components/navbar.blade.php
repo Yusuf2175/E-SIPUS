@@ -4,7 +4,7 @@
             <div class="rounded-xl bg-white/60 backdrop-blur-sm border  px-6 py-3 flex items-center justify-between">
                 <!-- Logo -->
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('assets/Logo_Sipus.png') }}" alt="Logo e-SIPUS" class="h-10 w-auto">
+                    <img src="{{ asset('assets/Logo_Sipus.webp') }}" alt="Logo e-SIPUS" class="h-10 w-auto">
                 </div>
 
                 <!-- Navigation Menu (Center) -->

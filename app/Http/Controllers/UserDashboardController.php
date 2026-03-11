@@ -2,34 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Book;
+use App\Services\UserDashboardService;
+use Illuminate\Support\Facades\Auth;
 
 class UserDashboardController extends Controller
 {
+    protected $dashboardService;
+
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct(UserDashboardService $dashboardService)
+    {
+        $this->dashboardService = $dashboardService;
+    }
+
+    /**
+     * Display user dashboard.
+     */
     public function index()
     {
-        $user = auth()->user();        
-        // Statistics
-        $stats = [
-            'active_borrowings' => $user->borrowings()->whereIn('status', ['approved', 'borrowed'])->count(),
-            'total_borrowings' => $user->borrowings()->count(),
-            'collections' => $user->collections()->count(),
-            'reviews' => $user->reviews()->count(),
-        ];
+        $user = Auth::user();
         
-        // Recent borrowings
-        $recentBorrowings = $user->borrowings()
-            ->with('book')
-            ->latest()
-            ->take(5)
-            ->get();
+        $stats = $this->dashboardService->getDashboardStats($user);
+        $recentBorrowings = $this->dashboardService->getRecentBorrowings($user, 5);
+        $recommendedBooks = $this->dashboardService->getRecommendedBooks(6);
         
-        // Recommended books (based on user's borrowing history)
-        $recommendedBooks = Book::available()
-            ->inRandomOrder()
-            ->take(6)
-            ->get();
-        
-        return view('dashboards.user', compact('user','stats', 'recentBorrowings', 'recommendedBooks'));
+        return view('dashboards.user', compact(
+            'user',
+            'stats', 
+            'recentBorrowings', 
+            'recommendedBooks'
+        ));
     }
 }

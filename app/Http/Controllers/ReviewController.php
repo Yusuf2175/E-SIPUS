@@ -3,147 +3,99 @@
 namespace App\Http\Controllers;
 
 use App\Models\Review;
-use App\Models\Book;
+use App\Http\Requests\ReviewStoreRequest;
+use App\Http\Requests\ReviewUpdateRequest;
+use App\Services\ReviewService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
 {
-    public function store(Request $request)
+    protected $reviewService;
+
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct(ReviewService $reviewService)
     {
-        $request->validate([
-            'book_id' => 'required|exists:books,id',
-            'review' => 'required|string|max:1000',
-            'rating' => 'required|integer|min:1|max:5'
-        ]);
-
-        // Check if user already has a review for this book
-        $exists = Review::where('user_id', Auth::id())
-            ->where('book_id', $request->book_id)
-            ->exists();
-
-        if ($exists) {
-            return back()->with('error', 'Anda sudah memberikan ulasan untuk buku ini');
-        }
-
-        // Check if user has borrowed this book with approved or borrowed status
-        $hasApprovedBorrowing = \App\Models\Borrowing::where('user_id', Auth::id())
-            ->where('book_id', $request->book_id)
-            ->whereIn('status', ['approved', 'borrowed'])
-            ->exists();
-
-        if (!$hasApprovedBorrowing) {
-            return back()->with('error', 'Anda harus meminjam dan mendapatkan persetujuan untuk buku ini terlebih dahulu sebelum dapat memberikan review');
-        }
-
-        Review::create([
-            'user_id' => Auth::id(),
-            'book_id' => $request->book_id,
-            'review' => $request->review,
-            'rating' => $request->rating
-        ]);
-
-        return back()->with('success', 'Ulasan berhasil ditambahkan');
+        $this->reviewService = $reviewService;
     }
 
-    public function update(Request $request, Review $review)
-    {
-        if ($review->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $request->validate([
-            'review' => 'required|string|max:1000',
-            'rating' => 'required|integer|min:1|max:5'
-        ]);
-
-        $review->update([
-            'review' => $request->review,
-            'rating' => $request->rating
-        ]);
-
-        return back()->with('success', 'Ulasan berhasil diperbarui');
-    }
-
-    public function destroy(Review $review)
-    {
-        if ($review->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $review->delete();
-        return back()->with('success', 'Ulasan berhasil dihapus');
-    }
-
+    /**
+     * Display a listing of reviews.
+     */
     public function index(Request $request)
     {
         $user = Auth::user();
         
-        // Build query based on user role
-        $query = Review::with(['book', 'user']);
+        $filters = $request->only(['rating', 'book_id', 'search']);
+        $reviews = $this->reviewService->getFilteredReviews($user, $filters, 15);
         
-        // User can only see their own reviews
-        if ($user->isUser()) {
-            $query->where('user_id', $user->id);
-        }
-        // Admin and Petugas can see all reviews
-        
-        // Filter by rating
-        if ($request->filled('rating')) {
-            $query->where('rating', $request->rating);
-        }
-        
-        // Filter by book
-        if ($request->filled('book_id')) {
-            $query->where('book_id', $request->book_id);
-        }
-        
-        // Search by review content or user name
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('review', 'like', "%{$search}%")
-                  ->orWhereHas('user', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('book', function($q) use ($search) {
-                      $q->where('title', 'like', "%{$search}%");
-                  });
-            });
-        }
-        
-        $reviews = $query->orderBy('created_at', 'desc')->paginate(15);
-        
-        // Statistics for Admin/Petugas
         $stats = null;
         if ($user->isAdmin() || $user->isPetugas()) {
-            $stats = [
-                'total_reviews' => Review::count(),
-                'average_rating' => round(Review::avg('rating'), 1),
-                'five_star' => Review::where('rating', 5)->count(),
-                'four_star' => Review::where('rating', 4)->count(),
-                'three_star' => Review::where('rating', 3)->count(),
-                'two_star' => Review::where('rating', 2)->count(),
-                'one_star' => Review::where('rating', 1)->count(),
-            ];
+            $stats = $this->reviewService->getReviewStats();
         }
         
-        // Get books for filter dropdown
-        $books = Book::orderBy('title')->get();
+        $books = $this->reviewService->getBooksForFilter();
         
         return view('reviews.index', compact('reviews', 'stats', 'books'));
     }
 
+    /**
+     * Store a newly created review.
+     */
+    public function store(ReviewStoreRequest $request)
+    {
+        try {
+            $this->reviewService->createReview(Auth::id(), $request->validated());
+            
+            return back()->with('success', 'Ulasan berhasil ditambahkan');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Update the specified review.
+     */
+    public function update(ReviewUpdateRequest $request, Review $review)
+    {
+        try {
+            $this->reviewService->updateReview($review, Auth::id(), $request->validated());
+            
+            return back()->with('success', 'Ulasan berhasil diperbarui');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove the specified review.
+     */
+    public function destroy(Review $review)
+    {
+        try {
+            $this->reviewService->deleteReview($review, Auth::id());
+            
+            return back()->with('success', 'Ulasan berhasil dihapus');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove the specified review by admin/petugas.
+     */
     public function adminDestroy(Review $review)
     {
         $user = Auth::user();
         
-        // Only admin and petugas can delete any review
         if (!$user->isAdmin() && !$user->isPetugas()) {
             abort(403);
         }
         
-        $review->delete();
+        $this->reviewService->adminDeleteReview($review);
+        
         return back()->with('success', 'Ulasan berhasil dihapus');
     }
 }

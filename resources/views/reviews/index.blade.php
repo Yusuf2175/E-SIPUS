@@ -61,7 +61,7 @@
                     <div class="bg-white rounded-2xl border-2 border-slate-100 p-6 hover:border-red-200 transition-all">
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center">
-                                <span class="text-red-600 font-bold text-2xl">≤2★</span>
+                                <span class="text-red-600 font-bold text-2xl">2★</span>
                             </div>
                         </div>
                         <p class="text-4xl font-bold text-slate-800 mb-2">{{ $stats['one_star'] + $stats['two_star'] }}</p>

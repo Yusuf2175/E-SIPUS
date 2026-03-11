@@ -3,150 +3,111 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Http\Requests\BookStoreRequest;
+use App\Http\Requests\BookUpdateRequest;
+use App\Services\BookService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
+    protected $bookService;
+
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct(BookService $bookService)
+    {
+        $this->bookService = $bookService;
+    }
+
+    /**
+     * Display a listing of books with filters.
+     */
     public function index(Request $request)
     {
-        $query = Book::with('addedBy');
-        
-        if ($request->filled('category')) {
-            $query->where('category', $request->category);
-        }
-        
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('author', 'like', "%{$search}%")
-                  ->orWhere('isbn', 'like', "%{$search}%");
-            });
-        }
-        
-        if ($request->filled('available') && $request->available == '1') {
-            $query->available();
-        }
-        
-        if ($request->filled('added_by')) {
-            $query->whereHas('addedBy', function($q) use ($request) {
-                $q->where('role', $request->added_by);
-            });
-        }
-        
-        $books = $query->paginate(12);
-        $categories = \App\Models\Category::orderBy('name')->pluck('name');
+        $filters = $request->only(['category', 'search', 'available', 'added_by']);
+        $books = $this->bookService->getFilteredBooks($filters, 12);
+        $categories = $this->bookService->getCategoryNames();
         
         return view('books.index', compact('books', 'categories'));
     }
 
+    /**
+     * Show the form for creating a new book.
+     */
     public function create()
     {
-        $categories = \App\Models\Category::orderBy('name')->get();
+        $categories = $this->bookService->getCategories();
         return view('books.create', compact('categories'));
     }
 
+    /**
+     * Display the specified book.
+     */
     public function show(Book $book)
     {
-        $book->load(['addedBy', 'borrowings.user', 'reviews.user', 'categories']);
+        $userId = Auth::check() ? Auth::id() : null;
+        $data = $this->bookService->getBookDetails($book, $userId);
         
-        $userReview = null;
-        $inCollection = false;
-        $hasApprovedBorrowing = false;
-        
-        if (Auth::check()) {
-            $userReview = $book->reviews()->where('user_id', Auth::id())->first();
-            $inCollection = $book->collections()->where('user_id', Auth::id())->exists();
-            
-            // Check if user has borrowed this book with approved or borrowed status
-            $hasApprovedBorrowing = \App\Models\Borrowing::where('user_id', Auth::id())
-                ->where('book_id', $book->id)
-                ->whereIn('status', ['approved', 'borrowed'])
-                ->exists();
-        }
-        
-        $averageRating = $book->reviews()->avg('rating');
-        $totalReviews = $book->reviews()->count();
-        
-        return view('books.show', compact('book', 'userReview', 'inCollection', 'averageRating', 'totalReviews', 'hasApprovedBorrowing'));
-    }
-
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'isbn' => 'required|string|unique:books,isbn',
-            'description' => 'nullable|string',
-            'category' => 'required|string|max:255',
-            'publisher' => 'nullable|string|max:255',
-            'published_year' => 'nullable|integer|min:1000|max:' . date('Y'),
-            'total_copies' => 'required|integer|min:1',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        return view('books.show', [
+            'book' => $data['book'],
+            'userReview' => $data['user_review'],
+            'inCollection' => $data['in_collection'],
+            'averageRating' => $data['average_rating'],
+            'totalReviews' => $data['total_reviews'],
+            'hasApprovedBorrowing' => $data['has_approved_borrowing'],
         ]);
-
-        $data = $validated;
-        $data['available_copies'] = $data['total_copies'];
-        $data['added_by'] = Auth::id();
-
-        if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = $request->file('cover_image')->store('book-covers', 'public');
-        }
-
-        Book::create($data);
-
-        return redirect()->route('books.index')->with('success', 'Book added successfully!');
     }
 
+    /**
+     * Store a newly created book.
+     */
+    public function store(BookStoreRequest $request)
+    {
+        try {
+            $this->bookService->createBook($request->validated(), Auth::id());
+            
+            return redirect()->route('books.index')->with('success', 'Book added successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to add book: ' . $e->getMessage())->withInput();
+        }
+    }
+
+    /**
+     * Show the form for editing the specified book.
+     */
     public function edit(Book $book)
     {
-        $categories = \App\Models\Category::orderBy('name')->get();
+        $categories = $this->bookService->getCategories();
         return view('books.edit', compact('book', 'categories'));
     }
 
-    public function update(Request $request, Book $book)
+    /**
+     * Update the specified book.
+     */
+    public function update(BookUpdateRequest $request, Book $book)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'isbn' => 'required|string|unique:books,isbn,' . $book->id,
-            'description' => 'nullable|string',
-            'category' => 'required|string|max:255',
-            'publisher' => 'nullable|string|max:255',
-            'published_year' => 'nullable|integer|min:1000|max:' . date('Y'),
-            'total_copies' => 'required|integer|min:1',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
-
-        $data = $validated;
-
-        if ($request->hasFile('cover_image')) {
-            if ($book->cover_image && Storage::disk('public')->exists($book->cover_image)) {
-                Storage::disk('public')->delete($book->cover_image);
-            }
+        try {
+            $this->bookService->updateBook($book, $request->validated());
             
-            $data['cover_image'] = $request->file('cover_image')->store('book-covers', 'public');
+            return redirect()->route('books.index')->with('success', 'Book updated successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update book: ' . $e->getMessage())->withInput();
         }
-
-        $book->update($data);
-
-        return redirect()->route('books.index')->with('success', 'Book updated successfully!');
     }
 
+    /**
+     * Remove the specified book.
+     */
     public function destroy(Book $book)
     {
-        if ($book->activeBorrowings()->count() > 0) {
-            return redirect()->route('books.index')->with('error', 'Cannot delete book that is currently borrowed!');
+        try {
+            $this->bookService->deleteBook($book);
+            
+            return redirect()->route('books.index')->with('success', 'Book deleted successfully!');
+        } catch (\Exception $e) {
+            return redirect()->route('books.index')->with('error', $e->getMessage());
         }
-
-        if ($book->cover_image && Storage::disk('public')->exists($book->cover_image)) {
-            Storage::disk('public')->delete($book->cover_image);
-        }
-
-        $book->delete();
-
-        return redirect()->route('books.index')->with('success', 'Book deleted successfully!');
     }
 }

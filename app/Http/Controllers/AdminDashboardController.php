@@ -2,46 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
+use App\Http\Requests\UpdateUserRoleRequest;
+use App\Services\AdminDashboardService;
+use App\Services\UserManagementService;
 
 class AdminDashboardController extends Controller
 {
+    protected $dashboardService;
+    protected $userManagementService;
+
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct(
+        AdminDashboardService $dashboardService,
+        UserManagementService $userManagementService
+    ) {
+        $this->dashboardService = $dashboardService;
+        $this->userManagementService = $userManagementService;
+    }
+
+    /**
+     * Display admin dashboard.
+     */
     public function index()
     {
         $user = auth()->user();
         
-        // Statistics
-        $stats = [
-            'total_users' => User::count(),
-            'total_admins' => User::where('role', 'admin')->count(),
-            'total_petugas' => User::where('role', 'petugas')->count(),
-            'total_regular_users' => User::where('role', 'user')->count(),
-            'total_categories' => \App\Models\Category::count(),
-            'total_books' => \App\Models\Book::count(),
-            'available_books' => \App\Models\Book::where('available_copies', '>', 0)->count(),
-            'active_borrowings' => \App\Models\Borrowing::whereIn('status', ['approved', 'borrowed'])->count(), // Total active borrowings in system
-            'my_active_borrowings' => \App\Models\Borrowing::where('user_id', $user->id)
-                ->whereIn('status', ['approved', 'borrowed'])
-                ->count(), // My personal active borrowings
-            'overdue_borrowings' => \App\Models\Borrowing::where('status', 'borrowed')
-                ->where('due_date', '<', \Carbon\Carbon::now()->toDateString())
-                ->count(),
-        ];
-        
-        // Recent users with pagination
-        $recentUsers = User::latest()->paginate(6, ['*'], 'users_page');
-        
-        
-        // Recent borrowings with pagination
-        $recentBorrowings = \App\Models\Borrowing::with(['book', 'user'])
-            ->latest()
-            ->paginate(6);
-        
-        // My active borrowings (for CTA) - count both approved and borrowed status
-        $myActiveBorrowings = \App\Models\Borrowing::where('user_id', $user->id)
-            ->whereIn('status', ['approved', 'borrowed']) 
-            ->count();
+        $stats = $this->dashboardService->getDashboardStats($user->id);
+        $recentUsers = $this->dashboardService->getRecentUsers(6);
+        $recentBorrowings = $this->dashboardService->getRecentBorrowings(6);
+        $myActiveBorrowings = $this->dashboardService->getUserActiveBorrowingsCount($user->id);
         
         return view('dashboards.admin', compact(
             'user', 
@@ -52,47 +44,41 @@ class AdminDashboardController extends Controller
         ));
     }
 
+    /**
+     * Display user management page.
+     */
     public function manageUsers()
     {
-        // Only show users with role 'user'
-        $users = User::where('role', 'user')
-            ->oldest()
-            ->paginate(10);
+        $users = $this->userManagementService->getRegularUsers(10);
         
         return view('admin.users', compact('users'));
     }
 
-  
-
-    public function updateUserRole(Request $request, User $user)
+    /**
+     * Update user role.
+     */
+    public function updateUserRole(UpdateUserRoleRequest $request, User $user)
     {
-        $request->validate([
-            'role' => 'required|in:user,petugas,admin',
-        ]);
-
-        $user->update(['role' => $request->role]);
-
-        return back()->with('success', 'Role user berhasil diupdate.');
+        try {
+            $this->userManagementService->updateUserRole($user, $request->validated()['role']);
+            
+            return back()->with('success', 'Role user berhasil diupdate.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to update user role: ' . $e->getMessage());
+        }
     }
 
+    /**
+     * Delete user.
+     */
     public function destroyUser(User $user)
     {
-        // Prevent deleting self
-        if ($user->id === auth()->id()) {
-            return back()->with('error', 'You cannot delete your own account!');
+        try {
+            $userName = $this->userManagementService->deleteUser($user, auth()->id());
+            
+            return back()->with('success', 'User "' . $userName . '" has been deleted successfully!');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        // Check if user has active borrowings
-        $activeBorrowings = $user->activeBorrowings()->count();
-        if ($activeBorrowings > 0) {
-            return back()->with('error', 'Cannot delete user with active borrowings! User has ' . $activeBorrowings . ' book(s) currently borrowed.');
-        }
-
-        // Soft delete the user
-        $userName = $user->name;
-        $user->delete();
-
-        return back()->with('success', 'User "' . $userName . '" has been deleted successfully!');
     }
-
 }

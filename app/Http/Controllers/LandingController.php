@@ -2,35 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Book;
-use App\Models\User;
-use App\Models\Borrowing;
+use App\Services\LandingPageService;
 use Illuminate\View\View;
 
 class LandingController extends Controller
 {
+    protected $landingPageService;
+
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct(LandingPageService $landingPageService)
+    {
+        $this->landingPageService = $landingPageService;
+    }
+
+    /**
+     * Display landing page.
+     */
     public function index(): View
     {
-        // Get 6 recommended books (latest or most reviewed)
-        $recommendedBooks = Book::withCount('reviews')
-            ->orderBy('reviews_count', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->take(6)
-            ->get();
+        $data = $this->landingPageService->getLandingPageData();
         
-        // Get categories with book count
-        $categories = \App\Models\Category::withCount('books')
-            ->having('books_count', '>', 0)
-            ->orderBy('books_count', 'desc')
-            ->take(4)
-            ->get();
-        
-        // Statistics for about section
-        $totalUsers = User::whereIn('role', ['user', 'petugas'])->count();
-        $totalBooks = Book::count();
-        $totalBorrowings = Borrowing::count();
-        
-        return view('landingPage', compact('recommendedBooks', 'categories', 'totalUsers', 'totalBooks', 'totalBorrowings'));
+        return view('landingPage', [
+            'recommendedBooks' => $data['recommended_books'],
+            'categories' => $data['categories'],
+            'totalUsers' => $data['stats']['total_users'],
+            'totalBooks' => $data['stats']['total_books'],
+            'totalBorrowings' => $data['stats']['total_borrowings'],
+        ]);
     }
 }
 

@@ -35,7 +35,7 @@
         @if(Auth::user()->role === 'user')
             @php
                 $activeBorrowingsCount = \App\Models\Borrowing::where('user_id', Auth::id())
-                    ->whereIn('status', ['approved', 'borrowed']) // Status approved = sedang dipinjam
+                    ->whereIn('status', ['approved', 'borrowed'])
                     ->count();
             @endphp
             
@@ -64,64 +64,64 @@
         <!-- Statistics Cards (for Admin/Petugas) -->
         @if(Auth::user()->role === 'admin' || Auth::user()->role === 'petugas')
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-2xl border-2 border-slate-100 p-6 hover:border-ungu transition-all">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="w-14 h-14 bg-blue-500 rounded-xl flex items-center justify-center">
+                <!-- Currently Borrowed Card -->
+                <div class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-all">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-slate-500 mb-2">Currently Borrowed</p>
+                            <p class="text-4xl font-bold text-slate-900">{{ $stats['active'] ?? 0 }}</p>
+                        </div>
+                        <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
                             <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                             </svg>
                         </div>
-                        <div class="bg-blue-50 px-3 py-1 rounded-full">
-                            <span class="text-xs font-semibold text-blue-600">Active</span>
-                        </div>
                     </div>
-                    <p class="text-4xl font-bold text-slate-800 mb-2">{{ $stats['active'] ?? 0 }}</p>
-                    <p class="text-sm font-medium text-slate-600">Currently Borrowed</p>
                 </div>
 
-                <div class="bg-white rounded-2xl border-2 border-slate-100 p-6 hover:border-ungu transition-all">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="w-14 h-14 bg-green-500 rounded-xl flex items-center justify-center">
+                <!-- Books Returned Card -->
+                <div class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-all">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-slate-500 mb-2">Books Returned</p>
+                            <p class="text-4xl font-bold text-slate-900">{{ $stats['returned'] ?? 0 }}</p>
+                        </div>
+                        <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
                             <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
-                        <div class="bg-green-50 px-3 py-1 rounded-full">
-                            <span class="text-xs font-semibold text-green-600">Returned</span>
-                        </div>
                     </div>
-                    <p class="text-4xl font-bold text-slate-800 mb-2">{{ $stats['returned'] ?? 0 }}</p>
-                    <p class="text-sm font-medium text-slate-600">Books Returned</p>
                 </div>
 
-                <div class="bg-white rounded-2xl border-2 border-slate-100 p-6 hover:border-ungu transition-all">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="w-14 h-14 bg-red-500 rounded-xl flex items-center justify-center">
+                <!-- Overdue Books Card -->
+                <div class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-all">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-slate-500 mb-2">Overdue Books</p>
+                            <p class="text-4xl font-bold text-slate-900">{{ $stats['overdue'] ?? 0 }}</p>
+                        </div>
+                        <div class="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
                             <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
-                        <div class="bg-red-50 px-3 py-1 rounded-full">
-                            <span class="text-xs font-semibold text-red-600">Overdue</span>
-                        </div>
                     </div>
-                    <p class="text-4xl font-bold text-slate-800 mb-2">{{ $stats['overdue'] ?? 0 }}</p>
-                    <p class="text-sm font-medium text-slate-600">Overdue Books</p>
                 </div>
 
-                <div class="bg-white rounded-2xl border-2 border-slate-100 p-6 hover:border-ungu transition-all">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="w-14 h-14 bg-ungu rounded-xl flex items-center justify-center">
+                <!-- Total Borrowings Card -->
+                <div class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-all">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-slate-500 mb-2">Total Borrowings</p>
+                            <p class="text-4xl font-bold text-slate-900">{{ $stats['total'] ?? 0 }}</p>
+                        </div>
+                        <div class="w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg">
                             <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                             </svg>
                         </div>
-                        <div class="bg-cstm px-3 py-1 rounded-full">
-                            <span class="text-xs font-semibold text-primarys">Total</span>
-                        </div>
                     </div>
-                    <p class="text-4xl font-bold text-slate-800 mb-2">{{ $stats['total'] ?? 0 }}</p>
-                    <p class="text-sm font-medium text-slate-600">Total Borrowings</p>
                 </div>
             </div>
         @endif
@@ -190,145 +190,121 @@
                 @endif
             </div>
         @else
-            <!-- Borrowings List -->
-            <div class="space-y-5">
+            <!-- Borrowings List - Clean & Organized Layout -->
+            <div class="space-y-6">
                 @foreach($borrowings as $borrowing)
-                    <div class="group relative">
-                        <div class="relative bg-white rounded-3xl shadow-md transition-all duration-300 overflow-hidden hover:shadow-xl">
-                            <div class="p-6">
-                                <!-- Header Section -->
-                                <div class="flex items-start justify-between mb-6">
-                                    <!-- Book Cover & Title -->
-                                    <div class="flex gap-5 flex-1">
-                                        <div class="relative flex-shrink-0">
-                                            <div class="w-24 h-36 rounded-2xl overflow-hidden shadow-lg transform group-hover:scale-105 transition-all duration-300 ring-2 ring-slate-200">
-                                                @if($borrowing->book->cover_image)
-                                                    <img src="{{ asset('storage/' . $borrowing->book->cover_image) }}" alt="{{ $borrowing->book->title }}" class="w-full h-full object-cover">
-                                                @else
-                                                    <div class="w-full h-full bg-slate-200 flex items-center justify-center">
-                                                        <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                                                        </svg>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <!-- Book Info -->
-                                        <div class="flex-1 min-w-0">
-                                            <h3 class="text-xl font-bold text-slate-900 line-clamp-2 leading-tight mb-2">
-                                                {{ $borrowing->book->title }}
-                                            </h3>
-                                            <div class="flex items-center gap-2 text-slate-600 mb-4">
-                                                <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center">
-                                                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                                                    </svg>
-                                                </div>
-                                                <span class="text-sm font-semibold">{{ $borrowing->book->author }}</span>
-                                            </div>
-
-                                            @if(Auth::user()->role !== 'user')
-                                                <!-- Borrower Info -->
-                                                <div class="inline-flex items-center gap-3 bg-gradient-to-r from-slate-100 to-slate-50 rounded-xl px-4 py-2 border border-slate-200">
-                                                    <div class="w-10 h-10 bg-ungu rounded-lg flex items-center justify-center">
-                                                        <span class="text-white font-bold text-sm">{{ strtoupper(substr($borrowing->user->name, 0, 1)) }}</span>
-                                                    </div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <p class="font-semibold text-slate-900 text-sm truncate">{{ $borrowing->user->name }}</p>
-                                                        <p class="text-xs text-slate-600 truncate">{{ $borrowing->user->email }}</p>
-                                                    </div>
-                                                    @if($borrowing->user->role === 'admin')
-                                                        <span class="px-2 py-1 text-xs font-semibold rounded-lg bg-red-100 text-red-700">Admin</span>
-                                                    @elseif($borrowing->user->role === 'petugas')
-                                                        <span class="px-2 py-1 text-xs font-semibold rounded-lg bg-green-100 text-green-700">Staff</span>
-                                                    @else
-                                                        <span class="px-2 py-1 text-xs font-semibold rounded-lg bg-blue-100 text-blue-700">User</span>
-                                                    @endif
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                    <!-- Status Badge -->
-                                    <div class="flex-shrink-0">
-                                        @if($borrowing->status === 'pending')
-                                            <div class="bg-yellow-500 text-white px-4 py-2 rounded-xl shadow-lg">
-                                                <div class="flex items-center gap-2">
-                                                    <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                    </svg>
-                                                    <span class="text-xs font-bold tracking-wide">PENDING</span>
-                                                </div>
-                                            </div>
-                                        @elseif($borrowing->status === 'approved')
-                                            <div class="bg-green-500 text-white px-4 py-2 rounded-xl shadow-lg">
-                                                <div class="flex items-center gap-2">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                    </svg>
-                                                    <span class="text-xs font-bold tracking-wide">BORROWED</span>
-                                                </div>
-                                            </div>
-                                        @elseif($borrowing->status === 'pending_return')
-                                            <div class="bg-orange-500 text-white px-4 py-2 rounded-xl shadow-lg">
-                                                <div class="flex items-center gap-2">
-                                                    <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
-                                                    </svg>
-                                                    <span class="text-xs font-bold tracking-wide">PENDING RETURN</span>
-                                                </div>
-                                            </div>
-                                        @elseif($borrowing->status === 'rejected')
-                                            <div class="bg-red-500 text-white px-4 py-2 rounded-xl shadow-lg">
-                                                <div class="flex items-center gap-2">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                    </svg>
-                                                    <span class="text-xs font-bold tracking-wide">REJECTED</span>
-                                                </div>
-                                            </div>
-                                        @elseif($borrowing->status === 'borrowed')
-                                            @if($borrowing->isOverdue())
-                                                <div class="bg-red-500 text-white px-4 py-2 rounded-xl shadow-lg">
-                                                    <div class="flex items-center gap-2">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                        </svg>
-                                                        <span class="text-xs font-bold tracking-wide">OVERDUE</span>
-                                                    </div>
-                                                </div>
-                                            @else
-                                                <div class="bg-green-500 text-white px-4 py-2 rounded-xl shadow-lg">
-                                                    <div class="flex items-center gap-2">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                                                        </svg>
-                                                        <span class="text-xs font-bold tracking-wide">BORROWED</span>
-                                                    </div>
-                                                </div>
-                                            @endif
+                    <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-slate-200">
+                        <!-- Book Info & Status Section -->
+                        <div class="p-6">
+                            <div class="flex items-start gap-5">
+                                <!-- Book Cover -->
+                                <div class="flex-shrink-0">
+                                    <div class="w-28 h-40 rounded-xl overflow-hidden shadow-md ring-2 ring-slate-100">
+                                        @if($borrowing->book->cover_image)
+                                            <img src="{{ asset('storage/' . $borrowing->book->cover_image) }}" alt="{{ $borrowing->book->title }}" class="w-full h-full object-cover">
                                         @else
-                                            <div class="bg-blue-500 text-white px-4 py-2 rounded-xl shadow-lg">
-                                                <div class="flex items-center gap-2">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                                    </svg>
-                                                    <span class="text-xs font-bold tracking-wide">RETURNED</span>
-                                                </div>
+                                            <div class="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
+                                                <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                                </svg>
                                             </div>
                                         @endif
                                     </div>
                                 </div>
 
-                                <div class="my-6 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+                                <!-- Book Details & User Info -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-start justify-between gap-4 mb-4">
+                                        <div class="flex-1">
+                                            <h3 class="text-xl font-bold text-slate-900 mb-2 line-clamp-2">
+                                                {{ $borrowing->book->title }}
+                                            </h3>
+                                            <p class="text-sm text-slate-600 mb-3">
+                                                <span class="font-semibold">by</span> {{ $borrowing->book->author }}
+                                            </p>
+                                        </div>
 
-                                <!-- Date Timeline & Actions -->
-                                <div class="flex items-center justify-between gap-6 flex-wrap">
+                                        <!-- Status Badge -->
+                                        <div class="flex-shrink-0">
+                                            @if($borrowing->status === 'pending')
+                                                <span class="inline-flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    PENDING
+                                                </span>
+                                            @elseif($borrowing->status === 'approved')
+                                                <span class="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    BORROWED
+                                                </span>
+                                            @elseif($borrowing->status === 'pending_return')
+                                                <span class="inline-flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                                                    </svg>
+                                                    PENDING RETURN
+                                                </span>
+                                            @elseif($borrowing->status === 'rejected')
+                                                <span class="inline-flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                    </svg>
+                                                    REJECTED
+                                                </span>
+                                            @elseif($borrowing->status === 'borrowed')
+                                                @if($borrowing->isOverdue())
+                                                    <span class="inline-flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                        </svg>
+                                                        OVERDUE
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                                        </svg>
+                                                        BORROWED
+                                                    </span>
+                                                @endif
+                                            @else
+                                                <span class="inline-flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                    RETURNED
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    @if(Auth::user()->role !== 'user')
+                                        <!-- Borrower Info (Admin/Petugas View) -->
+                                        <div class="inline-flex items-center gap-3 bg-slate-50 rounded-xl px-4 py-2.5 border border-slate-200 mb-4">
+                                            <div class="w-10 h-10 bg-ungu rounded-lg flex items-center justify-center">
+                                                <span class="text-white font-bold text-sm">{{ strtoupper(substr($borrowing->user->name, 0, 1)) }}</span>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="font-semibold text-slate-900 text-sm truncate">{{ $borrowing->user->name }}</p>
+                                                <p class="text-xs text-slate-600 truncate">{{ $borrowing->user->email }}</p>
+                                            </div>
+                                            @if($borrowing->user->role === 'admin')
+                                                <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-red-100 text-red-700">Admin</span>
+                                            @elseif($borrowing->user->role === 'petugas')
+                                                <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-green-100 text-green-700">Staff</span>
+                                            @else
+                                                <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-blue-100 text-blue-700">User</span>
+                                            @endif
+                                        </div>
+                                    @endif
+
                                     <!-- Date Timeline -->
-                                    <div class="flex items-center gap-4 flex-1 min-w-0">
+                                    <div class="flex items-center gap-3 mb-4">
                                         <!-- Borrowed Date -->
-                                        <div class="flex-1 bg-blue-50 rounded-xl p-3 border border-blue-200">
+                                        <div class="flex-1 bg-blue-50 rounded-xl p-3 border border-blue-100">
                                             <div class="flex items-center gap-2 mb-1">
                                                 <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -339,7 +315,7 @@
                                         </div>
 
                                         <!-- Due Date -->
-                                        <div class="flex-1 bg-orange-50 rounded-xl p-3 border border-orange-200">
+                                        <div class="flex-1 bg-orange-50 rounded-xl p-3 border border-orange-100">
                                             <div class="flex items-center gap-2 mb-1">
                                                 <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -351,7 +327,7 @@
 
                                         <!-- Returned Date (if returned) -->
                                         @if($borrowing->status === 'returned' && $borrowing->returned_date)
-                                            <div class="flex-1 bg-green-50 rounded-xl p-3 border border-green-200">
+                                            <div class="flex-1 bg-green-50 rounded-xl p-3 border border-green-100">
                                                 <div class="flex items-center gap-2 mb-1">
                                                     <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -363,133 +339,115 @@
                                         @endif
                                     </div>
 
-                                    <!-- Additional Info for Pending/Rejected Status -->
-                                    @if($borrowing->status === 'pending' || $borrowing->status === 'rejected' || $borrowing->notes || $borrowing->reject_reason)
-                                        <div class="mt-4 space-y-3">
+                                    <!-- Additional Info (Notes/Rejection Reason) -->
+                                    @if($borrowing->notes || $borrowing->reject_reason || ($borrowing->status === 'approved' && $borrowing->approvedBy))
+                                        <div class="space-y-2 mb-4">
                                             @if($borrowing->notes)
-                                                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                                                    <div class="flex items-start gap-2">
-                                                        <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                                                        </svg>
-                                                        <div class="flex-1">
-                                                            <p class="text-xs font-semibold text-blue-700 mb-1">Borrower Notes:</p>
-                                                            <p class="text-sm text-blue-900">{{ $borrowing->notes }}</p>
-                                                        </div>
-                                                    </div>
+                                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                                    <p class="text-xs font-semibold text-blue-700 mb-1">Borrower Notes:</p>
+                                                    <p class="text-sm text-blue-900">{{ $borrowing->notes }}</p>
                                                 </div>
                                             @endif
 
                                             @if($borrowing->status === 'rejected' && $borrowing->reject_reason)
-                                                <div class="bg-red-50 border border-red-200 rounded-xl p-4">
-                                                    <div class="flex items-start gap-2">
-                                                        <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                        </svg>
-                                                        <div class="flex-1">
-                                                            <p class="text-xs font-semibold text-red-700 mb-1">Rejection Reason:</p>
-                                                            <p class="text-sm text-red-900">{{ $borrowing->reject_reason }}</p>
-                                                            @if($borrowing->approvedBy)
-                                                                <p class="text-xs text-red-600 mt-2">Rejected by: {{ $borrowing->approvedBy->name }}</p>
-                                                            @endif
-                                                        </div>
-                                                    </div>
+                                                <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                                                    <p class="text-xs font-semibold text-red-700 mb-1">Rejection Reason:</p>
+                                                    <p class="text-sm text-red-900">{{ $borrowing->reject_reason }}</p>
+                                                    @if($borrowing->approvedBy)
+                                                        <p class="text-xs text-red-600 mt-1">Rejected by: {{ $borrowing->approvedBy->name }}</p>
+                                                    @endif
                                                 </div>
                                             @endif
 
                                             @if($borrowing->status === 'approved' && $borrowing->approvedBy)
-                                                <div class="bg-green-50 border border-green-200 rounded-xl p-4">
-                                                    <div class="flex items-center gap-2">
-                                                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                        </svg>
-                                                        <p class="text-sm text-green-900">
-                                                            Approved by <span class="font-semibold">{{ $borrowing->approvedBy->name }}</span> 
-                                                            on {{ $borrowing->approved_at->format('d M Y, H:i') }}
-                                                        </p>
-                                                    </div>
+                                                <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                                                    <p class="text-sm text-green-900">
+                                                        Approved by <span class="font-semibold">{{ $borrowing->approvedBy->name }}</span> 
+                                                        on {{ $borrowing->approved_at->format('d M Y, H:i') }}
+                                                    </p>
                                                 </div>
                                             @endif
                                         </div>
                                     @endif
+                                </div>
+                            </div>
+                        </div>
 
-                                    <!-- Action Buttons -->
-                                    <div class="flex items-center gap-3 flex-wrap">
-                                        <a href="{{ route('books.show', $borrowing->book) }}" class="inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                            </svg>
-                                            View Book
-                                        </a>
+                        <!-- Action Buttons Section (Separated) -->
+                        <div class="bg-slate-50 px-6 py-4 border-t border-slate-200">
+                            <div class="flex items-center justify-between gap-4 flex-wrap">
+                                <!-- Left: View Book Button -->
+                                <a href="{{ route('books.show', $borrowing->book) }}" class="inline-flex items-center px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 font-semibold rounded-xl transition-all border border-slate-200 shadow-sm">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                    View Book
+                                </a>
 
-                                        @if(in_array($borrowing->status, ['approved', 'borrowed', 'returned']))
-                                            <!-- Print Receipt Button -->
-                                            <a href="{{ route('borrowings.print', $borrowing) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-xl transition shadow-md hover:shadow-lg">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                                </svg>
-                                                Download Bukti
-                                            </a>
-                                        @endif
+                                <!-- Right: Action Buttons -->
+                                <div class="flex items-center gap-3 flex-wrap">
 
-                                        @if((Auth::user()->role === 'admin' || Auth::user()->role === 'petugas') && $borrowing->status === 'pending')
-                                            <!-- Approve Button -->
-                                            <button type="button" onclick="confirmApprove({{ $borrowing->id }}, '{{ $borrowing->book->title }}', '{{ $borrowing->user->name }}')" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition shadow-md hover:shadow-lg">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                </svg>
-                                                Approve
-                                            </button>
+                                @if(in_array($borrowing->status, ['approved', 'borrowed', 'returned']))
+                                    <a href="{{ route('borrowings.print', $borrowing) }}" class="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-xl transition-all shadow-md">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        Download Receipt
+                                    </a>
+                                @endif
 
-                                            <!-- Reject Button -->
-                                            <button onclick="openRejectModal({{ $borrowing->id }}, '{{ $borrowing->book->title }}', '{{ $borrowing->user->name }}')" class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition shadow-md hover:shadow-lg">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                </svg>
-                                                Reject
-                                            </button>
-                                        @endif
+                                @if((Auth::user()->role === 'admin' || Auth::user()->role === 'petugas') && $borrowing->status === 'pending')
+                                    <button type="button" onclick="confirmApprove({{ $borrowing->id }}, '{{ $borrowing->book->title }}', '{{ $borrowing->user->name }}')" class="inline-flex items-center px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition-all shadow-md">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Approve
+                                    </button>
 
-                                        @if((Auth::user()->role === 'admin' || Auth::user()->role === 'petugas') && $borrowing->status === 'pending_return')
-                                            <!-- Approve Return Button -->
-                                            <button type="button" onclick="confirmApproveReturn({{ $borrowing->id }}, '{{ $borrowing->book->title }}', '{{ $borrowing->user->name }}')" class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition shadow-md hover:shadow-lg">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                </svg>
-                                                Approve Return
-                                            </button>
-                                        @endif
+                                    <button onclick="openRejectModal({{ $borrowing->id }}, '{{ $borrowing->book->title }}', '{{ $borrowing->user->name }}')" class="inline-flex items-center px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition-all shadow-md">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                        Reject
+                                    </button>
+                                @endif
 
-                                        @if((Auth::user()->role === 'admin' || Auth::user()->role === 'petugas') && ($borrowing->status === 'borrowed' || $borrowing->status === 'approved'))
-                                            <button onclick="openReturnModal({{ $borrowing->id }}, '{{ $borrowing->book->title }}', '{{ $borrowing->user->name }}')" class="inline-flex items-center px-4 py-2 bg-ungu hover:bg-primarys text-white font-semibold rounded-xl transition">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
-                                                </svg>
-                                                Return Book
-                                            </button>
-                                        @endif
+                                @if((Auth::user()->role === 'admin' || Auth::user()->role === 'petugas') && $borrowing->status === 'pending_return')
+                                    <button type="button" onclick="confirmApproveReturn({{ $borrowing->id }}, '{{ $borrowing->book->title }}', '{{ $borrowing->user->name }}')" class="inline-flex items-center px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all shadow-md">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Approve Return
+                                    </button>
+                                @endif
 
-                                        @if($borrowing->status === 'returned' && $borrowing->user_id === Auth::id())
-                                            <!-- Delete History Button (User/Petugas/Admin bisa hide history mereka sendiri) -->
-                                            <button onclick="confirmDeleteHistory({{ $borrowing->id }}, '{{ $borrowing->book->title }}')" class="inline-flex items-center px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl transition shadow-md hover:shadow-lg">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
-                                                </svg>
-                                                Hide History
-                                            </button>
-                                        @endif
+                                @if((Auth::user()->role === 'admin' || Auth::user()->role === 'petugas') && ($borrowing->status === 'borrowed' || $borrowing->status === 'approved'))
+                                    <button onclick="openReturnModal({{ $borrowing->id }}, '{{ $borrowing->book->title }}', '{{ $borrowing->user->name }}')" class="inline-flex items-center px-4 py-2.5 bg-ungu hover:bg-primarys text-white font-semibold rounded-xl transition-all shadow-md">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                                        </svg>
+                                        Return Book
+                                    </button>
+                                @endif
 
-                                        @if(Auth::user()->role === 'admin' && $borrowing->status === 'returned')
-                                            <!-- Permanent Delete Button (Admin Only) -->
-                                            <button onclick="confirmPermanentDelete({{ $borrowing->id }}, '{{ $borrowing->book->title }}', '{{ $borrowing->user->name }}')" class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition shadow-md hover:shadow-lg">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                </svg>
-                                                Delete Permanently
-                                            </button>
-                                        @endif
-                                    </div>
+                                @if($borrowing->status === 'returned' && $borrowing->user_id === Auth::id())
+                                    <button onclick="confirmDeleteHistory({{ $borrowing->id }}, '{{ $borrowing->book->title }}')" class="inline-flex items-center px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl transition-all shadow-md">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                                        </svg>
+                                        Hide History
+                                    </button>
+                                @endif
+
+                                @if(Auth::user()->role === 'admin' && $borrowing->status === 'returned')
+                                    <button onclick="confirmPermanentDelete({{ $borrowing->id }}, '{{ $borrowing->book->title }}', '{{ $borrowing->user->name }}')" class="inline-flex items-center px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition-all shadow-md">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        Delete Permanently
+                                    </button>
+                                @endif
                                 </div>
                             </div>
                         </div>
