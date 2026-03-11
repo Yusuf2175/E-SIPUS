@@ -31,7 +31,7 @@
     @endif
 
     <!-- Report Types Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Laporan Peminjaman -->
         <div class="bg-white rounded-lg shadow-sm overflow-hidden">
             <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white">
@@ -49,30 +49,26 @@
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Mulai</label>
-                    <input type="date" name="start_date" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <input type="date" name="start_date" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 text-slate-700">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Akhir</label>
-                    <input type="date" name="end_date" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <input type="date" name="end_date" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 text-slate-700">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                    <select name="status" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="all">Semua Status</option>
+                    <select name="status" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 text-slate-700">
                         <option value="borrowed">Sedang Dipinjam</option>
-                        <option value="returned">Dikembalikan</option>
-                        <option value="overdue">Terlambat</option>
                     </select>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Format</label>
-                    <select name="format" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="excel">Excel (CSV)</option>
+                    <select name="format" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 text-slate-700">
+                        <option value="pdf">PDF</option>
                     </select>
-                    <p class="text-xs text-gray-500 mt-1">Format PDF akan tersedia segera</p>
                 </div>
 
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center">
@@ -101,7 +97,7 @@
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
-                    <select name="category" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                    <select name="category" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-purple-500 focus:ring-purple-500 text-slate-700">
                         <option value="">Semua Kategori</option>
                         @php
                             $categories = \App\Models\Book::distinct()->pluck('category');
@@ -114,7 +110,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Ketersediaan</label>
-                    <select name="availability" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                    <select name="availability" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-purple-500 focus:ring-purple-500 text-slate-700">
                         <option value="all">Semua</option>
                         <option value="available">Tersedia</option>
                         <option value="borrowed">Sedang Dipinjam</option>
@@ -123,10 +119,9 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Format</label>
-                    <select name="format" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-purple-500 focus:ring-purple-500">
-                        <option value="excel">Excel (CSV)</option>
+                    <select name="format" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-purple-500 focus:ring-purple-500 text-slate-700">
+                        <option value="pdf">PDF</option>
                     </select>
-                    <p class="text-xs text-gray-500 mt-1">Format PDF akan tersedia segera</p>
                 </div>
 
                 <div class="pt-8"></div>
@@ -157,7 +152,7 @@
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                    <select name="role" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500">
+                    <select name="role" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 text-slate-700">
                         <option value="all">Semua Role</option>
                         <option value="user">User</option>
                         <option value="petugas">Petugas</option>
@@ -167,20 +162,19 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Registrasi Mulai</label>
-                    <input type="date" name="registration_start" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500">
+                    <input type="date" name="registration_start" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 text-slate-700">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Registrasi Akhir</label>
-                    <input type="date" name="registration_end" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500">
+                    <input type="date" name="registration_end" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 text-slate-700">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Format</label>
-                    <select name="format" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500">
-                        <option value="excel">Excel (CSV)</option>
+                    <select name="format" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 text-slate-700">
+                        <option value="pdf">PDF</option>
                     </select>
-                    <p class="text-xs text-gray-500 mt-1">Format PDF akan tersedia segera</p>
                 </div>
 
                 <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center">
@@ -191,23 +185,85 @@
                 </button>
             </form>
         </div>
-    </div>
 
-    <!-- Info Section -->
-    <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <div class="flex items-start">
-            <svg class="w-6 h-6 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <div>
-                <h3 class="text-blue-900 font-semibold mb-2">Informasi Laporan</h3>
-                <ul class="text-blue-800 text-sm space-y-1">
-                    <li>• <strong>Laporan Peminjaman:</strong> Berisi data peminjaman buku dalam periode tertentu dengan filter status</li>
-                    <li>• <strong>Laporan Buku:</strong> Berisi data koleksi buku dengan filter kategori dan ketersediaan</li>
-                    <li>• <strong>Laporan User:</strong> Berisi data pengguna dengan statistik peminjaman dan aktivitas</li>
-                    <li>• Format PDF cocok untuk presentasi dan arsip, format Excel cocok untuk analisis data lebih lanjut</li>
-                </ul>
+        <!-- Laporan Pengembalian -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-6 text-white">
+                <div class="flex items-center justify-between mb-4">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Laporan Pengembalian</h3>
+                <p class="text-orange-100 text-sm">Data pengembalian buku perpustakaan</p>
             </div>
+            
+            <form action="{{ route('reports.return') }}" method="POST" class="p-6 space-y-4">
+                @csrf
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Mulai</label>
+                    <input type="date" name="start_date" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-orange-500 focus:ring-orange-500 text-slate-700">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Akhir</label>
+                    <input type="date" name="end_date" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-orange-500 focus:ring-orange-500 text-slate-700">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status Pengembalian</label>
+                    <select name="return_status" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-orange-500 focus:ring-orange-500 text-slate-700">
+                        <option value="all">Semua</option>
+                        <option value="on_time">Tepat Waktu</option>
+                        <option value="late">Terlambat</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Format</label>
+                    <select name="format" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-orange-500 focus:ring-orange-500 text-slate-700">
+                        <option value="pdf">PDF</option>
+                    </select>
+                </div>
+
+                <div class="pt-8"></div>
+
+                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Generate Laporan
+                </button>
+            </form>
         </div>
     </div>
+
+    <!-- Script untuk auto show calendar -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            
+            dateInputs.forEach(input => {
+                // Show calendar on click
+                input.addEventListener('click', function() {
+                    try {
+                        this.showPicker();
+                    } catch (e) {
+                        // Fallback for browsers that don't support showPicker()
+                        this.focus();
+                    }
+                });
+                
+                // Show calendar on focus
+                input.addEventListener('focus', function() {
+                    try {
+                        this.showPicker();
+                    } catch (e) {
+                        // Fallback for browsers that don't support showPicker()
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

@@ -3,34 +3,36 @@
 @section('page-title', 'Manage Users')
 
 @section('content')
-    <!-- Header Section -->
-    <div class="mb-8">
-        <div class="flex items-center justify-between">
+    <!-- Header with Search -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between gap-4 mb-4">
             <div>
-                <h1 class="text-3xl font-bold text-slate-800 mb-2">Manage Users</h1>
-                <p class="text-slate-600">View and manage all library members</p>
+                <h1 class="text-2xl font-bold text-slate-900">Manage Users</h1>
+                <p class="text-sm text-slate-600 mt-1">View and manage all library members</p>
             </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+            <input 
+                type="text" 
+                id="searchInput"
+                placeholder="Search members by name or email..." 
+                class="w-full pl-12 pr-4 py-3 bg-white text-slate-700 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+            >
         </div>
     </div>
 
-    @if(session('success'))
-        <div class="bg-green-50 border-l-4 border-green-500 text-green-800 px-6 py-4 rounded-lg mb-6 flex items-center gap-3 shadow-sm">
-            <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <p class="font-medium">{{ session('success') }}</p>
-        </div>
-    @endif
-
-    <!-- Users Table Card -->
-    <div class="bg-white rounded-2xl shadow-md overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
-            <div class="flex items-center justify-between">
-                <h2 class="text-lg font-semibold text-slate-800">All Library Members</h2>
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-slate-500">Showing {{ $users->firstItem() ?? 0 }} to {{ $users->lastItem() ?? 0 }} of {{ $users->total() }} members</span>
-                </div>
-            </div>
+    <!-- Table Card -->
+    <div class="bg-white rounded-xl border border-slate-200">
+        <!-- Table Header -->
+        <div class="px-6 py-4 border-b border-slate-200">
+            <h2 class="text-base font-semibold text-slate-900">Library Members</h2>
         </div>
 
         <!-- Table -->
@@ -38,76 +40,37 @@
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">No</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">User</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Email</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Role</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Registered</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">No</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Joined</th>
+                        <th class="px-6 py-3 text-center text-xs font-semibold text-slate-600 uppercase">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-slate-100">
+                <tbody class="divide-y divide-slate-100">
                     @forelse($users as $index => $user)
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <!-- Number -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center justify-center w-8 h-8 bg-slate-100 rounded-lg">
-                                <span class="text-sm font-bold text-slate-700">{{ $users->firstItem() + $index }}</span>
-                            </div>
-                        </td>
-
-                        <!-- User Info -->
-                        <td class="px-6 py-4 whitespace-nowrap">
+                    <tr class="hover:bg-slate-50 user-row">
+                        <td class="px-6 py-4 text-sm text-slate-700">{{ $users->firstItem() + $index }}</td>
+                        
+                        <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold">
-                                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-semibold text-sm">
+                                    {{ strtoupper(substr($user->name, 0, 2)) }}
                                 </div>
                                 <div>
-                                    <p class="text-sm font-semibold text-slate-800">{{ $user->name }}</p>
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
-                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-                                        </svg>
-                                        Member
-                                    </span>
+                                    <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>
+                                    <span class="text-xs text-slate-500">ID: {{ $user->id }}</span>
                                 </div>
                             </div>
                         </td>
-
-                        <!-- Email -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                </svg>
-                                <span class="text-sm text-slate-700">{{ $user->email }}</span>
-                            </div>
-                        </td>
-
-                        <!-- Role Badge -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-700 border border-blue-200">
-                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-                                </svg>
-                                Member
-                            </span>
-                        </td>
-
-                        <!-- Registered Date -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <span class="text-sm text-slate-600">{{ $user->created_at->format('d M Y') }}</span>
-                            </div>
-                        </td>
-
-                        <!-- Actions -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center gap-2">
-                                <button onclick="confirmDeleteUser({{ $user->id }}, '{{ addslashes($user->name) }}')" class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg border border-red-200 hover:bg-red-100 transition">
+                        
+                        <td class="px-6 py-4 text-sm text-slate-700">{{ $user->email }}</td>
+                        
+                        <td class="px-6 py-4 text-sm text-slate-700">{{ $user->created_at->format('d M Y') }}</td>
+                        
+                        <td class="px-6 py-4">
+                            <div class="flex justify-center">
+                                <button onclick="confirmDeleteUser({{ $user->id }}, '{{ addslashes($user->name) }}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                     </svg>
@@ -121,24 +84,41 @@
                         </td>
                     </tr>
                     @empty
-                    <tr>
-                        <td colspan="6" class="px-6 py-12 text-center">
-                            <div class="flex flex-col items-center justify-center">
-                                <svg class="w-16 h-16 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                </svg>
-                                <p class="text-slate-500 font-medium">No members found</p>
+                    <tr class="empty-state">
+                        <td colspan="5" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center mb-3">
+                                    <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                    </svg>
+                                </div>
+                                <p class="text-sm font-medium text-slate-900">No members found</p>
                             </div>
                         </td>
                     </tr>
                     @endforelse
+                    
+                    <!-- No Search Results -->
+                    <tr id="noResults" class="hidden">
+                        <td colspan="5" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center mb-3">
+                                    <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </div>
+                                <p class="text-sm font-medium text-slate-900 mb-1">No results found</p>
+                                <p class="text-xs text-slate-500">Try searching with different keywords</p>
+                            </div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
 
         <!-- Pagination -->
         @if($users->hasPages())
-        <div class="px-6 py-4 border-t border-slate-200 bg-slate-50">
+        <div class="px-6 py-4 border-t border-slate-200">
             {{ $users->links() }}
         </div>
         @endif
@@ -147,10 +127,42 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const searchValue = this.value.toLowerCase();
+            const tableRows = document.querySelectorAll('.user-row');
+            const noResults = document.getElementById('noResults');
+            const emptyState = document.querySelector('.empty-state');
+            let visibleCount = 0;
+            
+            tableRows.forEach(row => {
+                const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const email = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                
+                if (name.includes(searchValue) || email.includes(searchValue)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Show/hide no results message
+            if (searchValue && visibleCount === 0) {
+                noResults.classList.remove('hidden');
+                if (emptyState) emptyState.style.display = 'none';
+            } else {
+                noResults.classList.add('hidden');
+                if (emptyState && visibleCount === 0 && !searchValue) {
+                    emptyState.style.display = '';
+                }
+            }
+        });
+
         function confirmDeleteUser(userId, userName) {
             Swal.fire({
                 title: 'Delete Member?',
-                html: `Are you sure you want to delete member "<strong>${userName}</strong>"?<br><br>
+                html: `Are you sure you want to delete "<strong>${userName}</strong>"?<br><br>
                        <div class="text-left bg-red-50 border border-red-200 rounded-lg p-3 mt-3">
                            <p class="text-sm text-red-800"><strong>⚠️ Warning:</strong></p>
                            <ul class="text-xs text-red-700 mt-2 space-y-1">
@@ -162,42 +174,22 @@
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: 'Yes, Delete Member',
+                confirmButtonText: 'Yes, Delete',
                 cancelButtonText: 'Cancel',
-                reverseButtons: true,
-                customClass: {
-                    popup: 'rounded-2xl',
-                    confirmButton: 'rounded-xl px-6 py-3 font-semibold',
-                    cancelButton: 'rounded-xl px-6 py-3 font-semibold'
-                }
+                reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Deleting...',
-                        text: 'Please wait',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
                     document.getElementById('delete-user-form-' + userId).submit();
                 }
             });
         }
 
-        // Show success/error messages
         @if(session('success'))
             Swal.fire({
                 icon: 'success',
                 title: 'Success!',
                 text: '{{ session('success') }}',
-                confirmButtonColor: '#10b981',
-                confirmButtonText: 'OK',
-                customClass: {
-                    popup: 'rounded-2xl',
-                    confirmButton: 'rounded-xl px-6 py-3 font-semibold'
-                }
+                confirmButtonColor: '#10b981'
             });
         @endif
 
@@ -206,12 +198,7 @@
                 icon: 'error',
                 title: 'Error!',
                 text: '{{ session('error') }}',
-                confirmButtonColor: '#ef4444',
-                confirmButtonText: 'OK',
-                customClass: {
-                    popup: 'rounded-2xl',
-                    confirmButton: 'rounded-xl px-6 py-3 font-semibold'
-                }
+                confirmButtonColor: '#ef4444'
             });
         @endif
     </script>

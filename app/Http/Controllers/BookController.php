@@ -54,16 +54,23 @@ class BookController extends Controller
         
         $userReview = null;
         $inCollection = false;
+        $hasApprovedBorrowing = false;
         
         if (Auth::check()) {
             $userReview = $book->reviews()->where('user_id', Auth::id())->first();
             $inCollection = $book->collections()->where('user_id', Auth::id())->exists();
+            
+            // Check if user has borrowed this book with approved or borrowed status
+            $hasApprovedBorrowing = \App\Models\Borrowing::where('user_id', Auth::id())
+                ->where('book_id', $book->id)
+                ->whereIn('status', ['approved', 'borrowed'])
+                ->exists();
         }
         
         $averageRating = $book->reviews()->avg('rating');
         $totalReviews = $book->reviews()->count();
         
-        return view('books.show', compact('book', 'userReview', 'inCollection', 'averageRating', 'totalReviews'));
+        return view('books.show', compact('book', 'userReview', 'inCollection', 'averageRating', 'totalReviews', 'hasApprovedBorrowing'));
     }
 
     public function store(Request $request)

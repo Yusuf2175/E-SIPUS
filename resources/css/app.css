@@ -2,18 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-.size-cstm {
-    border-radius: 3.5rem;
-    height: calc(100vh - 2.5rem);
-    max-height: calc(100vh - 2.5rem);
-    overflow-y: auto;
-    scrollbar-width: none; 
-    -ms-overflow-style: none; 
+.radius-cstm{
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
 }
-
-.size-cstm::-webkit-scrollbar {
-    display: none; 
-}
-.w-cstm {
-    width: calc(150% - 2.5rem);
+.radius-cs{
+    border-bottom-right-radius: 50px;
 }

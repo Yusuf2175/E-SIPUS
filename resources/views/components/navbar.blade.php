@@ -28,13 +28,10 @@
                 <!-- Right Actions -->
                 <div class="flex items-center gap-3">
                     @auth
-                        <!-- If logged in -->
-                        <a href="{{ route('dashboard') }}" class="text-sm font-medium text-slate-700 hover:text-purple-600 transition">
-                            Dashboard
-                        </a>
+        
                         <a href="{{ route('dashboard') }}">
                             <button class="inline-flex items-center px-6 py-2.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-semibold hover:opacity-90 transition-all duration-300">
-                                Get Started
+                                Go to Dashboard
                             </button>
                         </a>
                     @else
@@ -44,7 +41,7 @@
                         </a>
                         <a href="{{ route('register') }}">
                             <button class="inline-flex items-center px-6 py-2.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-semibold hover:opacity-90 transition-all duration-300">
-                                Get Started
+                                Sign Up
                             </button>
                         </a>
                     @endauth

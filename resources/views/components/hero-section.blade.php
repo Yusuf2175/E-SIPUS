@@ -8,7 +8,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                 </svg>
                 <span class="text-sm font-semibold text-slate-700">Smart Digital Library Platform</span>
-                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
             </div>
 
             {{-- Main Heading --}}
@@ -58,9 +57,7 @@
                 </div>
             </div>
 
-            {{-- Dashboard Mockup with Skeleton Loader --}}
             <div class="mt-20 max-w-6xl mx-auto relative">
-                <!-- Decorative Elements -->
                 <div class="absolute -left-20 top-20 w-32 h-32 bg-purple-200/30 rounded-full blur-3xl"></div>
                 <div class="absolute -right-20 bottom-20 w-40 h-40 bg-indigo-200/30 rounded-full blur-3xl"></div>
                 
@@ -90,7 +87,6 @@
                     {{-- Dashboard Content --}}
                     <div class="p-5 bg-gradient-to-br from-slate-50/30 to-white/50 h-[480px]">
                         <div class="flex gap-5 h-full">
-                            {{-- Sidebar --}}
                             <div class="w-40 space-y-1.5">
                                 <div class=" rounded-lg px-4 py-3 text-slate-500 text-sm font-medium">
                                     Dashboard
@@ -174,5 +170,6 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </section>

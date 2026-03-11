@@ -29,7 +29,6 @@ Route::get('/dashboard', function () {
 // User Dashboard Routes
 Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user.')->group(function () {
     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
-    Route::post('/request-role', [UserDashboardController::class, 'requestRole'])->name('request.role');
 });
 
 // Book Management Routes (Admin and Petugas only) - MUST BE BEFORE /books/{book}
@@ -74,6 +73,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     Route::patch('/borrowings/{borrowing}/return', [App\Http\Controllers\BorrowingController::class, 'return'])->name('borrowings.return');
     Route::get('/borrowings/{borrowing}', [App\Http\Controllers\BorrowingController::class, 'show'])->name('borrowings.show');
+    Route::get('/borrowings/{borrowing}/print', [App\Http\Controllers\BorrowingController::class, 'printReceipt'])->name('borrowings.print');
     
     // Collection routes
     Route::get('/collections', [App\Http\Controllers\CollectionController::class, 'index'])->name('collections.index');
@@ -100,7 +100,7 @@ Route::middleware(['auth', 'verified', 'role:petugas,admin'])->prefix('reports')
     Route::post('/borrowing', [App\Http\Controllers\ReportController::class, 'borrowingReport'])->name('borrowing');
     Route::post('/book', [App\Http\Controllers\ReportController::class, 'bookReport'])->name('book');
     Route::post('/user', [App\Http\Controllers\ReportController::class, 'userReport'])->name('user');
-    Route::post('/statistics', [App\Http\Controllers\ReportController::class, 'statisticsReport'])->name('statistics');
+    Route::post('/return', [App\Http\Controllers\ReportController::class, 'returnReport'])->name('return');
 });
 
 // Admin Dashboard Routes

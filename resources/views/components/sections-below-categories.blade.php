@@ -1,5 +1,5 @@
 
-<section id="libary" class="py-16 lg:py-20" >
+<section id="libary" class="py-20 lg:py-32 bg-white" >
     <div class="max-w-7xl mx-auto px-6 md:px-10">
         <!-- Section Header -->
         <div class="text-center mb-16">

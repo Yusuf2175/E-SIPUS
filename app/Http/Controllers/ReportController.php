@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 class ReportController extends Controller
 {
@@ -61,7 +62,11 @@ class ReportController extends Controller
                 })->count(),
         ];
 
-        // For now, only support Excel/CSV format
+        // Generate report based on format
+        if ($request->format === 'pdf') {
+            return $this->generateBorrowingPDF($borrowings, $stats, $startDate, $endDate, $status);
+        }
+        
         return $this->generateExcel($borrowings, $stats, $startDate, $endDate, $status);
     }
 
@@ -73,7 +78,7 @@ class ReportController extends Controller
             'format' => 'required|in:pdf,excel'
         ]);
 
-        $query = Book::with(['addedByUser']);
+        $query = Book::with(['addedBy']);
 
         if ($request->filled('category')) {
             $query->where('category', $request->category);
@@ -90,12 +95,16 @@ class ReportController extends Controller
         // Statistics
         $stats = [
             'total' => $books->count(),
-            'available' => $books->where('is_available', true)->count(),
-            'borrowed' => $books->where('is_available', false)->count(),
+            'available' => $books->filter(function($book) { return $book->getActualAvailableCopies() > 0; })->count(),
+            'borrowed' => $books->filter(function($book) { return $book->getActualAvailableCopies() == 0; })->count(),
             'categories' => $books->pluck('category')->unique()->count(),
         ];
 
-        // For now, only support Excel/CSV format
+        // Generate report based on format
+        if ($request->format === 'pdf') {
+            return $this->generateBookPDF($books, $stats, $request->category, $request->availability);
+        }
+        
         return $this->generateBookExcel($books, $stats, $request->category, $request->availability);
     }
 
@@ -144,7 +153,11 @@ class ReportController extends Controller
             'active_users' => $activeUsers,
         ];
 
-        // For now, only support Excel/CSV format
+        // Generate report based on format
+        if ($request->format === 'pdf') {
+            return $this->generateStatisticsPDF($stats, $startDate, $endDate, $request->period);
+        }
+        
         return $this->generateStatisticsExcel($stats, $startDate, $endDate, $request->period);
     }
 
@@ -188,8 +201,79 @@ class ReportController extends Controller
             'active_borrowings' => $users->sum('active_borrowings_count'),
         ];
 
-        // Generate Excel/CSV format
+        // Generate report based on format
+        if ($request->format === 'pdf') {
+            return $this->generateUserPDF($users, $stats, $request->role, $request->registration_start, $request->registration_end);
+        }
+        
         return $this->generateUserExcel($users, $stats, $request->role, $request->registration_start, $request->registration_end);
+    }
+
+    public function returnReport(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'return_status' => 'nullable|in:all,on_time,late',
+            'format' => 'required|in:pdf,excel'
+        ]);
+
+        $startDate = Carbon::parse($request->start_date);
+        $endDate = Carbon::parse($request->end_date);
+        $returnStatus = $request->return_status ?? 'all';
+
+        // Query returned borrowings
+        $query = Borrowing::with(['book', 'user', 'returnedBy'])
+            ->where('status', 'returned')
+            ->whereBetween('returned_date', [$startDate, $endDate]);
+
+        $returns = $query->orderBy('returned_date', 'desc')->get();
+
+        // Filter by return status
+        if ($returnStatus === 'on_time') {
+            $returns = $returns->filter(function ($return) {
+                $dueDate = Carbon::parse($return->due_date);
+                $returnDate = Carbon::parse($return->returned_date);
+                return $returnDate->lte($dueDate);
+            });
+        } elseif ($returnStatus === 'late') {
+            $returns = $returns->filter(function ($return) {
+                $dueDate = Carbon::parse($return->due_date);
+                $returnDate = Carbon::parse($return->returned_date);
+                return $returnDate->gt($dueDate);
+            });
+        }
+
+        // Calculate statistics
+        $onTimeCount = 0;
+        $lateCount = 0;
+        $totalLateDays = 0;
+
+        foreach ($returns as $return) {
+            $dueDate = Carbon::parse($return->due_date);
+            $returnDate = Carbon::parse($return->returned_date);
+            
+            if ($returnDate->gt($dueDate)) {
+                $lateCount++;
+                $totalLateDays += $returnDate->diffInDays($dueDate);
+            } else {
+                $onTimeCount++;
+            }
+        }
+
+        $stats = [
+            'total' => $returns->count(),
+            'on_time' => $onTimeCount,
+            'late' => $lateCount,
+            'avg_late_days' => $lateCount > 0 ? round($totalLateDays / $lateCount, 1) : 0,
+        ];
+
+        // Generate report based on format
+        if ($request->format === 'pdf') {
+            return $this->generateReturnPDF($returns, $stats, $startDate, $endDate, $returnStatus);
+        }
+        
+        return $this->generateReturnExcel($returns, $stats, $startDate, $endDate, $returnStatus);
     }
 
     private function generateExcel($borrowings, $stats, $startDate, $endDate, $status)
@@ -395,6 +479,169 @@ class ReportController extends Controller
                     $user->borrowings_count,
                     $user->active_borrowings_count,
                     $user->reviews_count
+                ]);
+            }
+            
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    private function generateUserPDF($users, $stats, $role, $startDate, $endDate)
+    {
+        $data = [
+            'users' => $users,
+            'stats' => $stats,
+            'role' => $role,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'createdBy' => Auth::user()->name,
+            'printDate' => Carbon::now()->format('d/m/Y H:i')
+        ];
+
+        $pdf = PDF::loadView('reports.pdf.user', $data);
+        $pdf->setPaper('a4', 'portrait');
+        
+        return $pdf->download('laporan-user-' . Carbon::now()->format('Y-m-d') . '.pdf');
+    }
+
+    private function generateBorrowingPDF($borrowings, $stats, $startDate, $endDate, $status)
+    {
+        $statusLabels = [
+            'all' => 'Semua Status',
+            'borrowed' => 'Sedang Dipinjam',
+            'returned' => 'Dikembalikan',
+            'overdue' => 'Terlambat'
+        ];
+
+        $data = [
+            'borrowings' => $borrowings,
+            'stats' => $stats,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'statusLabel' => $statusLabels[$status] ?? 'Semua Status',
+            'createdBy' => Auth::user()->name,
+            'printDate' => Carbon::now()->format('d/m/Y H:i')
+        ];
+
+        $pdf = PDF::loadView('reports.pdf.borrowing', $data);
+        $pdf->setPaper('a4', 'landscape');
+        
+        return $pdf->download('laporan-peminjaman-' . Carbon::now()->format('Y-m-d') . '.pdf');
+    }
+
+    private function generateBookPDF($books, $stats, $category, $availability)
+    {
+        $data = [
+            'books' => $books,
+            'stats' => $stats,
+            'category' => $category,
+            'availability' => $availability,
+            'createdBy' => Auth::user()->name,
+            'printDate' => Carbon::now()->format('d/m/Y H:i')
+        ];
+
+        $pdf = PDF::loadView('reports.pdf.book', $data);
+        $pdf->setPaper('a4', 'portrait');
+        
+        return $pdf->download('laporan-buku-' . Carbon::now()->format('Y-m-d') . '.pdf');
+    }
+
+    private function generateStatisticsPDF($stats, $startDate, $endDate, $period)
+    {
+        $periodLabels = [
+            'daily' => 'Harian',
+            'weekly' => 'Mingguan',
+            'monthly' => 'Bulanan',
+            'yearly' => 'Tahunan'
+        ];
+
+        $data = [
+            'stats' => $stats,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'period' => $periodLabels[$period] ?? 'Harian',
+            'createdBy' => Auth::user()->name,
+            'printDate' => Carbon::now()->format('d/m/Y H:i')
+        ];
+
+        $pdf = PDF::loadView('reports.pdf.statistics', $data);
+        $pdf->setPaper('a4', 'portrait');
+        
+        return $pdf->download('laporan-statistik-' . Carbon::now()->format('Y-m-d') . '.pdf');
+    }
+
+    private function generateReturnPDF($returns, $stats, $startDate, $endDate, $returnStatus)
+    {
+        $statusLabels = [
+            'all' => 'Semua',
+            'on_time' => 'Tepat Waktu',
+            'late' => 'Terlambat'
+        ];
+
+        $data = [
+            'returns' => $returns,
+            'stats' => $stats,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'statusLabel' => $statusLabels[$returnStatus] ?? 'Semua',
+            'createdBy' => Auth::user()->name,
+            'printDate' => Carbon::now()->format('d/m/Y H:i')
+        ];
+
+        $pdf = PDF::loadView('reports.pdf.return', $data);
+        $pdf->setPaper('a4', 'landscape');
+        
+        return $pdf->download('laporan-pengembalian-' . Carbon::now()->format('Y-m-d') . '.pdf');
+    }
+
+    private function generateReturnExcel($returns, $stats, $startDate, $endDate, $returnStatus)
+    {
+        $filename = 'laporan-pengembalian-' . Carbon::now()->format('Y-m-d') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function() use ($returns, $stats, $startDate, $endDate) {
+            $file = fopen('php://output', 'w');
+            
+            // Header
+            fputcsv($file, ['LAPORAN PENGEMBALIAN BUKU']);
+            fputcsv($file, ['Periode: ' . $startDate->format('d/m/Y') . ' - ' . $endDate->format('d/m/Y')]);
+            fputcsv($file, ['Dibuat oleh: ' . Auth::user()->name]);
+            fputcsv($file, ['Tanggal: ' . Carbon::now()->format('d/m/Y H:i')]);
+            fputcsv($file, []);
+            
+            // Statistics
+            fputcsv($file, ['STATISTIK']);
+            fputcsv($file, ['Total Pengembalian', $stats['total']]);
+            fputcsv($file, ['Tepat Waktu', $stats['on_time']]);
+            fputcsv($file, ['Terlambat', $stats['late']]);
+            fputcsv($file, ['Rata-rata Keterlambatan (hari)', $stats['avg_late_days']]);
+            fputcsv($file, []);
+            
+            // Table header
+            fputcsv($file, ['No', 'Peminjam', 'Buku', 'Tanggal Pinjam', 'Jatuh Tempo', 'Tanggal Kembali', 'Keterlambatan (hari)', 'Status']);
+            
+            // Data
+            foreach ($returns as $index => $return) {
+                $dueDate = Carbon::parse($return->due_date);
+                $returnDate = Carbon::parse($return->returned_date);
+                $lateDays = $returnDate->gt($dueDate) ? $returnDate->diffInDays($dueDate) : 0;
+                $status = $lateDays > 0 ? 'Terlambat' : 'Tepat Waktu';
+                
+                fputcsv($file, [
+                    $index + 1,
+                    $return->user->name,
+                    $return->book->title,
+                    Carbon::parse($return->borrowed_date)->format('d/m/Y'),
+                    $dueDate->format('d/m/Y'),
+                    $returnDate->format('d/m/Y'),
+                    $lateDays > 0 ? $lateDays : '-',
+                    $status
                 ]);
             }
             

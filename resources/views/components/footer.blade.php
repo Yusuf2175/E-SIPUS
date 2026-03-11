@@ -22,7 +22,7 @@
                 <ul class="space-y-2 text-sm">
                     <li><a href="#home" class="hover:text-purple-400 transition-colors">Home</a></li>
                     <li><a href="#features" class="hover:text-purple-400 transition-colors">Features</a></li>
-                    <li><a href="#recommended" class="hover:text-purple-400 transition-colors">Library</a></li>
+                    <li><a href="#libary" class="hover:text-purple-400 transition-colors">Library</a></li>
                     <li><a href="{{ route('books.index') }}" class="hover:text-purple-400 transition-colors">Books</a></li>
                 </ul>
             </div>
@@ -31,7 +31,7 @@
             <div>
                 <h4 class="text-white font-semibold mb-4">Contact</h4>
                 <ul class="space-y-2 text-sm">
-                    <li>Email: info@esipus.com</li>
+                    <li>Email: Brlyinex2@esipus.com</li>
                     <li>Phone: +62 123 4567 890</li>
                 </ul>
             </div>

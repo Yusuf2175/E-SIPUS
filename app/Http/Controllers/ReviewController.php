@@ -17,12 +17,23 @@ class ReviewController extends Controller
             'rating' => 'required|integer|min:1|max:5'
         ]);
 
+        // Check if user already has a review for this book
         $exists = Review::where('user_id', Auth::id())
             ->where('book_id', $request->book_id)
             ->exists();
 
         if ($exists) {
             return back()->with('error', 'Anda sudah memberikan ulasan untuk buku ini');
+        }
+
+        // Check if user has borrowed this book with approved or borrowed status
+        $hasApprovedBorrowing = \App\Models\Borrowing::where('user_id', Auth::id())
+            ->where('book_id', $request->book_id)
+            ->whereIn('status', ['approved', 'borrowed'])
+            ->exists();
+
+        if (!$hasApprovedBorrowing) {
+            return back()->with('error', 'Anda harus meminjam dan mendapatkan persetujuan untuk buku ini terlebih dahulu sebelum dapat memberikan review');
         }
 
         Review::create([
