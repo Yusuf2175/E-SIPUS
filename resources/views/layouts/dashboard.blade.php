@@ -11,7 +11,7 @@
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-slate-50">
+<body class="antialiased font-sans bg-slate-50">
     <div class="flex min-h-screen">
         <!-- Sidebar -->
         @if(Auth::user()->role === 'admin')
@@ -25,15 +25,15 @@
         <!-- Main Content -->
         <div class="flex-1 ml-64">
             <!-- Top Bar -->
-            <aside class="px-12 py-5 sticky top-0 z-30">
-                <header class="rounded-3xl bg-gradient-to-br from-ungu via-purple-600 to-secondrys">
-                    <div class="flex items-center justify-between px-6 py-2">
+            <aside class="px-8 py-3 sticky top-0 z-30">
+                <header class="bg-white rounded-xl shadow-sm border border-r-2 border-slate-200">
+                    <div class="flex items-center justify-between gap-8 px-4 py-4">
                         
                         <!-- Search Bar -->
-                        <div class="flex-1 max-w-3xl relative" x-data="searchComponent()">
+                        <div class="flex-1 max-w-xl relative" x-data="searchComponent()">
                             <div class="relative">
                                 <!-- Search Icon -->
-                                <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-40">
+                                <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
                                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <circle cx="11" cy="11" r="8"></circle>
                                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -50,7 +50,7 @@
                                     @keydown.up.prevent="navigateUp"
                                     @keydown.enter.prevent="selectResult"
                                     placeholder="Search pages in dashboard..." 
-                                    class="w-full pl-12 pr-4 py-3 bg-white/95 backdrop-blur-sm rounded-2xl text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white transition ">
+                                    class="w-full pl-12 pr-4 py-2.5 bg-slate-200/60 rounded-lg text-sm text-slate-700 placeholder-slate-400 border border-slate-200/60 focus:outline-none focus:ring-2 focus:ring-ungu/20 focus:border-ungu/40 focus:bg-white transition-all duration-200">
                             </div>
 
                             <!-- Search Results Dropdown -->
@@ -58,16 +58,16 @@
                                 x-cloak
                                 x-show="showResults && filteredResults.length > 0"
                                 x-transition
-                                class="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl max-h-96 overflow-y-auto z-50">
+                                class="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-xl max-h-96 overflow-y-auto z-50">
                                 <template x-for="(result, index) in filteredResults" :key="index">
                                     <a 
                                         :href="result.url"
                                         @mouseenter="selectedIndex = index"
-                                        :class="selectedIndex === index ? 'bg-ungu/10 ' : 'hover:bg-slate-50 b border-transparent'"
+                                        :class="selectedIndex === index ? 'bg-ungu/10' : 'hover:bg-slate-50'"
                                         class="flex items-center gap-3 px-4 py-3 border-b border-slate-100 last:border-0 transition">
                                         <div 
                                             :class="result.color"
-                                            class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+                                            class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">
                                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="result.icon"></path>
                                             </svg>
@@ -88,7 +88,7 @@
                                 x-cloak
                                 x-show="showResults && query.length > 0 && filteredResults.length === 0"
                                 x-transition
-                                class="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl p-6 z-50 text-center">
+                                class="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-xl p-6 z-50 text-center">
                                 <svg class="w-12 h-12 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
@@ -97,22 +97,28 @@
                             </div>
                         </div>
 
-                        <!-- User Info -->
-                        <a href="{{ route('profile.edit')}}">
-                            <div class="flex items-center gap-3 ml-6">
-                                <div class="flex items-center gap-3 px-3 py-2 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 transition cursor-pointer border border-white/20">
-                                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-ungu font-bold shadow-md ring-2 ring-white/30">
-                                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                    </div>
-                                    <div class="text-left">
-                                        <p class="text-sm font-bold text-white">{{ Auth::user()->name }}</p>
-                                        <p class="text-xs text-white/90 font-semibold flex items-center gap-1.5">
-                                            {{ ucfirst(Auth::user()->role) }}
-                                        </p>
-                                    </div>
+                        <!-- Right Section: Notification & Profile -->
+                        <div class="flex items-center gap-4">
+                            <!-- Notification Icon -->
+                            <button class="relative p-2.5 hover:bg-slate-100 rounded-lg transition-colors duration-200 group">
+                                <svg class="w-5 h-5 text-slate-600 group-hover:text-ungu transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                                </svg>
+                                <!-- Notification Badge -->
+                                <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                            </button>
+
+                            <!-- User Profile -->
+                            <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 rounded-lg transition-all duration-200 group">
+                                <div class="w-10 h-10 bg-gradient-to-br from-ungu to-primarys rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                                 </div>
-                            </div>
-                        </a>
+                                <div class="text-left">
+                                    <p class="text-sm font-semibold text-slate-900 group-hover:text-ungu transition-colors leading-tight">{{ Auth::user()->name }}</p>
+                                    <p class="text-xs text-slate-500 leading-tight mt-0.5">  {{ ucfirst(Auth::user()->role) }}</p>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </header>
             </aside>

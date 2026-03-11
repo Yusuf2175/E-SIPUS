@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\User;
+use App\Models\Borrowing;
 use Illuminate\View\View;
 
 class LandingController extends Controller
@@ -16,7 +18,19 @@ class LandingController extends Controller
             ->take(6)
             ->get();
         
-        return view('landingPage', compact('recommendedBooks'));
+        // Get categories with book count
+        $categories = \App\Models\Category::withCount('books')
+            ->having('books_count', '>', 0)
+            ->orderBy('books_count', 'desc')
+            ->take(4)
+            ->get();
+        
+        // Statistics for about section
+        $totalUsers = User::whereIn('role', ['user', 'petugas'])->count();
+        $totalBooks = Book::count();
+        $totalBorrowings = Borrowing::count();
+        
+        return view('landingPage', compact('recommendedBooks', 'categories', 'totalUsers', 'totalBooks', 'totalBorrowings'));
     }
 }
 

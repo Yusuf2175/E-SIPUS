@@ -24,6 +24,9 @@ class PetugasDashboardController extends Controller
                 ->count(),
             'total_users' => User::where('role', 'user')->count(),
             'books_added_by_me' => Book::where('added_by', $user->id)->count(),
+            'my_active_borrowings' => Borrowing::where('user_id', $user->id)
+                ->whereIn('status', ['approved', 'borrowed'])
+                ->count(),
         ];
         
         // Recent borrowings with pagination
@@ -48,7 +51,7 @@ class PetugasDashboardController extends Controller
         
         // My active borrowings (for CTA)
         $myActiveBorrowings = Borrowing::where('user_id', $user->id)
-            ->where('status', 'borrowed')
+            ->whereIn('status', ['approved', 'borrowed'])
             ->count();
         
         return view('dashboards.petugas', compact('user', 'stats', 'recentBorrowings', 'overdueBorrowings', 'lowStockBooks', 'myActiveBorrowings'));
@@ -69,5 +72,15 @@ class PetugasDashboardController extends Controller
             ->paginate(10);
         
         return view('petugas.users', compact('users'));
+    }
+
+    public function viewUsersList()
+    {
+        // Get all users with role 'user' (read-only view)
+        $users = User::where('role', 'user')
+            ->oldest()
+            ->paginate(10);
+        
+        return view('petugas.users-list', compact('users'));
     }
 }

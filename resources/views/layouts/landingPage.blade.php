@@ -7,6 +7,12 @@
     <title>{{ config('app.name') }}</title>
     <link rel="icon" href="{{ asset('assets/Logo_E-Sipus.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+    </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 flex flex-col antialiased">
 

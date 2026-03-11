@@ -252,16 +252,16 @@
                     <h2 class="text-2xl font-bold text-slate-800 mb-6">Reviews and Ratings</h2>
 
                     <!-- Add Review Form -->
-                    @if(!$userReview)
+                    @if(!$userReview && $hasApprovedBorrowing)
                         <div class="mb-8 p-6 bg-slate-50 rounded-xl">
-                            <h3 class="text-lg font-semibold text-gray-400 mb-4">Write Your Review</h3>
+                            <h3 class="text-lg font-semibold text-slate-800 mb-4">Write Your Review</h3>
                             <form action="{{ route('reviews.store') }}" method="POST" id="reviewForm">
                                 @csrf
                                 <input type="hidden" name="book_id" value="{{ $book->id }}">
                                 <input type="hidden" name="rating" id="ratingInput" value="">
                                 
                                 <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-400 mb-2">Ratings</label>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Ratings</label>
                                     <div class="flex gap-2" id="starRating">
                                         @for($i = 1; $i <= 5; $i++)
                                             <button type="button" class="star-btn focus:outline-none transition-transform hover:scale-110" data-rating="{{ $i }}">
@@ -271,12 +271,12 @@
                                             </button>
                                         @endfor
                                     </div>
-                                    <p class="text-sm text-gray-400 mt-2" id="ratingText">Select is ratings you give</p>
+                                    <p class="text-sm text-slate-600 mt-2" id="ratingText">Pilih rating Anda</p>
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-400 mb-2">Review</label>
-                                    <textarea name="review" rows="4" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-400" placeholder="Bagikan pengalaman Anda tentang buku ini..." required></textarea>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Review</label>
+                                    <textarea name="review" rows="4" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-slate-700" placeholder="Bagikan pengalaman Anda tentang buku ini..." required></textarea>
                                 </div>
 
                                 <button type="submit" class="px-6 py-3 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold rounded-lg transition-all">
@@ -321,14 +321,14 @@
                                         ratingText.textContent = ratingData.text;
                                         
                                         // Remove all color classes
-                                        ratingText.classList.remove('text-gray-400', 'text-red-600', 'text-orange-600', 'text-yellow-600', 'text-lime-600', 'text-green-600');
+                                        ratingText.classList.remove('text-slate-600', 'text-red-600', 'text-orange-600', 'text-yellow-600', 'text-lime-600', 'text-green-600');
                                         
                                         // Add new color class
                                         ratingText.classList.add(ratingData.color, 'font-semibold');
                                     } else if (!isHover) {
                                         ratingText.textContent = 'Pilih rating Anda';
                                         ratingText.classList.remove('text-red-600', 'text-orange-600', 'text-yellow-600', 'text-lime-600', 'text-green-600', 'font-semibold');
-                                        ratingText.classList.add('text-gray-400');
+                                        ratingText.classList.add('text-slate-600');
                                     }
                                 }
 
@@ -361,6 +361,19 @@
                                 });
                             });
                         </script>
+                    @elseif(!$userReview && !$hasApprovedBorrowing)
+                        <!-- Message for users who haven't borrowed the book -->
+                        <div class="mb-8 p-6 bg-amber-50 border-2 border-amber-200 rounded-xl">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                <div>
+                                    <h4 class="font-semibold text-amber-800 mb-1">Belum Bisa Memberikan Review</h4>
+                                    <p class="text-sm text-amber-700">Anda harus meminjam dan mendapatkan persetujuan untuk buku ini terlebih dahulu sebelum dapat memberikan review dan rating.</p>
+                                </div>
+                            </div>
+                        </div>
                        
                     @else
                         <!-- User's Review -->

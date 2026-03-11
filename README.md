@@ -1,124 +1,224 @@
-# E-SIPUS — Digital Library Management System
+# E-Sipus - Sistem Informasi Perpustakaan
 
-<div align="center">
+Aplikasi manajemen perpustakaan berbasis web menggunakan Laravel 12, Tailwind CSS, dan DaisyUI.
 
-<img src="public/assets/Logo_E-Sipus.png" width="160"/>
+## 📋 Persyaratan Sistem
 
-### Modern Web-Based Library Information System
+Sebelum memulai instalasi, pastikan sistem Anda memiliki:
 
-![Status](https://img.shields.io/badge/status-active-success?style=for-the-badge)
-![Version](https://img.shields.io/badge/version-1.0-blue?style=for-the-badge)
-![UI](https://img.shields.io/badge/ui-modern-black?style=for-the-badge)
-![Role](https://img.shields.io/badge/role-admin%20%7C%20petugas%20%7C%20user-orange?style=for-the-badge)
-![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
+- PHP >= 8.2
+- Composer
+- Node.js >= 18.x
+- NPM atau Yarn
+- MySQL/PostgreSQL/SQLite
+- Git
 
-Sistem Informasi Perpustakaan Digital dengan workflow peminjaman,
-approval system, dashboard statistik, dan role-based access.
+## 🚀 Instalasi
 
-</div>
+### 1. Clone Repository
 
----
+```bash
+git clone <repository-url>
+cd <project-folder>
+```
 
-# ✨ Overview
+### 2. Install Dependencies PHP
 
-E-SIPUS adalah aplikasi web sistem informasi perpustakaan digital  
-yang digunakan untuk mengelola buku, peminjaman, pengembalian,
-user, laporan, dan dashboard admin dalam satu sistem.
+```bash
+composer install
+```
 
-Fitur utama:
+Package PHP yang akan terinstall otomatis:
 
-- Role Based System
-- Approval Workflow
-- Soft Delete History
-- Dashboard Statistik
-- Modern UI
-- Print Bukti
-- Review Buku
-- Favorit Buku
+- **Laravel Framework** v12
+- **Laravel Breeze** - Authentication
+- **Laravel DomPDF** - Generate PDF (langsung siap pakai, tidak perlu build)
 
-Project ini dibuat sebagai sistem perpustakaan modern berbasis web.
+### 3. Konfigurasi Environment
 
----
+Salin file `.env.example` menjadi `.env`:
 
-# 🧑‍💻 Role Access
+```bash
+cp .env.example .env
+```
 
-| Role | Description |
-|------|------------|
-| 🔴 Admin | Full control |
-| 🟢 Petugas | Manage books |
-| 🔵 User | Borrow books |
+Kemudian edit file `.env` dan sesuaikan konfigurasi database:
 
----
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=nama_database
+DB_USERNAME=username_database
+DB_PASSWORD=password_database
+```
 
-# 🔴 Admin Features
+### 4. Generate Application Key
 
-- CRUD Buku
-- CRUD Kategori
-- Kelola User
-- Approve Peminjaman
-- Approve Pengembalian
-- Hapus permanen history
-- Laporan
-- Statistik dashboard
+```bash
+php artisan key:generate
+```
 
----
+### 5. Install Dependencies Node.js
 
-# 🟢 Petugas Features
+Install Tailwind CSS, DaisyUI, dan dependencies lainnya:
 
-- Tambah buku
-- Edit buku sendiri
-- Approve peminjaman buku sendiri
-- Approve pengembalian
-- Lihat peminjaman
-- Hide history
+```bash
+npm install
+```
 
----
+Package yang akan terinstall:
 
-# 🔵 User Features
+- **Tailwind CSS** v3.4.19 - Framework CSS utility-first
+- **DaisyUI** v5.5.18 - Component library untuk Tailwind CSS
+- **@tailwindcss/forms** - Plugin untuk styling form
+- **Alpine.js** - Framework JavaScript ringan
+- **Vite** - Build tool modern
 
-- Lihat buku
-- Pinjam buku
-- Return buku
-- History peminjaman
-- Hide history
-- Favorit buku
-- Review buku
-- Print bukti
+**Catatan:** Package ini perlu di-build/compile (lihat langkah 8)
+
+### 6. Jalankan Migrasi Database
+
+```bash
+php artisan migrate
+```
+
+Jika ingin mengisi data awal (seeder):
+
+```bash
+php artisan db:seed
+```
+
+### 7. Buat Storage Link
+
+```bash
+php artisan storage:link
+```
+
+### 8. Build Assets
+
+Untuk development:
+
+```bash
+npm run dev
+```
+
+Untuk production:
+
+```bash
+npm run build
+```
+
+## 🎨 Teknologi yang Digunakan
+
+### Backend
+
+- **Laravel 12** - PHP Framework
+- **Laravel Breeze** - Authentication scaffolding
+- **Laravel DomPDF** (barryvdh/laravel-dompdf) - Generate PDF
+
+### Frontend
+
+- **Tailwind CSS 3.4** - Utility-first CSS framework
+- **DaisyUI 5.5** - Tailwind CSS component library
+- **Alpine.js 3.4** - Lightweight JavaScript framework
+- **SweetAlert2** - Beautiful alert/modal library
+- **Vite** - Frontend build tool
+
+### Development Tools
+
+- **Laravel Pint** - Code style fixer
+- **Laravel Sail** - Docker development environment
+- **Pest PHP** - Testing framework
+
+## 🔧 Konfigurasi Tambahan
+
+### Tailwind CSS & DaisyUI
+
+Konfigurasi Tailwind sudah tersedia di `tailwind.config.js`. DaisyUI sudah terintegrasi sebagai plugin Tailwind.
+
+Untuk menggunakan tema DaisyUI, edit file `tailwind.config.js`:
+
+```javascript
+module.exports = {
+    plugins: [require("daisyui")],
+    daisyui: {
+        themes: ["light", "dark", "cupcake"],
+    },
+};
+```
+
+### Laravel DomPDF
+
+Package untuk generate PDF sudah terinstall. Untuk menggunakannya:
+
+```php
+use Barryvdh\DomPDF\Facade\Pdf;
+
+$pdf = Pdf::loadView('pdf.document', $data);
+return $pdf->download('document.pdf');
+```
+
+## 🏃 Menjalankan Aplikasi
+
+### Development
+
+Jalankan server development Laravel dan Vite secara bersamaan:
+
+```bash
+composer run dev
+```
+
+Atau jalankan secara terpisah:
+
+```bash
+# Terminal 1 - Laravel Server
+php artisan serve
+
+# Terminal 2 - Vite Dev Server
+npm run dev
+```
+
+### Production
+
+1. Build assets production:
+
+```bash
+npm run build
+```
+
+2. Optimize Laravel:
+
+```bash
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+## 🐛 Troubleshooting
+
+### Error: "No application encryption key has been specified"
+
+```bash
+php artisan key:generate
+```
+
+### Error: "Class 'Barryvdh\DomPDF\ServiceProvider' not found"
+
+```bash
+composer dump-autoload
+php artisan config:clear
+```
+
+### Tailwind CSS tidak ter-compile
+
+```bash
+npm run build
+php artisan view:clear
+```
 
 
----
 
-# 🔐 Security
+##  Developer
 
-- Role middleware
-- Auth login
-- Validation
-- Soft delete
-- Approval system
-
----
-
-# 📊 System Modules
-
-- Book Management
-- Borrowing System
-- Return System
-- User Management
-- Category Management
-- Dashboard
-- Report
-- Review
-- Favorite
-- Print Receipt
-
----
-
-# 👨‍💻 Author
-
-Yusuf
-
-GitHub  
-https://github.com/Yusuf2175
-
----
-
+Dikembangkan dengan ❤️ menggunakan Laravel & Tailwind CSS

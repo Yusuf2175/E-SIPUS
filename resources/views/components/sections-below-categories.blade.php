@@ -1,68 +1,128 @@
-  <!-- CATEGORIES -->
-    <section id="categories" class="py-16 lg:py-24 bg-slate-50/80">
-        <div class="max-w-6xl mx-auto px-6 md:px-10">
-            <div class="text-center mb-14 md:mb-20">
-                <h3 class="text-xl md:text-3xl font-extrabold tracking-wide text-slate-900 uppercase mb-4">Popular Categories</h3>
+
+<section id="libary" class="py-20 lg:py-32 bg-white" >
+    <div class="max-w-7xl mx-auto px-6 md:px-10">
+        <!-- Section Header -->
+        <div class="text-center mb-16">
+            <div class="inline-flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-full mb-6">
+                <span class="text-sm font-semibold text-purple-700">Library</span>
             </div>
-            <div class="relative">
-                <div class="absolute left-6 md:left-1/2 top-0 bottom-0 w-1 bg-ungu md:-translate-x-1/2 rounded-full"></div>
-
-                <div class="relative flex items-center  justify-between mb-14 md:mb-20 w-full">
-                    <div class="order-1 w-full md:w-5/12 md:text-left pl-20 md:pl-0 md:pr-16">
-                        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-purple-50 relative">
-                            <h4 class="text-xl font-bold text-slate-800 mb-2">Novel & Sastra</h4>
-                            <p class="text-sm text-slate-500 leading-relaxed">A collection of best-selling novels and classic literary works from renowned authors.</p>
-                            <div class="absolute top-6 right-6 w-8 h-8 bg-purple-50 rounded-full flex items-center justify-center text-ungu">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="absolute left-6 md:left-1/2 -translate-x-1/2 w-12 h-12 rounded-2xl bg-ungu z-10 flex items-center justify-center text-white font-bold text-lg">01</div>
-                    <div class="order-2 hidden md:block w-5/12"></div>
-                </div>
-
-                <div class="relative flex items-center justify-between mb-14 md:mb-20 w-full">
-                    <div class="order-1 hidden md:block w-5/12"></div>
-                    <div class="absolute left-6 md:left-1/2 -translate-x-1/2 w-12 h-12 rounded-2xl bg-secondrys z-10 flex items-center justify-center text-white font-bold text-lg">02</div>
-                    <div class="order-2 w-full md:w-5/12 pl-20 md:pl-16">
-                        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-green-50 relative">
-                            <h4 class="text-xl font-bold text-slate-800 mb-2">Sains & Teknologi</h4>
-                            <p class="text-sm text-slate-500 leading-relaxed">The latest books on natural science, computers, and technological innovations.</p>
-                            <div class="absolute top-6 right-6 w-8 h-8 bg-green-50 rounded-full flex items-center justify-center text-[#22C55E]">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="relative flex items-center justify-between mb-14 md:mb-20 w-full">
-                    <div class="order-1 w-full md:w-5/12 md:text-left pl-20 md:pl-0 md:pr-16">
-                        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-orange-50 relative">
-                            <h4 class="text-xl font-bold text-slate-800 mb-2">Bisnis & Ekonomi</h4>
-                            <p class="text-sm text-slate-500 leading-relaxed">A guide to global business, management, and economics.</p>
-                            <div class="absolute top-6 right-6 w-8 h-8 bg-orange-50 rounded-full flex items-center justify-center text-orange-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="absolute left-6 md:left-1/2 -translate-x-1/2 w-12 h-12 rounded-2xl bg-ungu z-10 flex items-center justify-center text-white font-bold text-lg">03</div>
-                    <div class="order-2 hidden md:block w-5/12"></div>
-                </div>
-
-                <div class="relative flex items-center justify-between w-full">
-                    <div class="order-1 hidden md:block w-5/12"></div>
-                    <div class="absolute left-6 md:left-1/2 -translate-x-1/2 w-12 h-12 rounded-2xl bg-secondrys z-10 flex items-center justify-center text-white font-bold text-lg">04</div>
-                    <div class="order-2 w-full md:w-5/12 pl-20 md:pl-16">
-                        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-blue-50 relative">
-                            <h4 class="text-xl font-bold text-slate-800 mb-2">Sejarah & Budaya</h4>
-                            <p class="text-sm text-slate-500 leading-relaxed">Exploring the past and various cultures of the world.</p>
-                            <div class="absolute top-6 right-6 w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-[#3B82F6]">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4">
+                Explore our 
+                <span class="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">curated collection</span>
+            </h2>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+                From bestsellers to timeless classics — discover your next great read.
+            </p>
         </div>
-    </section>
-   
+
+        @if($recommendedBooks->isEmpty())
+            <div class="text-center py-12">
+                <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+                <p class="text-slate-600">No books available yet</p>
+            </div>
+        @else
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @php
+                    $bookColors = [
+                        ['bg' => 'bg-gradient-to-br from-blue-400 to-blue-600', 'label' => 'bg-blue-500/90'],
+                        ['bg' => 'bg-gradient-to-br from-emerald-400 to-emerald-600', 'label' => 'bg-emerald-500/90'],
+                        ['bg' => 'bg-gradient-to-br from-orange-400 to-orange-600', 'label' => 'bg-orange-500/90'],
+                        ['bg' => 'bg-gradient-to-br from-purple-400 to-purple-600', 'label' => 'bg-purple-500/90'],
+                    ];
+                @endphp
+
+                @foreach($recommendedBooks->take(4) as $index => $book)
+                    @php
+                        $color = $bookColors[$index % 4];
+                    @endphp
+                    <a href="{{ auth()->check() ? route('books.show', $book) : route('login') }}" 
+                       class="group relative h-80 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                        <!-- Background with Book Cover or Gradient -->
+                        @if($book->cover_image)
+                            <div class="absolute inset-0">
+                                <img src="{{ asset('storage/' . $book->cover_image) }}" 
+                                     alt="{{ $book->title }}" 
+                                     class="w-full h-full object-cover">
+                                <!-- Dark Overlay -->
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20"></div>
+                            </div>
+                        @else
+                            <!-- Fallback Gradient Background -->
+                            <div class="{{ $color['bg'] }} absolute inset-0"></div>
+                            
+                            <!-- Decorative Pattern -->
+                            <div class="absolute inset-0 opacity-10">
+                                <div class="absolute top-0 right-0 w-40 h-40 bg-white rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                                <div class="absolute bottom-0 left-0 w-32 h-32 bg-white rounded-full translate-y-1/2 -translate-x-1/2"></div>
+                            </div>
+                        @endif
+
+                        <!-- Content -->
+                        <div class="relative h-full p-6 flex flex-col justify-end">
+                            <!-- Bottom Section -->
+                            <div class="text-white space-y-3">
+                                <!-- Book Title -->
+                                <h3 class="text-xl font-bold line-clamp-2 leading-tight">
+                                    {{ $book->title }}
+                                </h3>
+                                
+                                <!-- Author -->
+                                <p class="text-sm opacity-90 font-medium">
+                                    by {{ $book->author }}
+                                </p>
+                                
+                                <!-- Stats -->
+                                <div class="flex items-center gap-4 text-sm pt-2">
+                                    <div class="flex items-center gap-1.5">
+                                        <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                        </svg>
+                                        <span class="font-semibold">{{ $book->reviews_count }}</span>
+                                    </div>
+                                    @if($book->stock > 0)
+                                        <div class="flex items-center gap-1.5 text-green-400">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            <span class="font-semibold">Available</span>
+                                        </div>
+                                    @else
+                                        <div class="flex items-center gap-1.5 text-red-400">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                            <span class="font-semibold">Out of Stock</span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Hover Arrow -->
+                            <div class="absolute bottom-6 right-6 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+
+            <!-- View All Button -->
+            <div class="text-center mt-12">
+                <a href="{{ route('books.index') }}" 
+                   class="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white text-slate-700 text-base font-semibold border-2 border-slate-200 hover:border-purple-300 hover:bg-purple-50 transition-all duration-300">
+                    Browse All Books
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </a>
+            </div>
+        @endif
+    </div>
+</section>
+

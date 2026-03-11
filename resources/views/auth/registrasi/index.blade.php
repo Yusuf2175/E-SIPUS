@@ -8,8 +8,14 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-5xl">
+<body class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <!-- Background Image with Blur -->
+    <div class="absolute inset-0 z-0">
+        <img src="{{ asset('assets/background.png') }}" alt="Background" class="w-full h-full object-cover">
+        <div class="absolute inset-0 backdrop-blur-sm bg-black/20"></div>
+    </div>
+    
+    <div class="w-full max-w-5xl relative z-10">
         <!-- Main Card -->
         <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
             <div class="grid md:grid-cols-2">

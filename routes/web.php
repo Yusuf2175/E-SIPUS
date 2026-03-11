@@ -29,7 +29,6 @@ Route::get('/dashboard', function () {
 // User Dashboard Routes
 Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user.')->group(function () {
     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
-    Route::post('/request-role', [UserDashboardController::class, 'requestRole'])->name('request.role');
 });
 
 // Book Management Routes (Admin and Petugas only) - MUST BE BEFORE /books/{book}
@@ -74,6 +73,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     Route::patch('/borrowings/{borrowing}/return', [App\Http\Controllers\BorrowingController::class, 'return'])->name('borrowings.return');
     Route::get('/borrowings/{borrowing}', [App\Http\Controllers\BorrowingController::class, 'show'])->name('borrowings.show');
+    Route::get('/borrowings/{borrowing}/print', [App\Http\Controllers\BorrowingController::class, 'printReceipt'])->name('borrowings.print');
     
     // Collection routes
     Route::get('/collections', [App\Http\Controllers\CollectionController::class, 'index'])->name('collections.index');
@@ -91,6 +91,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified', 'role:petugas'])->prefix('petugas')->name('petugas.')->group(function () {
     Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [PetugasDashboardController::class, 'manageUsers'])->name('users');
+    Route::get('/users/list', [PetugasDashboardController::class, 'viewUsersList'])->name('users.list');
 });
 
 // Reports Routes (Petugas and Admin only)
@@ -99,7 +100,7 @@ Route::middleware(['auth', 'verified', 'role:petugas,admin'])->prefix('reports')
     Route::post('/borrowing', [App\Http\Controllers\ReportController::class, 'borrowingReport'])->name('borrowing');
     Route::post('/book', [App\Http\Controllers\ReportController::class, 'bookReport'])->name('book');
     Route::post('/user', [App\Http\Controllers\ReportController::class, 'userReport'])->name('user');
-    Route::post('/statistics', [App\Http\Controllers\ReportController::class, 'statisticsReport'])->name('statistics');
+    Route::post('/return', [App\Http\Controllers\ReportController::class, 'returnReport'])->name('return');
 });
 
 // Admin Dashboard Routes
@@ -108,6 +109,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/users', [AdminDashboardController::class, 'manageUsers'])->name('users');
     Route::patch('/users/{user}/role', [AdminDashboardController::class, 'updateUserRole'])->name('users.update.role');
     Route::delete('/users/{user}', [AdminDashboardController::class, 'destroyUser'])->name('users.destroy');
+    
+    // Petugas Management Routes
+    Route::get('/petugas', [App\Http\Controllers\PetugasController::class, 'index'])->name('petugas.index');
+    Route::post('/petugas', [App\Http\Controllers\PetugasController::class, 'store'])->name('petugas.store');
+    Route::put('/petugas/{petugas}', [App\Http\Controllers\PetugasController::class, 'update'])->name('petugas.update');
+    Route::delete('/petugas/{petugas}', [App\Http\Controllers\PetugasController::class, 'destroy'])->name('petugas.destroy');
 });
 
 Route::middleware('auth')->group(function () {

@@ -7,6 +7,7 @@ use App\Models\Borrowing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 class BorrowingController extends Controller
 {
@@ -352,5 +353,27 @@ class BorrowingController extends Controller
         $borrowing->delete();
 
         return redirect()->back()->with('success', "Borrowing record for '{$bookTitle}' has been permanently deleted!");
+    }
+
+    public function printReceipt(Borrowing $borrowing)
+    {
+        // Check if user has permission to view this receipt
+        $user = Auth::user();
+        
+        // User can only print their own receipt, or staff/admin can print any
+        if ($user->role === 'user' && $borrowing->user_id !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Load relationships
+        $borrowing->load(['user', 'book', 'approvedBy']);
+
+        // Generate PDF
+        $pdf = PDF::loadView('borrowings.pdf.receipt', compact('borrowing'));
+        $pdf->setPaper('a4', 'portrait');
+        
+        $filename = 'bukti-peminjaman-' . str_pad($borrowing->id, 6, '0', STR_PAD_LEFT) . '.pdf';
+        
+        return $pdf->download($filename);
     }
 }

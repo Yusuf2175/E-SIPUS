@@ -17,9 +17,13 @@ class AdminDashboardController extends Controller
             'total_admins' => User::where('role', 'admin')->count(),
             'total_petugas' => User::where('role', 'petugas')->count(),
             'total_regular_users' => User::where('role', 'user')->count(),
+            'total_categories' => \App\Models\Category::count(),
             'total_books' => \App\Models\Book::count(),
             'available_books' => \App\Models\Book::where('available_copies', '>', 0)->count(),
-            'active_borrowings' => \App\Models\Borrowing::where('status', 'borrowed')->count(),
+            'active_borrowings' => \App\Models\Borrowing::whereIn('status', ['approved', 'borrowed'])->count(), // Total active borrowings in system
+            'my_active_borrowings' => \App\Models\Borrowing::where('user_id', $user->id)
+                ->whereIn('status', ['approved', 'borrowed'])
+                ->count(), // My personal active borrowings
             'overdue_borrowings' => \App\Models\Borrowing::where('status', 'borrowed')
                 ->where('due_date', '<', \Carbon\Carbon::now()->toDateString())
                 ->count(),
@@ -34,9 +38,9 @@ class AdminDashboardController extends Controller
             ->latest()
             ->paginate(6);
         
-        // My active borrowings (for CTA)
+        // My active borrowings (for CTA) - count both approved and borrowed status
         $myActiveBorrowings = \App\Models\Borrowing::where('user_id', $user->id)
-            ->where('status', 'borrowed')
+            ->whereIn('status', ['approved', 'borrowed']) 
             ->count();
         
         return view('dashboards.admin', compact(
@@ -44,13 +48,16 @@ class AdminDashboardController extends Controller
             'stats',
             'recentUsers',
             'recentBorrowings',
-            'myActiveBorrowings'
+            'myActiveBorrowings',
         ));
     }
 
     public function manageUsers()
     {
-        $users = User::oldest()->paginate(10);
+        // Only show users with role 'user'
+        $users = User::where('role', 'user')
+            ->oldest()
+            ->paginate(10);
         
         return view('admin.users', compact('users'));
     }
