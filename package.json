@@ -5,7 +5,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "preinstall": "node preinstall.js"
+    "preinstall": "node preinstall.cjs"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.2",
