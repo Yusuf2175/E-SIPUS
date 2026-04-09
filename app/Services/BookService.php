@@ -13,18 +13,12 @@ class BookService
     /**
      * Get filtered and paginated books.
      */
-    public function getFilteredBooks(array $filters, int $perPage = 12, ?string $userProvince = null, array $nearbyProvinces = []): LengthAwarePaginator
+    public function getFilteredBooks(array $filters, int $perPage = 12): LengthAwarePaginator
     {
         $query = Book::with('addedBy');
 
         if (!empty($filters['category'])) {
             $query->where('category', $filters['category']);
-        }
-
-        // Filter region: jika 'all' atau kosong → tampilkan semua
-        $regionFilter = $filters['region'] ?? '';
-        if (!empty($regionFilter) && $regionFilter !== 'all') {
-            $query->where('region', $regionFilter);
         }
 
         if (!empty($filters['search'])) {
@@ -50,28 +44,7 @@ class BookService
             });
         }
 
-        // Sorting proximity — hanya aktif jika tidak ada filter region spesifik
-        if ($userProvince && (empty($regionFilter) || $regionFilter === 'all')) {
-            if (!empty($nearbyProvinces)) {
-                // Binding aman untuk IN clause
-                $placeholders = implode(',', array_fill(0, count($nearbyProvinces), '?'));
-                $query->orderByRaw(
-                    "CASE
-                        WHEN region = ? THEN 0
-                        WHEN region IN ({$placeholders}) THEN 1
-                        ELSE 2
-                    END",
-                    array_merge([$userProvince], $nearbyProvinces)
-                );
-            } else {
-                $query->orderByRaw('CASE WHEN region = ? THEN 0 ELSE 1 END', [$userProvince]);
-            }
-            $query->orderBy('created_at', 'desc');
-        } else {
-            $query->orderBy('created_at', 'desc');
-        }
-
-        return $query->paginate($perPage)->withQueryString();
+        return $query->orderBy('created_at', 'desc')->paginate($perPage)->withQueryString();
     }
 
     /**

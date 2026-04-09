@@ -6,39 +6,25 @@ use App\Models\Book;
 use App\Http\Requests\BookStoreRequest;
 use App\Http\Requests\BookUpdateRequest;
 use App\Services\BookService;
-use App\Services\LibraryLocationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
     protected $bookService;
-    protected $locationService;
 
-    public function __construct(BookService $bookService, LibraryLocationService $locationService)
+    public function __construct(BookService $bookService)
     {
-        $this->bookService     = $bookService;
-        $this->locationService = $locationService;
+        $this->bookService = $bookService;
     }
 
     public function index(Request $request)
     {
-        $filters         = $request->only(['category', 'search', 'available', 'added_by', 'region']);
-        $userProvince    = null;
-        $nearbyProvinces = [];
+        $filters    = $request->only(['category', 'search', 'available', 'added_by']);
+        $books      = $this->bookService->getFilteredBooks($filters, 12);
+        $categories = $this->bookService->getCategoryNames();
 
-        if (Auth::check()) {
-            $userProvince    = Auth::user()->province;
-            $nearbyProvinces = $userProvince
-                ? $this->locationService->getNeighborProvinces($userProvince)
-                : [];
-        }
-
-        $books        = $this->bookService->getFilteredBooks($filters, 12, $userProvince, $nearbyProvinces);
-        $categories   = $this->bookService->getCategoryNames();
-        $allProvinces = $this->locationService->getProvinces();
-
-        return view('books.index', compact('books', 'categories', 'userProvince', 'nearbyProvinces', 'allProvinces'));
+        return view('books.index', compact('books', 'categories'));
     }
 
     public function create()

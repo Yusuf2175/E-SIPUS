@@ -125,27 +125,6 @@
                             </span>
                         </div>
 
-                        {{-- Badge proximity --}}
-                        @if($userProvince && $book->region === $userProvince)
-                            <div class="absolute bottom-3 right-3">
-                                <span class="inline-flex items-center gap-1 px-2 py-1 bg-purple-600 text-white text-xs font-semibold rounded-full shadow">
-                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    Wilayah Anda
-                                </span>
-                            </div>
-                        @elseif($userProvince && in_array($book->region, $nearbyProvinces))
-                            <div class="absolute bottom-3 right-3">
-                                <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-500 text-white text-xs font-semibold rounded-full shadow">
-                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    Sekitar
-                                </span>
-                            </div>
-                        @endif
-
                         {{-- Edit/Delete (Admin & Petugas) --}}
                         @if(Auth::user()->isAdmin() || Auth::user()->isPetugas())
                             <div class="absolute top-3 left-3 flex gap-2">
@@ -186,16 +165,6 @@
                                 {{ $actualAvailableCopies }}/{{ $book->total_copies }} available
                             </span>
                         </div>
-
-                        @if($book->region)
-                            <div class="flex items-center gap-1 mb-3">
-                                <svg class="w-3 h-3 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                <span class="text-xs text-slate-500 truncate">{{ $book->region }}</span>
-                            </div>
-                        @endif
 
                         <a href="{{ route('books.show', $book) }}"
                            class="block w-full text-center px-4 py-2 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white text-sm font-semibold rounded-lg transition">
