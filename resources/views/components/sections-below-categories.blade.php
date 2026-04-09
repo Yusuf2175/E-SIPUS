@@ -83,7 +83,7 @@
                                         </svg>
                                         <span class="font-semibold">{{ $book->reviews_count }}</span>
                                     </div>
-                                    @if($book->stock > 0)
+                                    @if($book->getActualAvailableCopies() > 0)
                                         <div class="flex items-center gap-1.5 text-green-400">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>

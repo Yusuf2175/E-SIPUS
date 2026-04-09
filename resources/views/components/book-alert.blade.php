@@ -2,24 +2,28 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // Show success/error messages with SweetAlert
     @if(session('success'))
         Swal.fire({
             icon: 'success',
             title: 'Success!',
-            text: '{{ session('success') }}',
+            text: "{{ session('success') }}",
             confirmButtonColor: '#8b5cf6',
             confirmButtonText: 'OK',
             timer: 3000,
-            timerProgressBar: true
+            timerProgressBar: true,
+            showConfirmButton: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer);
+                toast.addEventListener('mouseleave', Swal.resumeTimer);
+            }
         });
     @endif
 
     @if(session('error'))
         Swal.fire({
             icon: 'error',
-            title: 'Error!',
-            text: '{{ session('error') }}',
+            title: 'Oops!',
+            text: "{{ session('error') }}",
             confirmButtonColor: '#ef4444',
             confirmButtonText: 'OK'
         });
@@ -29,7 +33,7 @@
         Swal.fire({
             icon: 'error',
             title: 'Validation Error!',
-            html: '<ul class="text-left">' +
+            html: '<ul class="text-left list-disc pl-4">' +
                 @foreach($errors->all() as $error)
                     '<li>{{ $error }}</li>' +
                 @endforeach

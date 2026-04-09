@@ -31,7 +31,11 @@ class BookService
         }
         
         if (!empty($filters['available']) && $filters['available'] == '1') {
-            $query->available();
+            $query->whereRaw('total_copies > (
+                SELECT COUNT(*) FROM borrowings 
+                WHERE borrowings.book_id = books.id 
+                AND borrowings.status IN (\'pending\', \'approved\', \'borrowed\', \'pending_return\')
+            )');
         }
         
         if (!empty($filters['added_by'])) {
