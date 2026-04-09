@@ -5,12 +5,16 @@ namespace App\Services;
 use App\Models\Book;
 use App\Models\Borrowing;
 use App\Models\User;
+use App\Services\RegionAccessService;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class BorrowingService
 {
+    public function __construct(
+        private RegionAccessService $regionAccessService
+    ) {}
     /**
      * Get filtered borrowings based on user role.
      */
@@ -99,6 +103,18 @@ class BorrowingService
     public function createBorrowingRequest(int $bookId, int $userId, ?string $notes = null): Borrowing
     {
         $book = Book::findOrFail($bookId);
+        $user = User::findOrFail($userId);
+
+        // Cek region access jika buku punya region
+        if ($book->region && $user->isUser()) {
+            $needsAccess = $this->regionAccessService->needsAccessRequest($user, $book->region);
+            if ($needsAccess) {
+                $hasAccess = $this->regionAccessService->hasApprovedAccess($userId, $book->region);
+                if (!$hasAccess) {
+                    throw new \Exception('region_access_required:' . $book->region);
+                }
+            }
+        }
 
         $this->validateNoDuplicateBorrowing($userId, $bookId);
         $this->validateBorrowingLimit($userId);

@@ -399,15 +399,137 @@
                                         @endfor
                                     </div>
                                 </div>
-                                <form action="{{ route('reviews.destroy', $userReview) }}" method="POST" onsubmit="return confirm('Hapus ulasan Anda?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-700 text-sm font-medium">Hapus</button>
-                                </form>
+                                {{-- Tombol Edit & Hapus --}}
+                                <div class="flex items-center gap-2">
+                                    <button type="button"
+                                            onclick="openEditReviewModal({{ $userReview->id }}, {{ $userReview->rating }}, {{ json_encode($userReview->review) }})"
+                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                        Edit
+                                    </button>
+                                    <form action="{{ route('reviews.destroy', $userReview) }}" method="POST"
+                                          onsubmit="return confirm('Hapus ulasan Anda?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                             <p class="text-slate-700">{{ $userReview->review }}</p>
-                            <p class="text-sm text-slate-500 mt-2">{{ $userReview->created_at->diffForHumans() }}</p>
+                            <p class="text-sm text-slate-500 mt-2">{{ $userReview->created_at->diffForHumans() }}
+                                @if($userReview->updated_at->gt($userReview->created_at))
+                                    <span class="text-xs text-purple-500 ml-1">(diedit)</span>
+                                @endif
+                            </p>
                         </div>
+
+                        {{-- Modal Edit Review --}}
+                        <div id="editReviewModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                            <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
+                                <div class="flex items-center justify-between mb-5">
+                                    <h3 class="text-lg font-bold text-slate-800">Edit Ulasan</h3>
+                                    <button onclick="closeEditReviewModal()" class="text-slate-400 hover:text-slate-600">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <form id="editReviewForm" method="POST">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="rating" id="editRatingInput">
+
+                                    {{-- Star Rating --}}
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">Rating</label>
+                                        <div class="flex gap-2" id="editStarRating">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <button type="button" class="edit-star-btn focus:outline-none transition-transform hover:scale-110" data-rating="{{ $i }}">
+                                                    <svg class="w-9 h-9 text-slate-300 transition-colors duration-200" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                    </svg>
+                                                </button>
+                                            @endfor
+                                        </div>
+                                        <p class="text-sm mt-1" id="editRatingText"></p>
+                                    </div>
+
+                                    {{-- Review Text --}}
+                                    <div class="mb-5">
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">Ulasan</label>
+                                        <textarea id="editReviewText" name="review" rows="4"
+                                                  class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-slate-700 resize-none"
+                                                  placeholder="Tulis ulasan Anda..." required></textarea>
+                                    </div>
+
+                                    <div class="flex gap-3">
+                                        <button type="button" onclick="closeEditReviewModal()"
+                                                class="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition">
+                                            Batal
+                                        </button>
+                                        <button type="submit"
+                                                class="flex-1 px-4 py-3 bg-gradient-to-r from-ungu to-secondrys hover:from-secondrys hover:to-ungu text-white font-semibold rounded-xl transition">
+                                            Simpan Perubahan
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <script>
+                        (function () {
+                            const ratingLabels = {
+                                1: { text: 'Sangat Buruk', color: 'text-red-600' },
+                                2: { text: 'Buruk',        color: 'text-orange-600' },
+                                3: { text: 'Cukup',        color: 'text-yellow-600' },
+                                4: { text: 'Bagus',        color: 'text-lime-600' },
+                                5: { text: 'Sangat Bagus', color: 'text-green-600' },
+                            };
+                            let editSelectedRating = 0;
+
+                            function updateEditStars(rating) {
+                                document.querySelectorAll('.edit-star-btn svg').forEach((svg, i) => {
+                                    svg.classList.toggle('text-yellow-400', i < rating);
+                                    svg.classList.toggle('text-slate-300',  i >= rating);
+                                });
+                                const txt = document.getElementById('editRatingText');
+                                txt.textContent  = rating ? ratingLabels[rating].text : '';
+                                txt.className    = 'text-sm mt-1 font-semibold ' + (rating ? ratingLabels[rating].color : '');
+                            }
+
+                            document.querySelectorAll('.edit-star-btn').forEach((btn, i) => {
+                                btn.addEventListener('click', () => {
+                                    editSelectedRating = i + 1;
+                                    document.getElementById('editRatingInput').value = editSelectedRating;
+                                    updateEditStars(editSelectedRating);
+                                });
+                                btn.addEventListener('mouseenter', () => updateEditStars(i + 1));
+                            });
+                            document.getElementById('editStarRating').addEventListener('mouseleave', () => updateEditStars(editSelectedRating));
+
+                            window.openEditReviewModal = function (id, rating, reviewText) {
+                                editSelectedRating = rating;
+                                document.getElementById('editRatingInput').value = rating;
+                                document.getElementById('editReviewText').value  = reviewText;
+                                document.getElementById('editReviewForm').action = `/reviews/${id}`;
+                                updateEditStars(rating);
+                                document.getElementById('editReviewModal').classList.remove('hidden');
+                            };
+
+                            window.closeEditReviewModal = function () {
+                                document.getElementById('editReviewModal').classList.add('hidden');
+                            };
+                        })();
+                        </script>
                     @endif
 
                     <!-- All Reviews -->

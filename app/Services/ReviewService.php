@@ -104,11 +104,11 @@ class ReviewService
     {
         $hasApprovedBorrowing = Borrowing::where('user_id', $userId)
             ->where('book_id', $bookId)
-            ->whereIn('status', ['approved', 'borrowed'])
+            ->whereIn('status', ['approved', 'borrowed', 'returned'])
             ->exists();
 
         if (!$hasApprovedBorrowing) {
-            throw new \Exception('Anda harus meminjam dan mendapatkan persetujuan untuk buku ini terlebih dahulu sebelum dapat memberikan review');
+            throw new \Exception('Anda harus meminjam buku ini terlebih dahulu sebelum dapat memberikan review');
         }
     }
 
@@ -166,7 +166,7 @@ class ReviewService
         // Check if has approved borrowing
         return Borrowing::where('user_id', $userId)
             ->where('book_id', $bookId)
-            ->whereIn('status', ['approved', 'borrowed'])
+            ->whereIn('status', ['approved', 'borrowed', 'returned'])
             ->exists();
     }
 

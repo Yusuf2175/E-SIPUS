@@ -85,50 +85,6 @@
                     @error('publisher')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
 
-                {{-- Region / Wilayah --}}
-                @if($lockedRegion)
-                    {{-- Petugas: region dikunci otomatis --}}
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Wilayah Buku</label>
-                        <div class="flex items-center gap-3 px-4 py-3 bg-purple-50 border border-purple-200 rounded-lg">
-                            <svg class="w-5 h-5 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                            <div>
-                                <p class="text-sm font-semibold text-purple-800">
-                                    {{ $lockedCity ? $lockedCity . ', ' : '' }}{{ $lockedRegion }}
-                                </p>
-                                <p class="text-xs text-purple-600">Wilayah otomatis sesuai lokasi akun Anda</p>
-                            </div>
-                            <svg class="w-4 h-4 text-purple-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                            </svg>
-                        </div>
-                        <input type="hidden" name="region" value="{{ $lockedRegion }}">
-                        <input type="hidden" name="city" value="{{ $lockedCity }}">
-                    </div>
-                @else
-                    {{-- Admin: bebas pilih region --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Provinsi</label>
-                        <select id="province_select"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-black">
-                            <option value="">-- Pilih Provinsi --</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Kabupaten / Kota</label>
-                        <select id="city_select" name="city" disabled
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-black disabled:bg-gray-100 disabled:cursor-not-allowed @error('city') border-red-500 @enderror">
-                            <option value="">-- Pilih Provinsi dulu --</option>
-                        </select>
-                        <input type="hidden" name="region" id="region_hidden" value="{{ old('region') }}">
-                        @error('city')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
-                    </div>
-                @endif
-
                 {{-- Published Year --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Published Year</label>
@@ -210,79 +166,6 @@
                 reader.readAsDataURL(file);
             }
         }
-
-        // Wilayah cascading — hanya untuk admin
-        @if(!$lockedRegion)
-        function toTitleCase(str) {
-            return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-        }
-
-        const provinceSelect = document.getElementById('province_select');
-        const citySelect     = document.getElementById('city_select');
-        const regionHidden   = document.getElementById('region_hidden');
-
-        const oldProvince = @json(old('region', ''));
-        const oldCity     = @json(old('city', ''));
-
-        async function loadProvinces() {
-            try {
-                const res  = await fetch('{{ route('wilayah.provinces') }}');
-                const data = await res.json();
-                data.forEach(p => {
-                    const opt = new Option(toTitleCase(p.name), p.id);
-                    opt.dataset.name = toTitleCase(p.name);
-                    provinceSelect.add(opt);
-                });
-                if (oldProvince) {
-                    const match = [...provinceSelect.options].find(o => o.dataset.name === oldProvince);
-                    if (match) {
-                        provinceSelect.value = match.value;
-                        await loadRegencies(match.value, oldCity);
-                    }
-                }
-            } catch (e) {
-                console.error('Gagal memuat provinsi', e);
-            }
-        }
-
-        async function loadRegencies(provinceId, restoreCity = '') {
-            citySelect.disabled = true;
-            citySelect.innerHTML = '<option value="">Memuat...</option>';
-            try {
-                const res  = await fetch(`{{ url('api/wilayah/regencies') }}/${provinceId}`);
-                const data = await res.json();
-                citySelect.innerHTML = '<option value="">-- Pilih Kabupaten/Kota --</option>';
-                data.forEach(r => {
-                    const opt = new Option(toTitleCase(r.name), toTitleCase(r.name));
-                    citySelect.add(opt);
-                });
-                citySelect.disabled = false;
-                if (restoreCity) citySelect.value = restoreCity;
-                updateRegionHidden();
-            } catch (e) {
-                citySelect.innerHTML = '<option value="">Gagal memuat data</option>';
-            }
-        }
-
-        function updateRegionHidden() {
-            const provOpt = provinceSelect.options[provinceSelect.selectedIndex];
-            regionHidden.value = provOpt && provOpt.dataset.name ? provOpt.dataset.name : '';
-        }
-
-        provinceSelect.addEventListener('change', function () {
-            if (this.value) {
-                loadRegencies(this.value);
-            } else {
-                citySelect.disabled = true;
-                citySelect.innerHTML = '<option value="">-- Pilih Provinsi dulu --</option>';
-                regionHidden.value = '';
-            }
-        });
-
-        citySelect.addEventListener('change', updateRegionHidden);
-
-        loadProvinces();
-        @endif
     </script>
 
 @endsection

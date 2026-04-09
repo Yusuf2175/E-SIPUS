@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileService
 {
@@ -12,13 +13,37 @@ class ProfileService
      */
     public function updateProfile(User $user, array $data): User
     {
+        // Handle avatar upload
+        if (isset($data['avatar']) && $data['avatar'] instanceof \Illuminate\Http\UploadedFile) {
+            // Hapus avatar lama
+            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $data['avatar'] = $data['avatar']->store('avatars', 'public');
+        } else {
+            unset($data['avatar']); // jangan overwrite jika tidak ada upload baru
+        }
+
         $user->fill($data);
 
-        // Reset email verification if email changed
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
 
+        $user->save();
+
+        return $user->fresh();
+    }
+
+    /**
+     * Hapus avatar user, kembali ke default.
+     */
+    public function removeAvatar(User $user): User
+    {
+        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+        $user->avatar = null;
         $user->save();
 
         return $user->fresh();

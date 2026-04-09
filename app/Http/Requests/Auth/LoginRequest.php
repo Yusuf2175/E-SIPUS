@@ -49,6 +49,25 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Cek account_status setelah berhasil authenticate
+        $user = Auth::user();
+
+        if ($user->account_status === 'pending') {
+            Auth::logout();
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'email' => 'Your account is awaiting approval from admin/staff. Please wait.',
+            ]);
+        }
+
+        if ($user->account_status === 'rejected') {
+            Auth::logout();
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'email' => 'Your account registration has been rejected. ' . ($user->rejection_reason ? 'Reason: ' . $user->rejection_reason : 'Please contact admin for more information.'),
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

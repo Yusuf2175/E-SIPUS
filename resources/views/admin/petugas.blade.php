@@ -161,29 +161,59 @@
             <div class="px-6 py-4 border-b border-slate-200">
                 <h3 class="text-xl font-bold text-slate-800">Add New Staff</h3>
             </div>
-            <form action="{{ route('admin.petugas.store') }}" method="POST" class="p-6 space-y-4">
+
+            {{-- Form asli hanya berisi hidden inputs — Chrome tidak bisa autofill --}}
+            <form id="addForm" action="{{ route('admin.petugas.store') }}" method="POST">
                 @csrf
+                <input type="hidden" id="add_real_name"     name="name">
+                <input type="hidden" id="add_real_email"    name="email">
+                <input type="hidden" id="add_real_password" name="password">
+            </form>
+
+            {{-- Field visible di luar form --}}
+            <div class="p-6 space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
-                    <input type="text" name="name" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                    <input id="add_vis_name" type="text"
+                           autocomplete="off"
+                           class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-slate-900">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
-                    <input type="email" name="email" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                    <input id="add_vis_email" type="text"
+                           autocomplete="off" readonly onfocus="this.removeAttribute('readonly')"
+                           class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-slate-900">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Password</label>
-                    <input type="password" name="password" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                    <div class="relative">
+                        <input id="add_vis_password" type="text"
+                               autocomplete="off"
+                               style="-webkit-text-security:disc"
+                               class="w-full px-4 pr-12 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-slate-900">
+                        <button type="button" onclick="toggleAddPwd()"
+                                class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600">
+                            <svg id="add_eye_on" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            <svg id="add_eye_off" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="flex gap-3 pt-4">
-                    <button type="button" onclick="closeAddModal()" class="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition">
+                    <button type="button" onclick="closeAddModal()"
+                            class="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition">
                         Cancel
                     </button>
-                    <button type="submit" class="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-lg transition">
+                    <button type="button" onclick="submitAddForm()"
+                            class="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-lg transition">
                         Add Staff
                     </button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -193,30 +223,60 @@
             <div class="px-6 py-4 border-b border-slate-200">
                 <h3 class="text-xl font-bold text-slate-800">Edit Staff</h3>
             </div>
-            <form id="editForm" method="POST" class="p-6 space-y-4">
+
+            {{-- Form asli hanya berisi hidden inputs --}}
+            <form id="editForm" method="POST">
                 @csrf
                 @method('PUT')
+                <input type="hidden" id="edit_real_name"     name="name">
+                <input type="hidden" id="edit_real_email"    name="email">
+                <input type="hidden" id="edit_real_password" name="password">
+            </form>
+
+            {{-- Field visible di luar form --}}
+            <div class="p-6 space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
-                    <input type="text" id="editName" name="name" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                    <input id="edit_vis_name" type="text"
+                           autocomplete="off"
+                           class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-slate-900">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
-                    <input type="email" id="editEmail" name="email" required class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                    <input id="edit_vis_email" type="text"
+                           autocomplete="off" readonly onfocus="this.removeAttribute('readonly')"
+                           class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-slate-900">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">New Password (leave blank to keep current)</label>
-                    <input type="password" name="password" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">New Password <span class="text-slate-400 font-normal">(kosongkan jika tidak diubah)</span></label>
+                    <div class="relative">
+                        <input id="edit_vis_password" type="text"
+                               autocomplete="off"
+                               style="-webkit-text-security:disc"
+                               class="w-full px-4 pr-12 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-slate-900">
+                        <button type="button" onclick="toggleEditPwd()"
+                                class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600">
+                            <svg id="edit_eye_on" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            <svg id="edit_eye_off" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="flex gap-3 pt-4">
-                    <button type="button" onclick="closeEditModal()" class="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition">
+                    <button type="button" onclick="closeEditModal()"
+                            class="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition">
                         Cancel
                     </button>
-                    <button type="submit" class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:shadow-lg transition">
+                    <button type="button" onclick="submitEditForm()"
+                            class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:shadow-lg transition">
                         Update Staff
                     </button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -261,22 +321,74 @@
         });
 
         function openAddModal() {
+            // Reset semua field visible saat modal dibuka
+            document.getElementById('add_vis_name').value     = '';
+            document.getElementById('add_vis_email').value    = '';
+            document.getElementById('add_vis_password').value = '';
             document.getElementById('addModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('add_vis_name').focus(), 100);
         }
 
         function closeAddModal() {
             document.getElementById('addModal').classList.add('hidden');
         }
 
+        function submitAddForm() {
+            const name  = document.getElementById('add_vis_name').value.trim();
+            const email = document.getElementById('add_vis_email').value.trim();
+            const pwd   = document.getElementById('add_vis_password').value;
+            if (!name || !email || !pwd) {
+                alert('Semua field wajib diisi.');
+                return;
+            }
+            document.getElementById('add_real_name').value     = name;
+            document.getElementById('add_real_email').value    = email;
+            document.getElementById('add_real_password').value = pwd;
+            document.getElementById('addForm').submit();
+        }
+
+        let addShowPwd = false;
+        function toggleAddPwd() {
+            addShowPwd = !addShowPwd;
+            const el = document.getElementById('add_vis_password');
+            el.style.webkitTextSecurity = addShowPwd ? 'none' : 'disc';
+            document.getElementById('add_eye_on').classList.toggle('hidden', addShowPwd);
+            document.getElementById('add_eye_off').classList.toggle('hidden', !addShowPwd);
+        }
+
         function openEditModal(id, name, email) {
             document.getElementById('editForm').action = `/admin/petugas/${id}`;
-            document.getElementById('editName').value = name;
-            document.getElementById('editEmail').value = email;
+            document.getElementById('edit_vis_name').value     = name;
+            document.getElementById('edit_vis_email').value    = email;
+            document.getElementById('edit_vis_password').value = '';
             document.getElementById('editModal').classList.remove('hidden');
         }
 
         function closeEditModal() {
             document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function submitEditForm() {
+            const name  = document.getElementById('edit_vis_name').value.trim();
+            const email = document.getElementById('edit_vis_email').value.trim();
+            const pwd   = document.getElementById('edit_vis_password').value;
+            if (!name || !email) {
+                alert('Nama dan email wajib diisi.');
+                return;
+            }
+            document.getElementById('edit_real_name').value     = name;
+            document.getElementById('edit_real_email').value    = email;
+            document.getElementById('edit_real_password').value = pwd; // boleh kosong
+            document.getElementById('editForm').submit();
+        }
+
+        let editShowPwd = false;
+        function toggleEditPwd() {
+            editShowPwd = !editShowPwd;
+            const el = document.getElementById('edit_vis_password');
+            el.style.webkitTextSecurity = editShowPwd ? 'none' : 'disc';
+            document.getElementById('edit_eye_on').classList.toggle('hidden', editShowPwd);
+            document.getElementById('edit_eye_off').classList.toggle('hidden', !editShowPwd);
         }
 
         function confirmDelete(id, name) {

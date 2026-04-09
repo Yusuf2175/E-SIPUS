@@ -18,12 +18,15 @@ class RegisteredUserController extends Controller
      */
     public function create()
     {
-        // Jika sudah login, redirect ke dashboard
         if (Auth::check()) {
             return redirect()->route('dashboard');
         }
-        
         return view('auth.registrasi.index');
+    }
+
+    public function pending()
+    {
+        return view('auth.registrasi.pending');
     }
 
     /**
@@ -43,20 +46,20 @@ class RegisteredUserController extends Controller
         ]);
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'role'     => 'user',
-            'address'  => $request->address,
-            'province' => $request->province,
-            'city'     => $request->city,
+            'name'           => $request->name,
+            'email'          => $request->email,
+            'password'       => Hash::make($request->password),
+            'role'           => 'user',
+            'account_status' => 'pending',   // menunggu persetujuan
+            'address'        => $request->address,
+            'province'       => $request->province,
+            'city'           => $request->city,
         ]);
 
         event(new Registered($user));
 
-        Auth::login($user);
-
-        // Redirect to user dashboard
-        return redirect()->route('user.dashboard');
+        // Jangan login otomatis — arahkan ke halaman pending
+        return redirect()->route('register.pending')
+            ->with('pending_email', $request->email);
     }
 }

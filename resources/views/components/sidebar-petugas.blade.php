@@ -34,6 +34,19 @@
                 </svg>
                 <span>View Users</span>
             </a>
+
+            <a href="{{ route('user-approvals.index') }}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 {{ request()->routeIs('user-approvals.*') ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="flex items-center gap-2">
+                    User Approvals
+                    @php $pendingCount = \App\Models\User::where('role','user')->where('account_status','pending')->count(); @endphp
+                    @if($pendingCount > 0)
+                        <span class="px-1.5 py-0.5 text-xs font-bold bg-yellow-400 text-white rounded-full">{{ $pendingCount }}</span>
+                    @endif
+                </span>
+            </a>
             
             <a href="{{ route('petugas.users') }}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 {{ request()->routeIs('petugas.users') ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50' }}">
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,9 +157,9 @@
     <!-- User Profile Footer -->
     <div class="absolute bottom-0 left-0 right-0 p-4 border-t radius-cs border-r-2 border-gray-200 bg-white">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-            </div>
+            <img src="{{ Auth::user()->avatarUrl() }}"
+                 alt="{{ Auth::user()->name }}"
+                 class="w-10 h-10 rounded-full object-cover flex-shrink-0">
             <div class="flex-1 min-w-0">
                 <p class="text-sm font-semibold text-gray-800 truncate">{{ Auth::user()->name }}</p>
                 <p class="text-xs text-gray-500">{{ ucfirst(Auth::user()->role) }}</p>

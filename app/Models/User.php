@@ -23,9 +23,12 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'account_status',
+        'rejection_reason',
         'address',
         'province',
         'city',
+        'avatar',
     ];
 
     /**
@@ -51,20 +54,24 @@ class User extends Authenticatable
         ];
     }
 
-    // Role methods
-    public function isAdmin()
-    {
-        return $this->role === 'admin';
-    }
+    public function isAdmin(): bool    { return $this->role === 'admin'; }
+    public function isPetugas(): bool  { return $this->role === 'petugas'; }
+    public function isUser(): bool     { return $this->role === 'user'; }
 
-    public function isPetugas()
-    {
-        return $this->role === 'petugas';
-    }
+    public function isPending(): bool  { return $this->account_status === 'pending'; }
+    public function isApproved(): bool { return $this->account_status === 'approved'; }
+    public function isRejected(): bool { return $this->account_status === 'rejected'; }
 
-    public function isUser()
+    /**
+     * URL avatar — pakai foto upload jika ada, fallback ke inisial via UI Avatars.
+     */
+    public function avatarUrl(): string
     {
-        return $this->role === 'user';
+        if ($this->avatar) {
+            return asset('storage/' . $this->avatar);
+        }
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name)
+             . '&background=7c3aed&color=fff&size=128&bold=true&rounded=true';
     }
 
     // Relationship with role requests

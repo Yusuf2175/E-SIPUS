@@ -63,6 +63,16 @@ class BorrowingController extends Controller
             return redirect()->route('books.show', $borrowing->book)
                 ->with('success', 'Borrowing request submitted successfully! Please wait for admin/staff approval.');
         } catch (\Exception $e) {
+            // Redirect ke form request akses wilayah
+            if (str_starts_with($e->getMessage(), 'region_access_required:')) {
+                $region   = substr($e->getMessage(), strlen('region_access_required:'));
+                $book     = \App\Models\Book::find($request->book_id);
+                $bookSlug = $book?->slug ?? '';
+                return redirect()->route('region-access.create', [
+                    'region' => $region,
+                    'book'   => $bookSlug,
+                ])->with('info', 'Buku ini berasal dari wilayah ' . $region . '. Anda perlu mengajukan permintaan akses terlebih dahulu.');
+            }
             return redirect()->back()->with('error', $e->getMessage());
         }
     }

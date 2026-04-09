@@ -14,7 +14,11 @@ Route::prefix('api/wilayah')->name('wilayah.')->group(function () {
     Route::get('/regencies/{provinceId}', [WilayahController::class, 'regencies'])->name('regencies');
 });
 
-Route::get('/', [LandingController::class, 'index'])->name('landingPage');  
+Route::get('/', [LandingController::class, 'index'])->name('landingPage');
+
+// Halaman pending setelah register
+Route::get('/register/pending', [App\Http\Controllers\Auth\RegisteredUserController::class, 'pending'])
+    ->name('register.pending');
 
 // Redirect to role-based dashboard
 Route::get('/dashboard', function () {
@@ -60,6 +64,10 @@ Route::middleware(['auth', 'verified', 'role:admin,petugas'])->group(function ()
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/books', [App\Http\Controllers\BookController::class, 'index'])->name('books.index');
     Route::get('/books/{book}', [App\Http\Controllers\BookController::class, 'show'])->name('books.show');
+
+    // Region Access Request (user)
+    Route::get('/region-access/request', [App\Http\Controllers\RegionAccessController::class, 'create'])->name('region-access.create');
+    Route::post('/region-access/request', [App\Http\Controllers\RegionAccessController::class, 'store'])->name('region-access.store');
     
     // Borrowing routes
     Route::get('/borrowings', [App\Http\Controllers\BorrowingController::class, 'index'])->name('borrowings.index');
@@ -116,7 +124,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/users', [AdminDashboardController::class, 'manageUsers'])->name('users');
     Route::patch('/users/{user}/role', [AdminDashboardController::class, 'updateUserRole'])->name('users.update.role');
     Route::delete('/users/{user}', [AdminDashboardController::class, 'destroyUser'])->name('users.destroy');
-    
+
     // Petugas Management Routes
     Route::get('/petugas', [App\Http\Controllers\PetugasController::class, 'index'])->name('petugas.index');
     Route::post('/petugas', [App\Http\Controllers\PetugasController::class, 'store'])->name('petugas.store');
@@ -124,10 +132,25 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::delete('/petugas/{petugas}', [App\Http\Controllers\PetugasController::class, 'destroy'])->name('petugas.destroy');
 });
 
+// User Approval (Admin & Petugas)
+Route::middleware(['auth', 'verified', 'role:admin,petugas'])->prefix('user-approvals')->name('user-approvals.')->group(function () {
+    Route::get('/', [App\Http\Controllers\UserApprovalController::class, 'index'])->name('index');
+    Route::patch('/{user}/approve', [App\Http\Controllers\UserApprovalController::class, 'approve'])->name('approve');
+    Route::patch('/{user}/reject', [App\Http\Controllers\UserApprovalController::class, 'reject'])->name('reject');
+});
+
+// Region Access Management (Admin & Petugas)
+Route::middleware(['auth', 'verified', 'role:admin,petugas'])->prefix('region-access')->name('region-access.')->group(function () {
+    Route::get('/', [App\Http\Controllers\RegionAccessController::class, 'index'])->name('index');
+    Route::patch('/{regionAccess}/approve', [App\Http\Controllers\RegionAccessController::class, 'approve'])->name('approve');
+    Route::patch('/{regionAccess}/reject', [App\Http\Controllers\RegionAccessController::class, 'reject'])->name('reject');
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::delete('/profile/avatar', [ProfileController::class, 'removeAvatar'])->name('profile.avatar.remove');
 });
 
 require __DIR__.'/auth.php';

@@ -93,9 +93,9 @@
     <!-- User Profile Footer -->
     <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-r-2 radius-cs border-gray-200 bg-white">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-            </div>
+            <img src="{{ Auth::user()->avatarUrl() }}"
+                 alt="{{ Auth::user()->name }}"
+                 class="w-10 h-10 rounded-full object-cover flex-shrink-0">
             <div class="flex-1 min-w-0">
                 <p class="text-sm font-semibold text-gray-800 truncate">{{ Auth::user()->name }}</p>
                 <p class="text-xs text-gray-500">{{ ucfirst(Auth::user()->role) }}</p>

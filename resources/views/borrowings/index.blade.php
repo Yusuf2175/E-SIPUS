@@ -429,6 +429,33 @@
                                     </button>
                                 @endif
 
+                                @if($borrowing->status === 'returned')
+                                    @php
+                                        $existingReview = \App\Models\Review::where('user_id', Auth::id())
+                                            ->where('book_id', $borrowing->book_id)
+                                            ->first();
+                                    @endphp
+                                    @if($existingReview)
+                                        {{-- Sudah ada ulasan — tombol Edit --}}
+                                        <button onclick="openEditReviewModal({{ $existingReview->id }}, {{ $existingReview->rating }}, {{ json_encode($existingReview->review) }}, '{{ addslashes($borrowing->book->title) }}')"
+                                                class="inline-flex items-center px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all shadow-md">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                            Edit Ulasan
+                                        </button>
+                                    @else
+                                        {{-- Belum ada ulasan — tombol Tulis --}}
+                                        <button onclick="openWriteReviewModal({{ $borrowing->book_id }}, '{{ addslashes($borrowing->book->title) }}')"
+                                                class="inline-flex items-center px-4 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-xl transition-all shadow-md">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                            </svg>
+                                            Tulis Ulasan
+                                        </button>
+                                    @endif
+                                @endif
+
                                 @if($borrowing->status === 'returned' && $borrowing->user_id === Auth::id())
                                     <button onclick="confirmDeleteHistory({{ $borrowing->id }}, '{{ $borrowing->book->title }}')" class="inline-flex items-center px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl transition-all shadow-md">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -460,5 +487,212 @@
         @endif
 
 <x-borrowing-alert />
+
+{{-- ===== Modal: Tulis Ulasan Baru ===== --}}
+<div id="writeReviewModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
+        <div class="flex items-center justify-between mb-5">
+            <div>
+                <h3 class="text-lg font-bold text-slate-800">Tulis Ulasan</h3>
+                <p id="writeReviewBookTitle" class="text-sm text-slate-500 mt-0.5"></p>
+            </div>
+            <button onclick="closeWriteReviewModal()" class="text-slate-400 hover:text-slate-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <form id="writeReviewForm" action="{{ route('reviews.store') }}" method="POST">
+            @csrf
+            <input type="hidden" name="book_id" id="writeReviewBookId">
+            <input type="hidden" name="rating"  id="writeRatingInput">
+
+            {{-- Star Rating --}}
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-slate-700 mb-2">Rating <span class="text-red-500">*</span></label>
+                <div class="flex gap-2" id="writeStarRating">
+                    @for($i = 1; $i <= 5; $i++)
+                        <button type="button" class="write-star-btn focus:outline-none transition-transform hover:scale-110" data-rating="{{ $i }}">
+                            <svg class="w-9 h-9 text-slate-300 transition-colors duration-200" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                        </button>
+                    @endfor
+                </div>
+                <p class="text-sm mt-1 h-5" id="writeRatingText"></p>
+            </div>
+
+            {{-- Review Text --}}
+            <div class="mb-5">
+                <label class="block text-sm font-medium text-slate-700 mb-2">Ulasan <span class="text-red-500">*</span></label>
+                <textarea name="review" id="writeReviewText" rows="4"
+                          class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-slate-700 resize-none"
+                          placeholder="Bagikan pengalaman Anda tentang buku ini..." required></textarea>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="button" onclick="closeWriteReviewModal()"
+                        class="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition">
+                    Batal
+                </button>
+                <button type="submit"
+                        class="flex-1 px-4 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold rounded-xl transition shadow-md">
+                    Kirim Ulasan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- ===== Modal: Edit Ulasan ===== --}}
+<div id="editReviewModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
+        <div class="flex items-center justify-between mb-5">
+            <div>
+                <h3 class="text-lg font-bold text-slate-800">Edit Ulasan</h3>
+                <p id="editReviewBookTitle" class="text-sm text-slate-500 mt-0.5"></p>
+            </div>
+            <button onclick="closeEditReviewModal()" class="text-slate-400 hover:text-slate-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <form id="editReviewForm" method="POST">
+            @csrf
+            @method('PATCH')
+            <input type="hidden" name="rating" id="editRatingInput">
+
+            {{-- Star Rating --}}
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-slate-700 mb-2">Rating <span class="text-red-500">*</span></label>
+                <div class="flex gap-2" id="editStarRating">
+                    @for($i = 1; $i <= 5; $i++)
+                        <button type="button" class="edit-star-btn focus:outline-none transition-transform hover:scale-110" data-rating="{{ $i }}">
+                            <svg class="w-9 h-9 text-slate-300 transition-colors duration-200" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                        </button>
+                    @endfor
+                </div>
+                <p class="text-sm mt-1 h-5" id="editRatingText"></p>
+            </div>
+
+            {{-- Review Text --}}
+            <div class="mb-5">
+                <label class="block text-sm font-medium text-slate-700 mb-2">Ulasan <span class="text-red-500">*</span></label>
+                <textarea name="review" id="editReviewText" rows="4"
+                          class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-slate-700 resize-none"
+                          required></textarea>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="button" onclick="closeEditReviewModal()"
+                        class="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition">
+                    Batal
+                </button>
+                <button type="submit"
+                        class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-semibold rounded-xl transition shadow-md">
+                    Simpan Perubahan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+(function () {
+    const ratingLabels = {
+        1: { text: 'Sangat Buruk', color: 'text-red-600' },
+        2: { text: 'Buruk',        color: 'text-orange-600' },
+        3: { text: 'Cukup',        color: 'text-yellow-600' },
+        4: { text: 'Bagus',        color: 'text-lime-600' },
+        5: { text: 'Sangat Bagus', color: 'text-green-600' },
+    };
+
+    // ---- Write Review ----
+    let writeRating = 0;
+
+    function updateWriteStars(r) {
+        document.querySelectorAll('.write-star-btn svg').forEach((svg, i) => {
+            svg.classList.toggle('text-yellow-400', i < r);
+            svg.classList.toggle('text-slate-300',  i >= r);
+        });
+        const txt = document.getElementById('writeRatingText');
+        txt.textContent = r ? ratingLabels[r].text : '';
+        txt.className   = 'text-sm mt-1 h-5 font-semibold ' + (r ? ratingLabels[r].color : '');
+    }
+
+    document.querySelectorAll('.write-star-btn').forEach((btn, i) => {
+        btn.addEventListener('click', () => {
+            writeRating = i + 1;
+            document.getElementById('writeRatingInput').value = writeRating;
+            updateWriteStars(writeRating);
+        });
+        btn.addEventListener('mouseenter', () => updateWriteStars(i + 1));
+    });
+    document.getElementById('writeStarRating').addEventListener('mouseleave', () => updateWriteStars(writeRating));
+
+    document.getElementById('writeReviewForm').addEventListener('submit', function (e) {
+        if (!document.getElementById('writeRatingInput').value) {
+            e.preventDefault();
+            alert('Silakan pilih rating terlebih dahulu!');
+        }
+    });
+
+    window.openWriteReviewModal = function (bookId, bookTitle) {
+        writeRating = 0;
+        document.getElementById('writeRatingInput').value = '';
+        document.getElementById('writeReviewText').value  = '';
+        document.getElementById('writeReviewBookId').value = bookId;
+        document.getElementById('writeReviewBookTitle').textContent = bookTitle;
+        updateWriteStars(0);
+        document.getElementById('writeReviewModal').classList.remove('hidden');
+    };
+
+    window.closeWriteReviewModal = function () {
+        document.getElementById('writeReviewModal').classList.add('hidden');
+    };
+
+    // ---- Edit Review ----
+    let editRating = 0;
+
+    function updateEditStars(r) {
+        document.querySelectorAll('.edit-star-btn svg').forEach((svg, i) => {
+            svg.classList.toggle('text-yellow-400', i < r);
+            svg.classList.toggle('text-slate-300',  i >= r);
+        });
+        const txt = document.getElementById('editRatingText');
+        txt.textContent = r ? ratingLabels[r].text : '';
+        txt.className   = 'text-sm mt-1 h-5 font-semibold ' + (r ? ratingLabels[r].color : '');
+    }
+
+    document.querySelectorAll('.edit-star-btn').forEach((btn, i) => {
+        btn.addEventListener('click', () => {
+            editRating = i + 1;
+            document.getElementById('editRatingInput').value = editRating;
+            updateEditStars(editRating);
+        });
+        btn.addEventListener('mouseenter', () => updateEditStars(i + 1));
+    });
+    document.getElementById('editStarRating').addEventListener('mouseleave', () => updateEditStars(editRating));
+
+    window.openEditReviewModal = function (id, rating, reviewText, bookTitle) {
+        editRating = rating;
+        document.getElementById('editRatingInput').value = rating;
+        document.getElementById('editReviewText').value  = reviewText;
+        document.getElementById('editReviewBookTitle').textContent = bookTitle;
+        document.getElementById('editReviewForm').action = `/reviews/${id}`;
+        updateEditStars(rating);
+        document.getElementById('editReviewModal').classList.remove('hidden');
+    };
+
+    window.closeEditReviewModal = function () {
+        document.getElementById('editReviewModal').classList.add('hidden');
+    };
+})();
+</script>
 
 @endsection

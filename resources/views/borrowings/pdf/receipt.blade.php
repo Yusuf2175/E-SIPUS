@@ -2,7 +2,12 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Bukti Peminjaman #{{ str_pad($borrowing->id, 6, '0', STR_PAD_LEFT) }}</title>
+    @php
+        $isReturned  = $borrowing->status === 'returned';
+        $docType     = $isReturned ? 'Pengembalian' : 'Peminjaman';
+        $docNumber   = str_pad($borrowing->id, 6, '0', STR_PAD_LEFT);
+    @endphp
+    <title>Bukti {{ $docType }} #{{ $docNumber }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -107,6 +112,10 @@
             background: #dbeafe;
             color: #1e40af;
         }
+        .status-pending-return {
+            background: #fef3c7;
+            color: #92400e;
+        }
         .footer {
             margin-top: 40px;
             text-align: center;
@@ -121,17 +130,17 @@
     <!-- Header -->
     <div class="header">
         <h1>e-SIPUS</h1>
-        <h2>Bukti Peminjaman Buku</h2>
+        <h2>Bukti {{ $docType }} Buku</h2>
     </div>
 
     <!-- Receipt Number -->
     <div class="receipt-number">
-        <strong>No. Peminjaman:</strong> #{{ str_pad($borrowing->id, 6, '0', STR_PAD_LEFT) }}
+        <strong>No. {{ $docType }}:</strong> #{{ $docNumber }}
     </div>
 
     <!-- Borrower Information -->
     <div class="section">
-        <div class="section-title">Informasi Peminjam</div>
+        <div class="section-title">Informasi {{ $isReturned ? 'Pengembalian' : 'Peminjam' }}</div>
         <div class="info-grid">
             <div class="info-row">
                 <div class="info-label">Nama Peminjam</div>
@@ -172,7 +181,7 @@
 
     <!-- Borrowing Details -->
     <div class="section">
-        <div class="section-title">Detail Peminjaman</div>
+        <div class="section-title">Detail {{ $docType }}</div>
         <div class="info-grid">
             <div class="info-row">
                 <div class="info-label">Tanggal Pinjam</div>
@@ -182,11 +191,19 @@
                 <div class="info-label">Tanggal Jatuh Tempo</div>
                 <div class="info-value">{{ \Carbon\Carbon::parse($borrowing->due_date)->format('d F Y') }}</div>
             </div>
+            @if($isReturned && $borrowing->returned_date)
+            <div class="info-row">
+                <div class="info-label">Tanggal Dikembalikan</div>
+                <div class="info-value">{{ \Carbon\Carbon::parse($borrowing->returned_date)->format('d F Y') }}</div>
+            </div>
+            @endif
             <div class="info-row">
                 <div class="info-label">Status</div>
                 <div class="info-value">
                     @if($borrowing->status === 'approved' || $borrowing->status === 'borrowed')
                         <span class="status-badge status-borrowed">✓ Dipinjam</span>
+                    @elseif($borrowing->status === 'pending_return')
+                        <span class="status-badge status-pending-return">⏳ Menunggu Konfirmasi Pengembalian</span>
                     @elseif($borrowing->status === 'returned')
                         <span class="status-badge status-returned">✓ Dikembalikan</span>
                     @endif
@@ -194,8 +211,14 @@
             </div>
             @if($borrowing->approvedBy)
             <div class="info-row">
-                <div class="info-label">Disetujui Oleh</div>
+                <div class="info-label">{{ $isReturned ? 'Dikembalikan ke' : 'Disetujui Oleh' }}</div>
                 <div class="info-value">{{ $borrowing->approvedBy->name }}</div>
+            </div>
+            @endif
+            @if($isReturned && $borrowing->return_reason)
+            <div class="info-row">
+                <div class="info-label">Catatan Pengembalian</div>
+                <div class="info-value">{{ $borrowing->return_reason }}</div>
             </div>
             @endif
         </div>
@@ -204,13 +227,13 @@
     <!-- Signature Section -->
     <div class="signature-section">
         <div class="signature-box">
-            <p>Peminjam</p>
+            <p>{{ $isReturned ? 'Yang Mengembalikan' : 'Peminjam' }}</p>
             <div class="signature-line">
                 {{ $borrowing->user->name }}
             </div>
         </div>
         <div class="signature-box">
-            <p>Petugas yang Menyetujui</p>
+            <p>{{ $isReturned ? 'Petugas Penerima' : 'Petugas yang Menyetujui' }}</p>
             <div class="signature-line">
                 {{ $borrowing->approvedBy->name ?? '_______________' }}
             </div>

@@ -110,12 +110,12 @@
 
                             <!-- User Profile -->
                             <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 rounded-lg transition-all duration-200 group">
-                                <div class="w-10 h-10 bg-gradient-to-br from-ungu to-primarys rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
-                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                </div>
+                                <img src="{{ Auth::user()->avatarUrl() }}"
+                                     alt="{{ Auth::user()->name }}"
+                                     class="w-10 h-10 rounded-lg object-cover shadow-sm flex-shrink-0">
                                 <div class="text-left">
                                     <p class="text-sm font-semibold text-slate-900 group-hover:text-ungu transition-colors leading-tight">{{ Auth::user()->name }}</p>
-                                    <p class="text-xs text-slate-500 leading-tight mt-0.5">  {{ ucfirst(Auth::user()->role) }}</p>
+                                    <p class="text-xs text-slate-500 leading-tight mt-0.5">{{ ucfirst(Auth::user()->role) }}</p>
                                 </div>
                             </a>
                         </div>

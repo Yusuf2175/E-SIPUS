@@ -78,6 +78,13 @@
             font-size: 10px;
             color: #666;
         }
+        .signature-section { margin-top: 50px; width: 100%; }
+        .signature-section table { width: 100%; }
+        .signature-box { text-align: center; padding: 0 20px; }
+        .signature-title { font-size: 11px; color: #333; margin-bottom: 5px; }
+        .signature-place-date { font-size: 10px; color: #666; margin-bottom: 60px; }
+        .signature-line { border-top: 1px solid #333; padding-top: 5px; font-weight: bold; font-size: 11px; }
+        .signature-role { font-size: 10px; color: #666; }
     </style>
 </head>
 <body>
@@ -158,6 +165,31 @@
     <div class="footer">
         <p>Dokumen ini digenerate secara otomatis oleh Sistem Informasi Perpustakaan</p>
         <p>Dicetak pada: {{ now()->format('d/m/Y H:i:s') }}</p>
+    </div>
+
+    <div class="signature-section">
+        <table>
+            <tr>
+                <td class="signature-box" width="33%">
+                    <div class="signature-title">Dibuat Oleh,</div>
+                    <div class="signature-place-date">{{ now()->format('d F Y') }}</div>
+                    <div class="signature-line">{{ $createdBy }}</div>
+                    <div class="signature-role">Petugas / Admin</div>
+                </td>
+                <td class="signature-box" width="33%">
+                    <div class="signature-title">Diperiksa Oleh,</div>
+                    <div class="signature-place-date">{{ now()->format('d F Y') }}</div>
+                    <div class="signature-line">___________________</div>
+                    <div class="signature-role">Kepala Perpustakaan</div>
+                </td>
+                <td class="signature-box" width="33%">
+                    <div class="signature-title">Mengetahui,</div>
+                    <div class="signature-place-date">{{ now()->format('d F Y') }}</div>
+                    <div class="signature-line">___________________</div>
+                    <div class="signature-role">Pimpinan</div>
+                </td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>

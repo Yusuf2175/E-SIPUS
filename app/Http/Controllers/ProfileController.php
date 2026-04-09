@@ -40,11 +40,21 @@ class ProfileController extends Controller
     {
         try {
             $this->profileService->updateProfile($request->user(), $request->validated());
-            
+
             return Redirect::route('profile.edit')->with('status', 'profile-updated');
         } catch (\Exception $e) {
             return Redirect::back()->with('error', 'Failed to update profile: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Hapus avatar user.
+     */
+    public function removeAvatar(Request $request): RedirectResponse
+    {
+        $this->profileService->removeAvatar($request->user());
+
+        return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**
