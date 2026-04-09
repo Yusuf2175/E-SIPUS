@@ -26,6 +26,8 @@ class BookStoreRequest extends FormRequest
             'description' => 'nullable|string',
             'category' => 'required|string|max:255',
             'publisher' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
             'published_year' => 'nullable|integer|min:1000|max:' . date('Y'),
             'total_copies' => 'required|integer|min:1',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'

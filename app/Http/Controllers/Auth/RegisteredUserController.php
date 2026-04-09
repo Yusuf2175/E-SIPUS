@@ -34,20 +34,22 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'address' => ['required', 'string', 'max:500'],
+            'address'  => ['required', 'string', 'max:500'],
+            'province' => ['nullable', 'string', 'max:255'],
+            'city'     => ['nullable', 'string', 'max:255'],
         ]);
 
-        // All new registrations are automatically set to 'user' role
-        // Only admin can change user roles
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name'     => $request->name,
+            'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'user', // Default role for all new registrations
-            'address' => $request->address,
+            'role'     => 'user',
+            'address'  => $request->address,
+            'province' => $request->province,
+            'city'     => $request->city,
         ]);
 
         event(new Registered($user));

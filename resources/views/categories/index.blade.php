@@ -3,11 +3,9 @@
 @section('page-title', 'Category Management')
 
 @section('content')
-    <div class="flex-1 -mt-10">
-        <div class="p-8">
-            <!-- Header -->
-            <div class="mb-8">
-                <div class="flex items-center justify-between mb-3">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-3">
                     <div>
                         <h1 class="text-3xl font-bold text-slate-800">Category Management</h1>
                         <p class="text-slate-600 mt-1">Manage book categories for your library</p>
@@ -112,8 +110,6 @@
                     </div>
                 @endif
             @endif
-        </div>
-    </div>
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

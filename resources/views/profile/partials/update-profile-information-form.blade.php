@@ -75,6 +75,51 @@
             @enderror
         </div>
 
+        {{-- Wilayah: Provinsi & Kab/Kota --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                    Provinsi
+                </label>
+                <select id="prof_province"
+                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-slate-800">
+                    <option value="">-- Pilih Provinsi --</option>
+                </select>
+                <input type="hidden" name="province" id="prof_province_val" value="{{ old('province', $user->province) }}">
+                @error('province')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                    Kabupaten / Kota
+                </label>
+                <select id="prof_city" name="city" disabled
+                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-slate-800 disabled:bg-slate-50 disabled:cursor-not-allowed">
+                    <option value="">-- Pilih Provinsi dulu --</option>
+                </select>
+                @error('city')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+
+        {{-- Info wilayah terdeteksi --}}
+        @if($user->province)
+            <div class="flex items-center gap-2 px-4 py-2.5 bg-purple-50 border border-purple-200 rounded-xl text-sm text-purple-700">
+                <svg class="w-4 h-4 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                Wilayah Anda:
+                <span class="font-semibold">
+                    {{ $user->city ? $user->city . ', ' : '' }}{{ $user->province }}
+                </span>
+                <span class="text-purple-500 text-xs">— digunakan untuk rekomendasi buku terdekat</span>
+            </div>
+        @endif
+
         <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">Current Role</label>
             <div class="flex items-center gap-3">
@@ -128,3 +173,69 @@
         @csrf
     </form>
 </section>
+
+<script>
+(function () {
+    const provSelect = document.getElementById('prof_province');
+    const provVal    = document.getElementById('prof_province_val');
+    const citySelect = document.getElementById('prof_city');
+
+    const savedProvince = @json(old('province', $user->province ?? ''));
+    const savedCity     = @json(old('city', $user->city ?? ''));
+
+    function toTitle(str) {
+        return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    async function loadProvinces() {
+        try {
+            const res  = await fetch('{{ route('wilayah.provinces') }}');
+            const data = await res.json();
+            data.forEach(p => {
+                const opt = new Option(toTitle(p.name), p.id);
+                opt.dataset.name = toTitle(p.name);
+                provSelect.add(opt);
+            });
+            if (savedProvince) {
+                const match = [...provSelect.options].find(o => o.dataset.name === savedProvince);
+                if (match) {
+                    provSelect.value = match.value;
+                    await loadCities(match.value, savedCity);
+                }
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function loadCities(provinceId, restore = '') {
+        citySelect.disabled = true;
+        citySelect.innerHTML = '<option value="">Memuat...</option>';
+        try {
+            const res  = await fetch(`{{ url('api/wilayah/regencies') }}/${provinceId}`);
+            const data = await res.json();
+            citySelect.innerHTML = '<option value="">-- Pilih Kabupaten/Kota --</option>';
+            data.forEach(r => {
+                const name = toTitle(r.name);
+                citySelect.add(new Option(name, name));
+            });
+            citySelect.disabled = false;
+            if (restore) citySelect.value = restore;
+        } catch (e) {
+            citySelect.innerHTML = '<option value="">Gagal memuat</option>';
+        }
+    }
+
+    provSelect.addEventListener('change', function () {
+        const opt = this.options[this.selectedIndex];
+        provVal.value = opt.dataset.name ?? '';
+        if (this.value) {
+            loadCities(this.value);
+        } else {
+            citySelect.disabled = true;
+            citySelect.innerHTML = '<option value="">-- Pilih Provinsi dulu --</option>';
+            provVal.value = '';
+        }
+    });
+
+    loadProvinces();
+})();
+</script>

@@ -11,7 +11,19 @@ class BookUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->isAdmin() || $this->user()->isPetugas();
+        $user = $this->user();
+        $book = $this->route('book');
+
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        if ($user->isPetugas()) {
+            // Petugas hanya boleh update buku dari regionnya
+            return $book->region === $user->province;
+        }
+
+        return false;
     }
 
     /**
@@ -28,6 +40,8 @@ class BookUpdateRequest extends FormRequest
             'description' => 'nullable|string',
             'category' => 'required|string|max:255',
             'publisher' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
             'published_year' => 'nullable|integer|min:1000|max:' . date('Y'),
             'total_copies' => 'required|integer|min:1',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'

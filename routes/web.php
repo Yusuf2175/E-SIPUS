@@ -5,7 +5,14 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\PetugasDashboardController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
+
+// Wilayah API proxy (cached, no auth needed for dropdown)
+Route::prefix('api/wilayah')->name('wilayah.')->group(function () {
+    Route::get('/provinces', [WilayahController::class, 'provinces'])->name('provinces');
+    Route::get('/regencies/{provinceId}', [WilayahController::class, 'regencies'])->name('regencies');
+});
 
 Route::get('/', [LandingController::class, 'index'])->name('landingPage');  
 

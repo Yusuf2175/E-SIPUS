@@ -3,13 +3,11 @@
 @section('page-title', 'Reviews & Ratings')
 
 @section('content')
-    <div class="flex-1 -mt-10">
-        <div class="p-8">
-            <!-- Header -->
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-slate-800 mb-2">User Feedback Management</h1>
-                <p class="text-slate-600">Monitor and manage book reviews from library members</p>
-            </div>
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-800 mb-2">User Feedback Management</h1>
+        <p class="text-slate-600">Monitor and manage book reviews from library members</p>
+    </div>
 
             <!-- Statistics Cards (Admin & Petugas Only) -->
             @if($stats)
@@ -264,8 +262,6 @@
                     {{ $reviews->links() }}
                 </div>
             @endif
-        </div>
-    </div>
 
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

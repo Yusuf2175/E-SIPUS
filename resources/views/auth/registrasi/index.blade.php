@@ -99,6 +99,29 @@
                             @enderror
                         </div>
 
+                        <!-- Provinsi -->
+                        <div>
+                            <select id="reg_province" 
+                                    class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-slate-900 text-sm">
+                                <option value="">-- Pilih Provinsi --</option>
+                            </select>
+                            <input type="hidden" name="province" id="reg_province_val" value="{{ old('province') }}">
+                            @error('province')
+                                <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Kabupaten / Kota -->
+                        <div>
+                            <select id="reg_city" name="city" disabled
+                                    class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-slate-900 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                <option value="">-- Pilih Provinsi dulu --</option>
+                            </select>
+                            @error('city')
+                                <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
                         <!-- Password -->
                         <div>
                             <div class="relative">
@@ -174,6 +197,70 @@
             </div>
         </div>
     </div>
+
+<script>
+    const regProvince = document.getElementById('reg_province');
+    const regProvinceVal = document.getElementById('reg_province_val');
+    const regCity = document.getElementById('reg_city');
+
+    const oldProvince = @json(old('province', ''));
+    const oldCity     = @json(old('city', ''));
+
+    function toTitle(str) {
+        return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    async function loadRegProvinces() {
+        try {
+            const res  = await fetch('{{ route('wilayah.provinces') }}');
+            const data = await res.json();
+            data.forEach(p => {
+                const opt = new Option(toTitle(p.name), p.id);
+                opt.dataset.name = toTitle(p.name);
+                regProvince.add(opt);
+            });
+            if (oldProvince) {
+                const match = [...regProvince.options].find(o => o.dataset.name === oldProvince);
+                if (match) {
+                    regProvince.value = match.value;
+                    regProvinceVal.value = oldProvince;
+                    await loadRegCities(match.value, oldCity);
+                }
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function loadRegCities(provinceId, restore = '') {
+        regCity.disabled = true;
+        regCity.innerHTML = '<option value="">Memuat...</option>';
+        try {
+            const res  = await fetch(`{{ url('api/wilayah/regencies') }}/${provinceId}`);
+            const data = await res.json();
+            regCity.innerHTML = '<option value="">-- Pilih Kabupaten/Kota --</option>';
+            data.forEach(r => {
+                const name = toTitle(r.name);
+                regCity.add(new Option(name, name));
+            });
+            regCity.disabled = false;
+            if (restore) regCity.value = restore;
+        } catch (e) {
+            regCity.innerHTML = '<option value="">Gagal memuat</option>';
+        }
+    }
+
+    regProvince.addEventListener('change', function () {
+        const opt = this.options[this.selectedIndex];
+        regProvinceVal.value = opt.dataset.name ?? '';
+        if (this.value) {
+            loadRegCities(this.value);
+        } else {
+            regCity.disabled = true;
+            regCity.innerHTML = '<option value="">-- Pilih Provinsi dulu --</option>';
+        }
+    });
+
+    loadRegProvinces();
+</script>
 
 </body>
 </html>

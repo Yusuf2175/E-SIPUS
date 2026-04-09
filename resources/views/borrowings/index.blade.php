@@ -3,12 +3,10 @@
 @section('page-title', 'Borrowing Management')
 
 @section('content')
-<div class="flex-1 -mt-10">
-    <div class="p-8">
-        <!-- Header -->
-        <div class="mb-8">
-            <div class="flex items-center gap-4 mb-3">
-                <div>
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center gap-4 mb-3">
+            <div>
                     <h1 class="text-3xl font-bold text-slate-800">
                         {{ Auth::user()->role === 'user' ? 'Borrowing History' : 'Borrowing Records' }}
                     </h1>
@@ -460,8 +458,6 @@
                 {{ $borrowings->appends(request()->query())->links() }}
             </div>
         @endif
-    </div>
-</div>
 
 <x-borrowing-alert />
 

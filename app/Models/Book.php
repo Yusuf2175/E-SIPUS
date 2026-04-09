@@ -18,6 +18,8 @@ class Book extends Model
         'description',
         'category',
         'publisher',
+        'region',
+        'city',
         'published_year',
         'total_copies',
         'available_copies',

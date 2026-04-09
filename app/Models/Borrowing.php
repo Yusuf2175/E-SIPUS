@@ -28,13 +28,13 @@ class Borrowing extends Model
     ];
 
     protected $casts = [
-        'borrowed_date' => 'date',
-        'due_date' => 'date',
-        'returned_date' => 'date',
-        'approved_at' => 'datetime',
+        'borrowed_date'       => 'date',
+        'due_date'            => 'date',
+        'returned_date'       => 'date',
+        'approved_at'         => 'datetime',
         'return_requested_at' => 'datetime',
-        'hidden_at' => 'datetime',
-        'hidden_by_user' => 'boolean'
+        'hidden_at'           => 'datetime',
+        'hidden_by_user'      => 'boolean',
     ];
 
     public function user(): BelongsTo

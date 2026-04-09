@@ -6,19 +6,19 @@ use App\Models\Book;
 use App\Http\Requests\BookStoreRequest;
 use App\Http\Requests\BookUpdateRequest;
 use App\Services\BookService;
+use App\Services\LibraryLocationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
     protected $bookService;
+    protected $locationService;
 
-    /**
-     * Create a new controller instance.
-     */
-    public function __construct(BookService $bookService)
+    public function __construct(BookService $bookService, LibraryLocationService $locationService)
     {
         $this->bookService = $bookService;
+        $this->locationService = $locationService;
     }
 
     /**
@@ -26,11 +26,24 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        $filters = $request->only(['category', 'search', 'available', 'added_by']);
-        $books = $this->bookService->getFilteredBooks($filters, 12);
-        $categories = $this->bookService->getCategoryNames();
-        
-        return view('books.index', compact('books', 'categories'));
+        $filters = $request->only(['category', 'search', 'available', 'added_by', 'region']);
+
+        // Ambil provinsi user langsung dari kolom province
+        $userProvince    = null;
+        $nearbyProvinces = [];
+
+        if (Auth::check()) {
+            $userProvince = Auth::user()->province;
+            $nearbyProvinces = $userProvince
+                ? $this->locationService->getNeighborProvinces($userProvince)
+                : [];
+        }
+
+        $books       = $this->bookService->getFilteredBooks($filters, 12, $userProvince, $nearbyProvinces);
+        $categories  = $this->bookService->getCategoryNames();
+        $allProvinces = $this->locationService->getProvinces();
+
+        return view('books.index', compact('books', 'categories', 'userProvince', 'nearbyProvinces', 'allProvinces'));
     }
 
     /**
@@ -38,8 +51,14 @@ class BookController extends Controller
      */
     public function create()
     {
-        $categories = $this->bookService->getCategories();
-        return view('books.create', compact('categories'));
+        $categories  = $this->bookService->getCategories();
+        $user        = Auth::user();
+
+        // Petugas: region dikunci ke provinsi mereka
+        $lockedRegion = $user->isPetugas() ? $user->province : null;
+        $lockedCity   = $user->isPetugas() ? $user->city : null;
+
+        return view('books.create', compact('categories', 'lockedRegion', 'lockedCity'));
     }
 
     /**
@@ -66,8 +85,17 @@ class BookController extends Controller
     public function store(BookStoreRequest $request)
     {
         try {
-            $this->bookService->createBook($request->validated(), Auth::id());
-            
+            $data = $request->validated();
+
+            // Petugas: paksa region sesuai provinsi mereka, abaikan input
+            $user = Auth::user();
+            if ($user->isPetugas()) {
+                $data['region'] = $user->province;
+                $data['city']   = $user->city;
+            }
+
+            $this->bookService->createBook($data, $user->id);
+
             return redirect()->route('books.index')->with('success', 'Book added successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to add book: ' . $e->getMessage())->withInput();
@@ -79,8 +107,19 @@ class BookController extends Controller
      */
     public function edit(Book $book)
     {
-        $categories = $this->bookService->getCategories();
-        return view('books.edit', compact('book', 'categories'));
+        $user = Auth::user();
+
+        // Petugas hanya bisa edit buku dari regionnya sendiri
+        if ($user->isPetugas() && $book->region !== $user->province) {
+            return redirect()->route('books.index')
+                ->with('error', 'Anda hanya dapat mengedit buku dari wilayah ' . $user->province . '.');
+        }
+
+        $categories   = $this->bookService->getCategories();
+        $lockedRegion = $user->isPetugas() ? $user->province : null;
+        $lockedCity   = $user->isPetugas() ? $user->city : null;
+
+        return view('books.edit', compact('book', 'categories', 'lockedRegion', 'lockedCity'));
     }
 
     /**
@@ -89,8 +128,17 @@ class BookController extends Controller
     public function update(BookUpdateRequest $request, Book $book)
     {
         try {
-            $this->bookService->updateBook($book, $request->validated());
-            
+            $data = $request->validated();
+            $user = Auth::user();
+
+            // Petugas: paksa region tetap sesuai provinsinya
+            if ($user->isPetugas()) {
+                $data['region'] = $user->province;
+                $data['city']   = $user->city;
+            }
+
+            $this->bookService->updateBook($book, $data);
+
             return redirect()->route('books.index')->with('success', 'Book updated successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to update book: ' . $e->getMessage())->withInput();

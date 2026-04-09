@@ -25,8 +25,8 @@
         <!-- Main Content -->
         <div class="flex-1 ml-64">
             <!-- Top Bar -->
-            <aside class="px-8 py-3 sticky top-0 z-30">
-                <header class="bg-white/70 backdrop-blur-sm rounded-xl shadow-sm border-2 border-slate-200">
+            <aside class="px-8 py-3 sticky top-0 z-30 bg-slate-50">
+                <header class="bg-white rounded-xl shadow-sm border-2 border-slate-200">
                     <div class="flex items-center justify-between gap-8 px-4 py-2">
                         
                         <!-- Search Bar -->

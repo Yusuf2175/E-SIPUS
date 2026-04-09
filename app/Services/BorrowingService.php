@@ -18,10 +18,8 @@ class BorrowingService
     {
         $query = Borrowing::with(['book', 'user', 'approvedBy']);
         
-        // Apply role-based filtering
         $this->applyRoleFilter($query, $user);
         
-        // Apply status filter
         if ($status) {
             $this->applyStatusFilter($query, $status);
         }
@@ -102,19 +100,16 @@ class BorrowingService
     {
         $book = Book::findOrFail($bookId);
 
-        // Check for existing borrowing
         $this->validateNoDuplicateBorrowing($userId, $bookId);
-        
-        // Check borrowing limit
         $this->validateBorrowingLimit($userId);
 
         return Borrowing::create([
-            'user_id' => $userId,
-            'book_id' => $book->id,
+            'user_id'       => $userId,
+            'book_id'       => $book->id,
             'borrowed_date' => Carbon::now()->toDateString(),
-            'due_date' => Carbon::now()->addDays(14)->toDateString(),
-            'status' => 'pending',
-            'notes' => $notes
+            'due_date'      => Carbon::now()->addDays(14)->toDateString(),
+            'status'        => 'pending',
+            'notes'         => $notes,
         ]);
     }
 
