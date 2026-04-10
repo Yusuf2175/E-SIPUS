@@ -125,18 +125,7 @@
                                     <p class="text-sm text-slate-500 mb-1">Penerbit</p>
                                     <p class="font-semibold text-slate-800">{{ $book->publisher ?? '-' }}</p>
                                 </div>
-                                <div>
-                                    <p class="text-sm text-slate-500 mb-1">Wilayah / Region</p>
-                                    <p class="font-semibold text-slate-800">
-                                        @if($book->city && $book->region)
-                                            {{ $book->city }}, {{ $book->region }}
-                                        @elseif($book->region)
-                                            {{ $book->region }}
-                                        @else
-                                            -
-                                        @endif
-                                    </p>
-                                </div>
+
                                 <div>
                                     <p class="text-sm text-slate-500 mb-1">Tahun Terbit</p>
                                     <p class="font-semibold text-slate-800">{{ $book->published_year ?? '-' }}</p>
